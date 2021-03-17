@@ -1,0 +1,2 @@
+public class Fias {
+}
