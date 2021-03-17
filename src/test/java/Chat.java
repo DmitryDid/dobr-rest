@@ -7,15 +7,33 @@ public class Chat extends TestBase {
 
     // /api/v{version}/Chat/company/{companyId}
     @Test
-    public void name() {
-        String companyId = "7";
+    public void getChatCompanyById() {
+        String id = "7";
 
         Response response = given()
                 .spec(baseSpec)
                 .header("Authorization", "Bearer " + getToken())
                 .log().all()
                 .when()
-                .get("Chat/company/" + companyId)
+                .get("Chat/company/" + id)
+                .then()
+                .statusCode(200)
+                .extract()
+                .response();
+
+        toConsole(response);
+    }
+
+    @Test
+    public void getChatUserById() {
+        String id = "24";
+
+        Response response = given()
+                .spec(baseSpec)
+                .header("Authorization", "Bearer " + getToken())
+                .log().all()
+                .when()
+                .get("Chat/user/" + id)
                 .then()
                 .statusCode(200)
                 .extract()

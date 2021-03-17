@@ -25,11 +25,9 @@ public class User extends TestBase {
     }
 
     // /api/v1/user/5
-
     @Test
     public void putUserById() {
         String id = "22";
-
         Response response = given()
                 .spec(multiDataSpec)
                 .header("Authorization", "Bearer " + getToken())
@@ -42,6 +40,82 @@ public class User extends TestBase {
                 .multiPart("Longitude", 0)
                 .when()
                 .put("User/" + id)
+                .then()
+                .statusCode(200)
+                .extract()
+                .response();
+
+        toConsole(response);
+    }
+
+    // /api/v{version}/User/{id}/favorite/{favoriteId}
+    @Test
+    public void deleteUserFavorite() {
+        String userId = "22";
+        String favoriteId = "1";
+        Response response = given()
+                .spec(baseSpec)
+                .header("Authorization", "Bearer " + getToken())
+                .log().all()
+                .when()
+                .delete("User/" + userId + "/favorite/" + favoriteId)
+                .then()
+                .statusCode(200)
+                .extract()
+                .response();
+
+        toConsole(response);
+    }
+
+    // /api/v{version}/User/{id}/favorite
+    @Test
+    public void getUserFavorite() {
+        String id = "22";
+        Response response = given()
+                .spec(baseSpec)
+                .header("Authorization", "Bearer " + getToken())
+                .log().all()
+                .when()
+                .get("User/" + id + "/favorite")
+                .then()
+                .statusCode(200)
+                .extract()
+                .response();
+
+        toConsole(response);
+    }
+
+    // /api/v{version}/User/{id}/stories
+    @Test
+    public void getUserStories() {
+        String id = "22";
+        Response response = given()
+                .spec(baseSpec)
+                .header("Authorization", "Bearer " + getToken())
+                .log().all()
+                .when()
+                .get("User/" + id + "/stories")
+                .then()
+                .statusCode(200)
+                .extract()
+                .response();
+
+        toConsole(response);
+    }
+
+    // /api/v{version}/User/{id}/favorite/{favoriteId}
+    @Test
+    public void putUserFavorite() {
+        String id = "22";
+        String favoriteId = "3";
+
+
+        Response response = given()
+                .spec(baseSpec)
+                .header("Authorization", "Bearer " + getToken())
+                .log().uri()
+                .when()
+                .put("User/" + id + "/favorite/" + favoriteId)
                 .then()
                 .statusCode(200)
                 .extract()

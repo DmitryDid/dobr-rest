@@ -72,4 +72,40 @@ public class Company extends TestBase {
 
         toConsole(response);
     }
+
+    // /api/v{version}/Company/{id}/offer
+    @Test
+    public void getCompanyOffer() {
+        String id = "5";
+
+        Response response = given()
+                .spec(baseSpec)
+                .log().all()
+                .when()
+                .get("Company/" + id + "/offer")
+                .then()
+                .statusCode(200)
+                .extract()
+                .response();
+
+        toConsole(response);
+    }
+
+    // /api/v{version}/Company/{id}
+    @Test
+    public void getCompanyById() {
+        String id = "5";
+
+        Response response = given()
+                .spec(baseSpec)
+                .log().all()
+                .when()
+                .get("Company/" + id)
+                .then()
+                .statusCode(200)
+                .extract()
+                .response();
+
+        toConsole(response);
+    }
 }
