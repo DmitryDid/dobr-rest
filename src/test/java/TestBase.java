@@ -16,6 +16,10 @@ public class TestBase {
             .setContentType(ContentType.JSON)
             .build();
 
+    RequestSpecification multiDataSpec = new RequestSpecBuilder()
+            .setBaseUri(baseURL)
+            .build();
+
     protected void toConsole(Object object) {
         String response = "не удалось получить тело ответа";
         if (object instanceof Response) {
