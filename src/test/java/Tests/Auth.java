@@ -1,5 +1,6 @@
+package Tests;
+
 import io.restassured.response.Response;
-import org.json.JSONObject;
 import org.junit.Test;
 
 import static io.restassured.RestAssured.given;
