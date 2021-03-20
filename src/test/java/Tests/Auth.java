@@ -1,9 +1,11 @@
 package Tests;
 
 import io.restassured.response.Response;
+import org.json.JSONObject;
 import org.junit.Test;
 
 import static io.restassured.RestAssured.given;
+import static org.junit.Assert.*;
 
 public class Auth extends TestBase {
 
@@ -15,20 +17,25 @@ public class Auth extends TestBase {
                 .spec(baseSpec)
                 .log().all()
                 .when()
-                .post("auth/token/user/" + userid)
+                .post("Auth/token/user/" + userid)
                 .then()
                 .statusCode(200)
                 .extract()
                 .response();
 
         toConsole(response);
+
+        String token = (String) new JSONObject(response.asString()).get("access_token");
+
+        assertNotNull(token);
+        assertTrue(token.length() > 0);
     }
 
     // /api/v{version}/Auth/company
     @Test
-    public void gettingTokenOnUserData() {
-        String username = "будьдобр";
-        String password = "1234";
+    public void gettingTokenForCompany() {
+        String username = "bagdasarjan.cft@gmail.com"; // email
+        String password = "lavash5";                    // password
 
         Response response = given()
                 .spec(baseSpec)
@@ -43,8 +50,12 @@ public class Auth extends TestBase {
                 .statusCode(200)
                 .extract()
                 .response();
-
         toConsole(response);
+
+        String token = (String) new JSONObject(response.asString()).get("access_token");
+
+        assertNotNull(token);
+        assertTrue(token.length() > 0);
     }
 
     // /api/v{version}/Auth/token/company/{playerId}
@@ -60,16 +71,21 @@ public class Auth extends TestBase {
                 .statusCode(200)
                 .extract()
                 .response();
-
         toConsole(response);
+
+        String token = (String) new JSONObject(response.asString()).get("access_token");
+
+        assertNotNull(token);
+        assertTrue(token.length() > 0);
     }
 
     // /api/v{version}/Auth/refresh-token
     @Test
     public void getRefreshToken() {
+        String token = getToken();
         Response response = given()
                 .spec(baseSpec)
-                .header("Authorization", "Bearer " + getToken())
+                .header("Authorization", "Bearer " + token)
                 .log().all()
                 .when()
                 .get("Auth/refresh-token")
@@ -77,7 +93,11 @@ public class Auth extends TestBase {
                 .statusCode(200)
                 .extract()
                 .response();
-
         toConsole(response);
+
+        String refreshToken = (String) new JSONObject(response.asString()).get("access_token");
+
+        assertEquals(token.length(), refreshToken.length());
+        assertNotEquals(token, refreshToken);
     }
 }

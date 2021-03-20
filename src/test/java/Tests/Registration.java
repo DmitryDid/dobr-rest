@@ -7,11 +7,12 @@ import static io.restassured.RestAssured.given;
 
 public class Registration extends TestBase {
 
+    String email = "nsk_dem@mail.ru";
+    String code = "3733"; // придет на почту.
+
     // /api/v{version}/Registration/email-acceptance
     @Test
     public void emailAcceptance() {
-        String email = "email@mail.ru";
-        String code = "1234";
         Response response = given()
                 .spec(baseSpec)
                 .header("Authorization", "Bearer " + getToken())
@@ -33,7 +34,6 @@ public class Registration extends TestBase {
     // /api/v{version}/Registration/email-confirmation
     @Test
     public void emailConfirmation() {
-        String email = "email@mail.ru";
         Response response = given()
                 .spec(baseSpec)
                 .header("Authorization", "Bearer " + getToken())

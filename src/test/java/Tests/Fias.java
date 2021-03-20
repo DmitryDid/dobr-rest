@@ -10,7 +10,7 @@ public class Fias extends TestBase {
     // /api/v{version}/Fias/address/{text}
     @Test
     public void getFiasAddressText() {
-        String text = "text";
+        String text = "test_address";
         Response response = given()
                 .spec(baseSpec)
                 .header("Authorization", "Bearer " + getToken())
@@ -21,25 +21,22 @@ public class Fias extends TestBase {
                 .statusCode(200)
                 .extract()
                 .response();
-
         toConsole(response);
     }
 
     // /api/v{version}/Fias/inn/{inn}
     @Test
     public void getFiasInn() {
-        String inn = "text";
         Response response = given()
                 .spec(baseSpec)
                 .header("Authorization", "Bearer " + getToken())
                 .log().all()
                 .when()
-                .get("Fias/inn/" + inn)
+                .get("Fias/inn/" + "6240283167")
                 .then()
                 .statusCode(200)
                 .extract()
                 .response();
-
         toConsole(response);
     }
 }
