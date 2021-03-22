@@ -8,6 +8,11 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.json.JSONObject;
 import org.junit.Before;
+import org.junit.Test;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.config.EncoderConfig.encoderConfig;
@@ -62,6 +67,17 @@ public class TestBase {
         return (String) new JSONObject(response.body().asString()).get("access_token");
     }
 
+    public String getToken(String playerId) {
+        Response response = given()
+                .spec(baseSpec)
+                .when()
+                .post("auth/token/user/" + playerId)
+                .then()
+                .statusCode(200)
+                .extract().response();
+        return (String) new JSONObject(response.body().asString()).get("access_token");
+    }
+
     @Before
     public void init() {
         if (accessToken == null) {
@@ -82,5 +98,20 @@ public class TestBase {
         int end = number.length();
         int start = end - length;
         return number.substring(start, end);
+    }
+
+    // "2021-03-22T12:59:18.9914025Z" для примера разбора строки в дату
+    protected Date getDate(String stringDate) {
+        SimpleDateFormat format = new SimpleDateFormat();
+        format.applyPattern("yyyy-MM-dd'T'HH:mm:ss");
+        Date date;
+        try {
+            String s = stringDate.substring(0, 19);
+            date = format.parse(s);
+            return date;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
