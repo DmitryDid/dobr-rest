@@ -1,6 +1,7 @@
 package Tests;
 
 import io.restassured.response.Response;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static io.restassured.RestAssured.given;
@@ -11,6 +12,7 @@ public class Registration extends TestBase {
     String code = "3733"; // придет на почту.
 
     // /api/v{version}/Registration/email-acceptance
+    @Ignore // подтверждение приходит на почту
     @Test
     public void emailAcceptance() {
         Response response = given()
@@ -27,7 +29,6 @@ public class Registration extends TestBase {
                 .statusCode(200)
                 .extract()
                 .response();
-
         toConsole(response);
     }
 
