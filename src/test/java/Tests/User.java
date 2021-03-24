@@ -12,6 +12,39 @@ import static org.junit.Assert.*;
 
 public class User extends TestBase {
 
+    // POST /api/v{version}/User
+    @Test
+    public void postUser() {
+        String id = "22";
+        String name = "Did";
+        boolean isMan = true;
+        String playerId = UUID.randomUUID().toString();
+        String birthYear = "1986-07-10T12:59:18.99";
+        String fileName = "hacker.jpg";
+        File image = new File("src/test/java/Resources/" + fileName);
+        String latitude = "55.0415000";
+        String longitude = "82.9346000";
+
+        Response response = given()
+                .spec(multiDataSpec)
+                //.header("Authorization", "Bearer " + getToken())
+                .log().all()
+                .formParam("name", name)
+                .formParam("isMan", isMan)
+                .formParam("playerId", playerId)
+                .formParam("BirthYear", birthYear)
+                .formParam("latitude", latitude)
+                .formParam("longitude", longitude)
+                .multiPart("image", image)
+                .when()
+                .post("User")
+                .then()
+                .statusCode(200)
+                .extract()
+                .response();
+        toConsole(response);
+    }
+
     // /api/v{version}/User/{id}/image
     @Test
     public void getUserImageById() {
@@ -26,7 +59,6 @@ public class User extends TestBase {
                 .statusCode(200)
                 .extract()
                 .response();
-
         toConsole(response);
     }
 
@@ -46,24 +78,7 @@ public class User extends TestBase {
         toConsole(response);
     }
 
-    // GET /api/v{version}/User/{id}
-    @Test
-    public void getUserById() {
-        int userId = 22;
-        Response response = given()
-                .spec(baseSpec)
-                .header("Authorization", "Bearer " + getToken())
-                .log().all()
-                .when()
-                .get("User/" + userId)
-                .then()
-                .statusCode(200)
-                .extract()
-                .response();
-        toConsole(response);
-    }
-
-    // /api/v1/user/5
+    // PUT /api/v{version}/User/{id}   пересмотреть весь тест
     @Test
     public void putUserById() {
         String id = "22";
@@ -75,6 +90,7 @@ public class User extends TestBase {
         File image = new File("src/test/java/Resources/" + fileName);
         String latitude = "55.0415000";
         String longitude = "82.9346000";
+
         Response response = given()
                 .spec(multiDataSpec)
                 .header("Authorization", "Bearer " + getToken())
@@ -106,6 +122,39 @@ public class User extends TestBase {
         assertEquals(birthYear, user.get("birthYear"));
         assertEquals(playerId, user.get("playerId"));
         assertTrue(user.get("avatarName").toString().contains(fileName));  // ошибка
+
+        // GET /api/v{version}/User/{id}
+        Response getResponse = given()
+                .spec(baseSpec)
+                .header("Authorization", "Bearer " + getToken())
+                .log().all()
+                .when()
+                .get("User/" + id)
+                .then()
+                .statusCode(200)
+                .extract()
+                .response();
+        toConsole(getResponse);
+
+        JSONObject jsonObject = new JSONObject(response.asString());
+
+        assertEquals("Success", jsonObject.getString("status"));
+        assertEquals("bearer", jsonObject.getString("token_type"));
+        assertNotNull(jsonObject.getString("access_token"));
+
+        user = jsonObject.getJSONObject("user");
+
+        assertEquals(id, user.get("id"));
+        assertEquals("Did", user.get("name"));
+        assertEquals(true, user.get("isMan"));
+        assertEquals(true, user.get("isMan"));
+        assertEquals(55.0415, user.get("latitude"));
+        assertEquals(82.9346, user.get("longitude"));
+        assertEquals("1986-07-10T12:59:18.99", user.get("birthYear"));
+        assertEquals("", user.get("avatarName")); // предположительно бага
+        assertEquals("3af5b06b-7e51-4056-9704-976a727de7ee", user.get("playerId")); // предположительно бага
+
+
     }
 
     // /api/v{version}/User/{id}/favorite/{favoriteId}

@@ -1,6 +1,7 @@
 package Tests;
 
 import io.restassured.response.Response;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Test;
 
@@ -9,20 +10,18 @@ import static org.junit.Assert.*;
 
 public class Auth extends TestBase {
 
-    // /api/v{version}/Auth/token/user/{playerId}
+    // POST /api/v{version}/Auth/token/user/{playerId}
     @Test
-    public void getTokenForUser() {
-        String userid = "aee5c185-29b8-4d4c-a4bf-d7641aefc556";
+    public void getTokenUserByPlayerId() {
         Response response = given()
                 .spec(baseSpec)
                 .log().all()
                 .when()
-                .post("Auth/token/user/" + userid)
+                .post("Auth/token/user/" + playerId)
                 .then()
                 .statusCode(200)
                 .extract()
                 .response();
-
         toConsole(response);
 
         String token = (String) new JSONObject(response.asString()).get("access_token");
@@ -31,13 +30,23 @@ public class Auth extends TestBase {
         assertTrue(token.length() > 0);
     }
 
-    // /api/v{version}/Auth/company
+    // POST /api/v{version}/Auth/company
     @Test
-    public void gettingTokenForCompany() {
-        String username = "bagdasarjan.cft@gmail.com"; // email
-        String password = "lavash5";                    // password
+    public void getCompanyTokenByUsernameAndPassword() {
+        Response getResponse = given()
+                .spec(baseSpec)
+                .header("Authorization", "Bearer " + getToken())
+                .when()
+                .get("Company")
+                .then()
+                .statusCode(200)
+                .extract().response();
 
-        Response response = given()
+        JSONObject jsonObject = new JSONArray(getResponse.asString()).getJSONObject(0);
+        String username = jsonObject.getString("email");
+        String password = jsonObject.getString("password");
+
+        Response postResponse = given()
                 .spec(baseSpec)
                 .body("{\n" +
                         "  \"username\": \"" + username + "\",\n" +
@@ -50,18 +59,28 @@ public class Auth extends TestBase {
                 .statusCode(200)
                 .extract()
                 .response();
-        toConsole(response);
+        toConsole(postResponse);
 
-        String token = (String) new JSONObject(response.asString()).get("access_token");
+        String token = (String) new JSONObject(postResponse.asString()).get("access_token");
 
         assertNotNull(token);
         assertTrue(token.length() > 0);
     }
 
-    // /api/v{version}/Auth/token/company/{playerId}
+    // POST /api/v{version}/Auth/token/company/{playerId}
     @Test
-    public void getTokenForPlayer() {
-        String playerId = "5653c463-de6e-4ab1-b418-3c43814b9e0a";
+    public void getTokenForCompanyPlayer() {
+        Response getResponse = given()
+                .spec(baseSpec)
+                .header("Authorization", "Bearer " + getToken())
+                .when()
+                .get("Company")
+                .then()
+                .statusCode(200)
+                .extract().response();
+
+        String playerId = new JSONArray(getResponse.asString()).getJSONObject(0).getString("playerId");
+
         Response response = given()
                 .spec(baseSpec)
                 .log().all()
