@@ -5,14 +5,14 @@ import org.junit.Test;
 
 import static io.restassured.RestAssured.given;
 
-public class Offer extends TestBase {
+public class OfferTest extends TestBase {
 
     // /api/v1/offer/top
     @Test
     public void getOfferTop() {
         Response response = given()
                 .spec(baseSpec)
-                .header("Authorization", "Bearer " + getToken())
+                .header("Authorization", "Bearer " + auth.getToken())
                 .log().all()
                 .when()
                 .get("Offer/top")

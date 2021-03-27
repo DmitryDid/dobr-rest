@@ -10,7 +10,7 @@ import java.util.Date;
 import static io.restassured.RestAssured.given;
 import static org.junit.Assert.*;
 
-public class Chat extends TestBase {
+public class ChatTest extends TestBase {
 
     // GET /api/v{version}/Chat/user/{userId}
     @Test
@@ -18,7 +18,7 @@ public class Chat extends TestBase {
         String userId = "15";
         Response response = given()
                 .spec(baseSpec)
-                .header("Authorization", "Bearer " + getToken())
+                .header("Authorization", "Bearer " + auth.getToken())
                 .log().uri().log().method()
                 .when()
                 .get("Chat/user/" + userId)
@@ -70,7 +70,7 @@ public class Chat extends TestBase {
         String companyId = "5";
         Response response = given()
                 .spec(baseSpec)
-                .header("Authorization", "Bearer " + getToken())
+                .header("Authorization", "Bearer " + auth.getToken())
                 .log().uri().log().method()
                 .when()
                 .get("Chat/company/" + companyId)
@@ -110,7 +110,7 @@ public class Chat extends TestBase {
     // GET /api/v{version}/Chat/message
     @Test
     public void getChatMessage() {
-        String token = getToken();
+        String token = auth.getToken();
         Response response = given()
                 .spec(baseSpec)
                 .header("Authorization", "Bearer " + token)
@@ -133,7 +133,7 @@ public class Chat extends TestBase {
         boolean isUserMessage = true;
         Response response = given()
                 .spec(baseSpec)
-                .header("Authorization", "Bearer " + getToken())
+                .header("Authorization", "Bearer " + auth.getToken())
                 .body("{\n" +
                         "  \"text\": \"" + text + "\",\n" +
                         "  \"companyId\": " + companyId + ",\n" +

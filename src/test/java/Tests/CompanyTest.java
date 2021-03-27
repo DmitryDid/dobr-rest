@@ -14,7 +14,7 @@ import static io.restassured.RestAssured.given;
 import static io.restassured.config.EncoderConfig.encoderConfig;
 import static org.junit.Assert.*;
 
-public class Company extends TestBase {
+public class CompanyTest extends TestBase {
 
     @Test
     public void deleteCompanyCascade() {
@@ -132,6 +132,7 @@ public class Company extends TestBase {
     public void getCompanyAll() {
         Response response = given()
                 .spec(baseSpec)
+                .header("Authorization", "Bearer " + auth.getToken())
                 .log().all()
                 .when()
                 .get("Company")
@@ -145,23 +146,25 @@ public class Company extends TestBase {
         assertTrue(jsonArray.length() > 0);
 
         for (int i = 0; i < jsonArray.length(); i++) {
-            JSONObject jsonObject = jsonArray.getJSONObject(i);
-            assertNotNull(jsonObject.get("id"));
-            assertNotNull(jsonObject.get("latitude"));
-            assertNotNull(jsonObject.get("longitude"));
-            assertNotNull(jsonObject.get("nameOfficial"));
-            assertNotNull(jsonObject.get("name"));
-            assertNotNull(jsonObject.get("representative"));
-            assertNotNull(jsonObject.get("phone"));
-            assertNotNull(jsonObject.get("email"));
-            assertNotNull(jsonObject.get("inn"));
-            assertNotNull(jsonObject.get("password"));
-            assertNotNull(jsonObject.get("address"));
-            assertNotNull(jsonObject.get("timeOfWork"));
-            assertNotNull(jsonObject.get("emailConfirmed"));
-            assertNotNull(jsonObject.get("playerId"));
-            assertNotNull(jsonObject.get("productCategory"));
-            assertNotNull(jsonObject.get("avatarName"));
+            if (jsonArray.getJSONObject(i).getString("name").equals("test_company_name")) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                assertEquals(1, jsonObject.get("id"));
+                assertEquals("55.0415", jsonObject.get("latitude").toString());
+                assertEquals("82.9346", jsonObject.get("longitude").toString());
+                assertEquals("test_company nameOfficial", jsonObject.get("nameOfficial"));
+                assertEquals("test_company_representative", jsonObject.get("representative"));
+                assertTrue(Integer.parseInt(jsonObject.getString("phone")) > 0);
+                assertTrue(jsonObject.getString("email").contains("@mail.ru"));
+                assertEquals(10, jsonObject.getString("inn").length());
+                assertEquals("test_company_password", jsonObject.get("password"));
+                assertEquals("test_company_address", jsonObject.get("address"));
+                assertEquals("8-22", jsonObject.get("timeOfWork"));
+                assertFalse(jsonObject.getBoolean("emailConfirmed"));
+                assertTrue(jsonObject.getString("playerId").length() > 20);
+                assertEquals(1, jsonObject.getJSONObject("productCategory").get("id"));
+                assertEquals(3, jsonObject.get("imageId"));
+                assertEquals("null", jsonObject.get("image").toString());
+            }
         }
     }
 

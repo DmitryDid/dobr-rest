@@ -7,7 +7,7 @@ import java.io.File;
 
 import static io.restassured.RestAssured.given;
 
-public class ProductCategory extends TestBase {
+public class ProductCategoryTest extends TestBase {
 
     // POST /api/v{version}/ProductCategory
     @Test
@@ -21,7 +21,7 @@ public class ProductCategory extends TestBase {
         Response postResponse = given()
                 .spec(multiDataSpec)
                 .log().all()
-                .header("Authorization", "Bearer " + getToken())
+                .header("Authorization", "Bearer " + auth.getToken())
                 .formParam("name", name)
                 .formParam("ageLimit", ageLimit)
                 .multiPart("image", image)
@@ -39,7 +39,7 @@ public class ProductCategory extends TestBase {
     public void getProductCategoryAll() {
         Response postResponse = given()
                 .spec(baseSpec)
-                .header("Authorization", "Bearer " + getToken())
+                .header("Authorization", "Bearer " + auth.getToken())
                 .log().all()
                 .when()
                 .get("productCategory")

@@ -10,7 +10,7 @@ import java.util.UUID;
 import static io.restassured.RestAssured.given;
 import static org.junit.Assert.*;
 
-public class User extends TestBase {
+public class UserTest extends TestBase {
 
     // POST /api/v{version}/User
     @Test
@@ -51,7 +51,7 @@ public class User extends TestBase {
         String id = "14";
         Response response = given()
                 .spec(baseSpec)
-                .header("Authorization", "Bearer " + getToken())
+                .header("Authorization", "Bearer " + auth.getToken())
                 .log().all()
                 .when()
                 .get("User/" + id + "/image")
@@ -67,7 +67,7 @@ public class User extends TestBase {
     public void getUsersAll() {
         Response response = given()
                 .spec(baseSpec)
-                .header("Authorization", "Bearer " + getToken())
+                .header("Authorization", "Bearer " + auth.getToken())
                 .log().all()
                 .when()
                 .get("User")
@@ -93,7 +93,7 @@ public class User extends TestBase {
 
         Response response = given()
                 .spec(multiDataSpec)
-                .header("Authorization", "Bearer " + getToken())
+                .header("Authorization", "Bearer " + auth.getToken())
                 .log().all()
                 .formParam("name", name)
                 .formParam("isMan", isMan)
@@ -126,7 +126,7 @@ public class User extends TestBase {
         // GET /api/v{version}/User/{id}
         Response getResponse = given()
                 .spec(baseSpec)
-                .header("Authorization", "Bearer " + getToken())
+                .header("Authorization", "Bearer " + auth.getToken())
                 .log().all()
                 .when()
                 .get("User/" + id)
@@ -164,7 +164,7 @@ public class User extends TestBase {
         String favoriteId = "1";
         Response response = given()
                 .spec(baseSpec)
-                .header("Authorization", "Bearer " + getToken())
+                .header("Authorization", "Bearer " + auth.getToken())
                 .log().all()
                 .when()
                 .delete("User/" + userId + "/favorite/" + favoriteId)
@@ -181,7 +181,7 @@ public class User extends TestBase {
         String id = "22";
         Response response = given()
                 .spec(baseSpec)
-                .header("Authorization", "Bearer " + getToken())
+                .header("Authorization", "Bearer " + auth.getToken())
                 .log().all()
                 .when()
                 .get("User/" + id + "/favorite")
@@ -198,7 +198,7 @@ public class User extends TestBase {
         String id = "22";
         Response response = given()
                 .spec(baseSpec)
-                .header("Authorization", "Bearer " + getToken())
+                .header("Authorization", "Bearer " + auth.getToken())
                 .log().all()
                 .when()
                 .get("User/" + id + "/stories")
@@ -217,7 +217,7 @@ public class User extends TestBase {
 
         Response response = given()
                 .spec(baseSpec)
-                .header("Authorization", "Bearer " + getToken())
+                .header("Authorization", "Bearer " + auth.getToken())
                 .log().uri().log().method()
                 .when()
                 .put("User/" + userId + "/favorite/" + favoriteId)
@@ -231,7 +231,7 @@ public class User extends TestBase {
 
         Response deleteResponse = given()
                 .spec(baseSpec)
-                .header("Authorization", "Bearer " + getToken())
+                .header("Authorization", "Bearer " + auth.getToken())
                 .log().uri().log().method()
                 .when()
                 .delete("User/" + userId + "/favorite/" + favoriteId)
@@ -243,7 +243,7 @@ public class User extends TestBase {
 
         Response putAgainResponse = given()
                 .spec(baseSpec)
-                .header("Authorization", "Bearer " + getToken())
+                .header("Authorization", "Bearer " + auth.getToken())
                 .log().uri().log().method()
                 .when()
                 .put("User/" + userId + "/favorite/" + favoriteId)

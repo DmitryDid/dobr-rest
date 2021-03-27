@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import static io.restassured.RestAssured.given;
 
-public class Fias extends TestBase {
+public class FiasTest extends TestBase {
 
     // /api/v{version}/Fias/address/{text}
     @Test
@@ -13,7 +13,7 @@ public class Fias extends TestBase {
         String text = "test_address";
         Response response = given()
                 .spec(baseSpec)
-                .header("Authorization", "Bearer " + getToken())
+                .header("Authorization", "Bearer " + auth.getToken())
                 .log().all()
                 .when()
                 .get("Fias/address/" + text)
@@ -29,7 +29,7 @@ public class Fias extends TestBase {
     public void getFiasInn() {
         Response response = given()
                 .spec(baseSpec)
-                .header("Authorization", "Bearer " + getToken())
+                .header("Authorization", "Bearer " + auth.getToken())
                 .log().all()
                 .when()
                 .get("Fias/inn/" + "6240283167")
