@@ -1,6 +1,7 @@
 package Tests;
 
-import Constants.Const;
+import Action.Auth;
+import Constants.CONST;
 import io.restassured.response.Response;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -16,10 +17,10 @@ public class RegistrationTest extends TestBase {
     @Test
     public void emailAcceptance() {
         Response response = given()
-                .spec(baseSpec)
-                .header("Authorization", "Bearer " + auth.getToken())
+                .spec(CONST.BASE_SPEC)
+                .header("Authorization", "Bearer " + Auth.getToken())
                 .body("{\n" +
-                        "  \"email\": \"" + Const.EMAIL + "\",\n" +
+                        "  \"email\": \"" + CONST.EMAIL + "\",\n" +
                         "  \"code\": \"" + code + "\"\n" +
                         "}")
                 .log().all()
@@ -36,10 +37,10 @@ public class RegistrationTest extends TestBase {
     @Test
     public void emailConfirmation() {
         Response response = given()
-                .spec(baseSpec)
-                .header("Authorization", "Bearer " + auth.getToken())
+                .spec(CONST.BASE_SPEC)
+                .header("Authorization", "Bearer " + Auth.getToken())
                 .body("{\n" +
-                        "  \"email\": \"" + Const.EMAIL + "\"\n" +
+                        "  \"email\": \"" + CONST.EMAIL + "\"\n" +
                         "}")
                 .log().all()
                 .when()

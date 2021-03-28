@@ -6,11 +6,11 @@ import lombok.ToString;
 
 @Getter
 @ToString
-public class ImageDTO {
+public class FailDTO {
 
-    @JsonProperty("id")
-    Integer id;
+    @JsonProperty("status")
+    String status;
 
-    @JsonProperty("bytes")
-    String bytes;
+    @JsonProperty("message")
+    String message;
 }

@@ -2,8 +2,10 @@ package DTO;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
+@ToString
 public class CompanyDTO {
 
     @JsonProperty("id")
@@ -49,7 +51,7 @@ public class CompanyDTO {
     String playerId;
 
     @JsonProperty("productCategory")
-    ProductCategoryDTO productCategoryId;
+    ProductCategoryDTO productCategory;
 
     @JsonProperty("representative")
     String representative;

@@ -1,19 +1,24 @@
-package Entity;
+package Action;
 
-import Constants.Const;
-import Tests.TestBase;
+import Constants.CONST;
+import DTO.AuthDTO;
 import io.restassured.response.Response;
-import org.json.JSONObject;
+import lombok.Data;
 
 import static io.restassured.RestAssured.given;
 
-public class Auth extends TestBase {
+@Data
+public class Auth {
 
     public static String accessToken;
 
-    public Response getRefreshToken(String token) {
+    public static String getAccessToken() {
+        return accessToken;
+    }
+
+    public static Response getRefreshToken(String token) {
         Response response = given()
-                .spec(baseSpec)
+                .spec(CONST.BASE_SPEC)
                 .header("Authorization", "Bearer " + token)
                 .when()
                 .get("Auth/refresh-token")
@@ -24,9 +29,9 @@ public class Auth extends TestBase {
         return response;
     }
 
-    public Response getTokenUserByPlayerId(String id) {
+    public static Response getTokenUserByPlayerId(String id) {
         Response response = given()
-                .spec(baseSpec)
+                .spec(CONST.BASE_SPEC)
                 .when()
                 .post("Auth/token/user/" + id)
                 .then()
@@ -36,9 +41,9 @@ public class Auth extends TestBase {
         return response;
     }
 
-    public Response getTokenCompanyByUsernameAndPassword(String username, String password) {
+    public static Response getTokenCompanyByUsernameAndPassword(String username, String password) {
         Response response = given()
-                .spec(baseSpec)
+                .spec(CONST.BASE_SPEC)
                 .body("{\n" +
                         "  \"username\": \"" + username + "\",\n" +
                         "  \"password\": \"" + password + "\"\n" +
@@ -51,9 +56,9 @@ public class Auth extends TestBase {
         return response;
     }
 
-    public Response getTokenForCompanyByPlayerId(String id) {
+    public static Response getTokenForCompanyByPlayerId(String id) {
         Response response = given()
-                .spec(baseSpec)
+                .spec(CONST.BASE_SPEC)
                 .when()
                 .post("Auth/token/company/" + id)
                 .then()
@@ -63,11 +68,10 @@ public class Auth extends TestBase {
         return response;
     }
 
-    public Response getCompanyLostPassword(String email, String token) {
+    public static Response getCompanyLostPassword(String email, String token) {
         Response response = given()
-                .spec(baseSpec)
+                .spec(CONST.BASE_SPEC)
                 .header("Authorization", "Bearer " + token)
-                .log().all()
                 .when()
                 .body("{\n" +
                         "  \"email\": \"" + email + "\"\n" +
@@ -77,34 +81,50 @@ public class Auth extends TestBase {
                 .statusCode(200) // 500
                 .extract()
                 .response();
-        toConsole(response);
         return response;
     }
 
-    public String getToken() {
+    public static String getToken() {
         if (accessToken != null) return accessToken;
         Response response = given()
-                .spec(baseSpec)
+                .spec(CONST.BASE_SPEC)
                 .when()
-                .post("auth/token/user/" + Const.PLAYER_ID)
+                .post("auth/token/user/" + CONST.PLAYER_ID)
                 .then()
                 .extract().response();
 
         if (response.getStatusCode() != 200) {
 
-            user.createUser(Const.PLAYER_ID);
+            User.createUser(CONST.PLAYER_ID);
 
             response = given()
-                    .spec(baseSpec)
+                    .spec(CONST.BASE_SPEC)
                     .when()
                     .post("auth/token/user/")
                     .then()
                     .statusCode(200)
                     .extract().response();
-            accessToken = (String) new JSONObject(response.body().asString()).get("access_token");
+            accessToken = response.as(AuthDTO.class).getAccessToken();
             return accessToken;
         }
-        accessToken = (String) new JSONObject(response.body().asString()).get("access_token");
+        accessToken = response.as(AuthDTO.class).getAccessToken();
         return accessToken;
+    }
+
+    public static Response getCompanyRestorePassword(String email, String password, int code) {
+        Response response = given()
+                .spec(CONST.BASE_SPEC)
+                .header("Authorization", "Bearer " + accessToken)
+                .when()
+                .body("{\n" +
+                        "  \"email\": \"" + email + "\",\n" +
+                        "  \"newPassword\": \"" + password + "\",\n" +
+                        "  \"code\": \"" + code + "\"\n" +
+                        "}")
+                .post("Auth/company/restore-password")
+                .then()
+                .statusCode(200)
+                .extract().response();
+        return response;
     }
 }

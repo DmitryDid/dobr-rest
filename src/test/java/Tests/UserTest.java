@@ -1,5 +1,7 @@
 package Tests;
 
+import Action.Auth;
+import Constants.CONST;
 import io.restassured.response.Response;
 import org.json.JSONObject;
 import org.junit.Test;
@@ -26,7 +28,7 @@ public class UserTest extends TestBase {
         String longitude = "82.9346000";
 
         Response response = given()
-                .spec(multiDataSpec)
+                .spec(CONST.MULTi_DATA_SPEC)
                 //.header("Authorization", "Bearer " + getToken())
                 .log().all()
                 .formParam("name", name)
@@ -50,8 +52,8 @@ public class UserTest extends TestBase {
     public void getUserImageById() {
         String id = "14";
         Response response = given()
-                .spec(baseSpec)
-                .header("Authorization", "Bearer " + auth.getToken())
+                .spec(CONST.BASE_SPEC)
+                .header("Authorization", "Bearer " + Auth.getToken())
                 .log().all()
                 .when()
                 .get("User/" + id + "/image")
@@ -66,8 +68,8 @@ public class UserTest extends TestBase {
     @Test
     public void getUsersAll() {
         Response response = given()
-                .spec(baseSpec)
-                .header("Authorization", "Bearer " + auth.getToken())
+                .spec(CONST.BASE_SPEC)
+                .header("Authorization", "Bearer " + Auth.getToken())
                 .log().all()
                 .when()
                 .get("User")
@@ -92,8 +94,8 @@ public class UserTest extends TestBase {
         String longitude = "82.9346000";
 
         Response response = given()
-                .spec(multiDataSpec)
-                .header("Authorization", "Bearer " + auth.getToken())
+                .spec(CONST.MULTi_DATA_SPEC)
+                .header("Authorization", "Bearer " + Auth.getToken())
                 .log().all()
                 .formParam("name", name)
                 .formParam("isMan", isMan)
@@ -125,8 +127,8 @@ public class UserTest extends TestBase {
 
         // GET /api/v{version}/User/{id}
         Response getResponse = given()
-                .spec(baseSpec)
-                .header("Authorization", "Bearer " + auth.getToken())
+                .spec(CONST.BASE_SPEC)
+                .header("Authorization", "Bearer " + Auth.getToken())
                 .log().all()
                 .when()
                 .get("User/" + id)
@@ -163,8 +165,8 @@ public class UserTest extends TestBase {
         String userId = "22";
         String favoriteId = "1";
         Response response = given()
-                .spec(baseSpec)
-                .header("Authorization", "Bearer " + auth.getToken())
+                .spec(CONST.BASE_SPEC)
+                .header("Authorization", "Bearer " + Auth.getToken())
                 .log().all()
                 .when()
                 .delete("User/" + userId + "/favorite/" + favoriteId)
@@ -180,8 +182,8 @@ public class UserTest extends TestBase {
     public void getUserFavorite() {
         String id = "22";
         Response response = given()
-                .spec(baseSpec)
-                .header("Authorization", "Bearer " + auth.getToken())
+                .spec(CONST.BASE_SPEC)
+                .header("Authorization", "Bearer " + Auth.getToken())
                 .log().all()
                 .when()
                 .get("User/" + id + "/favorite")
@@ -197,8 +199,8 @@ public class UserTest extends TestBase {
     public void getUserStories() {
         String id = "22";
         Response response = given()
-                .spec(baseSpec)
-                .header("Authorization", "Bearer " + auth.getToken())
+                .spec(CONST.BASE_SPEC)
+                .header("Authorization", "Bearer " + Auth.getToken())
                 .log().all()
                 .when()
                 .get("User/" + id + "/stories")
@@ -216,8 +218,8 @@ public class UserTest extends TestBase {
         String favoriteId = "5";
 
         Response response = given()
-                .spec(baseSpec)
-                .header("Authorization", "Bearer " + auth.getToken())
+                .spec(CONST.BASE_SPEC)
+                .header("Authorization", "Bearer " + Auth.getToken())
                 .log().uri().log().method()
                 .when()
                 .put("User/" + userId + "/favorite/" + favoriteId)
@@ -230,8 +232,8 @@ public class UserTest extends TestBase {
         assertEquals("Already exist", response.asString());
 
         Response deleteResponse = given()
-                .spec(baseSpec)
-                .header("Authorization", "Bearer " + auth.getToken())
+                .spec(CONST.BASE_SPEC)
+                .header("Authorization", "Bearer " + Auth.getToken())
                 .log().uri().log().method()
                 .when()
                 .delete("User/" + userId + "/favorite/" + favoriteId)
@@ -242,8 +244,8 @@ public class UserTest extends TestBase {
         toConsole(deleteResponse);
 
         Response putAgainResponse = given()
-                .spec(baseSpec)
-                .header("Authorization", "Bearer " + auth.getToken())
+                .spec(CONST.BASE_SPEC)
+                .header("Authorization", "Bearer " + Auth.getToken())
                 .log().uri().log().method()
                 .when()
                 .put("User/" + userId + "/favorite/" + favoriteId)

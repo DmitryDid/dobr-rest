@@ -1,5 +1,7 @@
 package Tests;
 
+import Action.Auth;
+import Constants.CONST;
 import io.restassured.response.Response;
 import org.junit.Test;
 
@@ -12,8 +14,8 @@ public class FiasTest extends TestBase {
     public void getFiasAddressText() {
         String text = "test_address";
         Response response = given()
-                .spec(baseSpec)
-                .header("Authorization", "Bearer " + auth.getToken())
+                .spec(CONST.BASE_SPEC)
+                .header("Authorization", "Bearer " + Auth.getToken())
                 .log().all()
                 .when()
                 .get("Fias/address/" + text)
@@ -28,8 +30,8 @@ public class FiasTest extends TestBase {
     @Test
     public void getFiasInn() {
         Response response = given()
-                .spec(baseSpec)
-                .header("Authorization", "Bearer " + auth.getToken())
+                .spec(CONST.BASE_SPEC)
+                .header("Authorization", "Bearer " + Auth.getToken())
                 .log().all()
                 .when()
                 .get("Fias/inn/" + "6240283167")

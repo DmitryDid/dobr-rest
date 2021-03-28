@@ -1,5 +1,7 @@
 package Tests;
 
+import Action.Auth;
+import Constants.CONST;
 import io.restassured.response.Response;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -17,8 +19,8 @@ public class ChatTest extends TestBase {
     public void getChatUserById() {
         String userId = "15";
         Response response = given()
-                .spec(baseSpec)
-                .header("Authorization", "Bearer " + auth.getToken())
+                .spec(CONST.BASE_SPEC)
+                .header("Authorization", "Bearer " + Auth.getToken())
                 .log().uri().log().method()
                 .when()
                 .get("Chat/user/" + userId)
@@ -69,8 +71,8 @@ public class ChatTest extends TestBase {
     public void getChatCompanyById() {
         String companyId = "5";
         Response response = given()
-                .spec(baseSpec)
-                .header("Authorization", "Bearer " + auth.getToken())
+                .spec(CONST.BASE_SPEC)
+                .header("Authorization", "Bearer " + Auth.getToken())
                 .log().uri().log().method()
                 .when()
                 .get("Chat/company/" + companyId)
@@ -110,9 +112,9 @@ public class ChatTest extends TestBase {
     // GET /api/v{version}/Chat/message
     @Test
     public void getChatMessage() {
-        String token = auth.getToken();
+        String token = Auth.getToken();
         Response response = given()
-                .spec(baseSpec)
+                .spec(CONST.BASE_SPEC)
                 .header("Authorization", "Bearer " + token)
                 .log().all()
                 .when()
@@ -132,8 +134,8 @@ public class ChatTest extends TestBase {
         int userId = 15;
         boolean isUserMessage = true;
         Response response = given()
-                .spec(baseSpec)
-                .header("Authorization", "Bearer " + auth.getToken())
+                .spec(CONST.BASE_SPEC)
+                .header("Authorization", "Bearer " + Auth.getToken())
                 .body("{\n" +
                         "  \"text\": \"" + text + "\",\n" +
                         "  \"companyId\": " + companyId + ",\n" +

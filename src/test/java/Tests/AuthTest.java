@@ -1,14 +1,14 @@
 package Tests;
 
-import Constants.Const;
+import Action.Auth;
+import Action.Company;
+import Constants.CONST;
 import DTO.AuthDTO;
 import DTO.CompanyDTO;
+import Helpers.DBHelpers;
 import io.restassured.response.Response;
 import org.junit.Test;
 
-import java.util.ArrayList;
-
-import static io.restassured.RestAssured.given;
 import static org.junit.Assert.*;
 
 public class AuthTest extends TestBase {
@@ -16,24 +16,24 @@ public class AuthTest extends TestBase {
     // POST /api/v{version}/Auth/token/user/{playerId}
     @Test
     public void getTokenUserByPlayerId_200() {
-        Response response = auth.getTokenUserByPlayerId(Const.PLAYER_ID);
+        Response response = Auth.getTokenUserByPlayerId(CONST.PLAYER_ID);
         AuthDTO auth = response.as(AuthDTO.class);
 
         assertNotNull(auth.getAccessToken());
         assertEquals("bearer", auth.getTokenType());
         assertEquals("Success", auth.getStatus());
-        assertEquals(Const.PLAYER_ID, auth.getUser().getPlayerId());
+        assertEquals(CONST.PLAYER_ID, auth.getUser().getPlayerId());
     }
 
     // POST /api/v{version}/Auth/company
     @Test
     public void getCompanyTokenByUsernameAndPassword_200() {
         Integer companyId = 1;
-        dbHelpers.confirmEmailCompanyById(companyId);
+        DBHelpers.confirmEmailCompanyById(companyId);
 
-        CompanyDTO companyDTO = company.getCompanyById(companyId).as(CompanyDTO.class);
+        CompanyDTO companyDTO = Company.getCompanyById(companyId).as(CompanyDTO.class);
 
-        AuthDTO authDTO = auth.getTokenCompanyByUsernameAndPassword(
+        AuthDTO authDTO = Auth.getTokenCompanyByUsernameAndPassword(
                 companyDTO.getEmail(), companyDTO.getPassword())
                 .as(AuthDTO.class);
 
@@ -45,12 +45,12 @@ public class AuthTest extends TestBase {
 
     // POST /api/v{version}/Auth/token/company/{playerId}
     @Test
-    public void getTokenForCompanyByPlayerId_200() {
+    public void getTokenForCompanyByCompanyId_200() {
         Integer companyId = 2;
-        dbHelpers.confirmEmailCompanyById(companyId);
+        DBHelpers.confirmEmailCompanyById(companyId);
 
-        CompanyDTO companyDTO = company.getCompanyById(companyId).as(CompanyDTO.class);
-        AuthDTO authDTO = auth.getTokenForCompanyByPlayerId(companyDTO.getPlayerId()).as(AuthDTO.class);
+        CompanyDTO companyDTO = Company.getCompanyById(companyId).as(CompanyDTO.class);
+        AuthDTO authDTO = Auth.getTokenForCompanyByPlayerId(companyDTO.getPlayerId()).as(AuthDTO.class);
 
         assertNotNull(authDTO.getAccessToken());
         assertEquals("bearer", authDTO.getTokenType());
@@ -61,10 +61,10 @@ public class AuthTest extends TestBase {
     // /api/v{version}/Auth/refresh-token
     @Test
     public void getRefreshToken_200() {
-        AuthDTO authDTO = auth.getTokenUserByPlayerId(Const.PLAYER_ID).as(AuthDTO.class);
+        AuthDTO authDTO = Auth.getTokenUserByPlayerId(CONST.PLAYER_ID).as(AuthDTO.class);
         String token = authDTO.getAccessToken();
 
-        String refreshToken = auth.getRefreshToken(token)
+        String refreshToken = Auth.getRefreshToken(token)
                 .as(AuthDTO.class)
                 .getAccessToken();
 
@@ -77,43 +77,30 @@ public class AuthTest extends TestBase {
     @Test
     public void getCompanyLostPassword_200() {
         int companyId = 1;
-        CompanyDTO companyDTO = company.getCompanyById(companyId).as(CompanyDTO.class);
-        dbHelpers.confirmEmailCompanyById(companyId);
+        CompanyDTO companyDTO = Company.getCompanyById(companyId).as(CompanyDTO.class);
+        DBHelpers.confirmEmailCompanyById(companyId);
 
-        auth.getCompanyLostPassword(companyDTO.getEmail(), auth.getToken()); // 500
+        Response response = Auth.getCompanyLostPassword(companyDTO.getEmail(), Auth.getToken());
+        //TODO: дописать
+        toConsole(response);
     }
 
     // POST /api/v{version}/Auth/company/restore-password
     @Test
     public void getCompanyRestorePassword_200() {
         int companyId = 5;
-        dbHelpers.confirmEmailCompanyById(companyId);
+        DBHelpers.confirmEmailCompanyById(companyId);
 
-        CompanyDTO companyDTO = company.getCompanyById(companyId).as(CompanyDTO.class);
+        CompanyDTO companyDTO = Company.getCompanyById(companyId).as(CompanyDTO.class);
 
-        AuthDTO authDTO = auth.getTokenCompanyByUsernameAndPassword(
+        AuthDTO authDTO = Auth.getTokenCompanyByUsernameAndPassword(
                 companyDTO.getEmail(), companyDTO.getPassword())
                 .as(AuthDTO.class);
+        //TODO: доработать когда заработает
+        String newPassword = "NEW_test_company_password" + getUniqueNumber(3);
 
-        ArrayList list = dbHelpers.getConfirmCode();
-        for (int i = 0; i < list.size(); i++) {
-
-            Response response = given()
-                    .spec(baseSpec)
-                    .header("Authorization", "Bearer " + authDTO.getAccessToken())
-                    .log().uri().log().method()
-                    .when()
-                    .body("{\n" +
-                            "  \"email\": \"" + companyDTO.getEmail() + "\",\n" +
-                            "  \"newPassword\": \"NEW_test_company_password\",\n" +
-                            "  \"code\": \"" + list.get(i) + "\"\n" +
-                            "}")
-                    .post("Auth/company/restore-password")
-                    .then()
-                    //.statusCode(200) // 500
-                    .extract()
-                    .response();
-            System.out.println(response.getStatusCode());
-        }
+        AuthDTO newAuthDTO = Auth.getCompanyRestorePassword(CONST.EMAIL, newPassword,0000).as(AuthDTO.class);
+        assertEquals("Success", newAuthDTO.getStatus());
+        assertEquals(newPassword, newAuthDTO.getCompany().getPassword());
     }
 }

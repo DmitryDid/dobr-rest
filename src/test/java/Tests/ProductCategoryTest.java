@@ -1,5 +1,7 @@
 package Tests;
 
+import Action.Auth;
+import Constants.CONST;
 import io.restassured.response.Response;
 import org.junit.Test;
 
@@ -19,9 +21,9 @@ public class ProductCategoryTest extends TestBase {
 
         // POST /api/v{version}/Company
         Response postResponse = given()
-                .spec(multiDataSpec)
+                .spec(CONST.MULTi_DATA_SPEC)
                 .log().all()
-                .header("Authorization", "Bearer " + auth.getToken())
+                .header("Authorization", "Bearer " + Auth.getToken())
                 .formParam("name", name)
                 .formParam("ageLimit", ageLimit)
                 .multiPart("image", image)
@@ -38,8 +40,8 @@ public class ProductCategoryTest extends TestBase {
     @Test
     public void getProductCategoryAll() {
         Response postResponse = given()
-                .spec(baseSpec)
-                .header("Authorization", "Bearer " + auth.getToken())
+                .spec(CONST.BASE_SPEC)
+                .header("Authorization", "Bearer " + Auth.getToken())
                 .log().all()
                 .when()
                 .get("productCategory")
