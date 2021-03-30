@@ -1,5 +1,7 @@
 package Helpers;
 
+import org.junit.Test;
+
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -22,7 +24,7 @@ public class DBHelpers {
         System.out.println();
     }
 
-    public static void confirmEmailCompanyById(int id) {
+    public static void confirmEmailCompanyById(String id) {
         String request = "UPDATE company SET email_confirmed = true WHERE id = " + id + ";";
         executeRequest(request);
     }
@@ -37,5 +39,23 @@ public class DBHelpers {
         } catch (SQLException ignored) {
         }
         return list;
+    }
+
+    public static String getId(String request) {
+        try (Connection con = DriverManager.getConnection(url, user, password); Statement st = con.createStatement()) {
+            ResultSet rs = st.executeQuery(request);
+            rs.next();
+            return rs.getString("id");
+        } catch (SQLException e) {
+            e.getMessage();
+        }
+        System.out.println("Выполнен запрос в БД:\n" + request);
+        System.out.println();
+        return request;
+    }
+
+    @Test
+    public void name() {
+        getId("SELECT * FROM company WHERE email = nsk_dem@mail.ru;");
     }
 }

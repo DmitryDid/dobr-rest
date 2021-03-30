@@ -1,7 +1,8 @@
-package Action;
+package Pages;
 
 import Constants.CONST;
 import DTO.AuthDTO;
+import DTO.UserDTO;
 import io.restassured.response.Response;
 import lombok.Data;
 
@@ -35,7 +36,6 @@ public class Auth {
                 .when()
                 .post("Auth/token/user/" + id)
                 .then()
-                .statusCode(200)
                 .extract()
                 .response();
         return response;
@@ -81,34 +81,28 @@ public class Auth {
                 .statusCode(200) // 500
                 .extract()
                 .response();
+        System.out.println(response.asString());
         return response;
     }
 
     public static String getToken() {
         if (accessToken != null) return accessToken;
-        Response response = given()
-                .spec(CONST.BASE_SPEC)
-                .when()
-                .post("auth/token/user/" + CONST.PLAYER_ID)
-                .then()
-                .extract().response();
-
+        Response response = Auth.getTokenUserByPlayerId(CONST.PLAYER_ID);
         if (response.getStatusCode() != 200) {
+            String playerId = User.createUser(CONST.PLAYER_ID).as(AuthDTO.class).getUser().getPlayerId();
 
-            User.createUser(CONST.PLAYER_ID);
-
-            response = given()
+            return given()
                     .spec(CONST.BASE_SPEC)
                     .when()
-                    .post("auth/token/user/")
+                    .post("auth/token/user/" + playerId)
                     .then()
                     .statusCode(200)
-                    .extract().response();
-            accessToken = response.as(AuthDTO.class).getAccessToken();
-            return accessToken;
+                    .extract()
+                    .response()
+                    .as(AuthDTO.class)
+                    .getAccessToken();
         }
-        accessToken = response.as(AuthDTO.class).getAccessToken();
-        return accessToken;
+        return response.as(AuthDTO.class).getAccessToken();
     }
 
     public static Response getCompanyRestorePassword(String email, String password, int code) {

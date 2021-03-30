@@ -1,13 +1,14 @@
-package Action;
+package Pages;
 
 import Constants.CONST;
 import DTO.AuthDTO;
+import DTO.CompanyDTO;
 import Helpers.DBHelpers;
 import Tests.TestBase;
 import io.restassured.response.Response;
-import org.json.JSONObject;
 
 import java.io.File;
+import java.util.Map;
 import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
@@ -24,7 +25,7 @@ public class Company extends TestBase {
     static String password = "test_company_password";
     static String address = "test_company_address";
     static String timeOfWork = "8-22";
-    static String productCategoryId = "1";
+    static int productCategoryId = 1;
     static String playerId = UUID.randomUUID().toString();
     static String fileName = "appleGoogle.jpg";
     static File image = new File("src/test/java/Resources/" + fileName);
@@ -42,23 +43,37 @@ public class Company extends TestBase {
         return response;
     }
 
-    public static Response getCompanyById(int id) {
+    public static Response getCompanyById(String id) {
         Response response = given()
                 .spec(CONST.BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getAccessToken())
                 .when()
                 .get("Company/" + id)
                 .then()
-                .statusCode(200)
                 .extract()
                 .response();
         return response;
     }
 
-    public static Response createCompany() {
+    public static Response updateCompanyById(String id, Map data) {
         Response response = given()
                 .spec(CONST.MULTi_DATA_SPEC)
-                .formParam("id", id)
+                .header("Authorization", "Bearer " + Auth.getAccessToken())
+                .formParams(data)
+                .multiPart("image", image)
+                .when()
+                .put("Company/" + id)
+                .then()
+                .extract().response();
+
+        if (response.getStatusCode() != 200) System.err.println(response.body().asString());
+        return response;
+    }
+
+    public static Response createCompany() {
+        String email = getUniqueNumber(10);
+        Response response = given()
+                .spec(CONST.MULTi_DATA_SPEC)
                 .formParam("name", name)
                 .formParam("nameOfficial", nameOfficial)
                 .formParam("Latitude", latitude)
@@ -66,7 +81,7 @@ public class Company extends TestBase {
                 .formParam("representative", representative)
                 .formParam("phone", phone)
                 .formParam("email", CONST.EMAIL)
-                .formParam("inn", getUniqueNumber(10))
+                .formParam("inn", email)
                 .formParam("password", password)
                 .formParam("address", address)
                 .formParam("timeOfWork", timeOfWork)
@@ -79,19 +94,15 @@ public class Company extends TestBase {
                 .extract().response();
 
         if (response.getStatusCode() != 200) {
-            return createCompanyWithEmail(getUniqueNumber(10) + "mail.ru");
+            return createCompanyWithEmail(getUniqueNumber(10) + "@mail.ru");
         }
-
-        int companyId = (Integer) new JSONObject(response).getJSONObject("company").get("id");
-        DBHelpers.confirmEmailCompanyById(companyId);
-        System.out.println("Создана компания " + name);
+        System.out.println("Создана компания " + email);
         return response;
     }
 
     public static Response createCompanyWithEmail(String email) {
         Response response = given()
                 .spec(CONST.MULTi_DATA_SPEC)
-                .formParam("id", id)
                 .formParam("name", name)
                 .formParam("nameOfficial", nameOfficial)
                 .formParam("Latitude", latitude)
@@ -109,14 +120,10 @@ public class Company extends TestBase {
                 .when()
                 .post("Company")
                 .then()
+                .statusCode(200)
                 .extract().response();
 
-        AuthDTO authDTO = response.as(AuthDTO.class);
-
-        int companyId = authDTO.getCompany().getId();
-
-        DBHelpers.confirmEmailCompanyById(companyId);
-        System.out.println("Создана компания " + companyId);
+        System.out.println("Создана компания " + email);
         return response;
     }
 
@@ -133,19 +140,21 @@ public class Company extends TestBase {
         return response;
     }
 
-    public static Response deleteCompanyById(int id) {
-        Response rsponse = given()
+    public static Response deleteCompanyById(String id) {
+        Response response = given()
                 .spec(CONST.BASE_SPEC)
+                .header("Authorization", "Bearer " + Auth.getAccessToken())
                 .when()
                 .delete("Company/" + id)
                 .then()
                 .statusCode(200)
                 .extract()
                 .response();
-        return rsponse;
+        System.out.println("Удалена компания " + id);
+        return response;
     }
 
-    public static Response getCompanyImageById(int id) {
+    public static Response getCompanyImageById(String id) {
         Response response = given()
                 .spec(CONST.BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getAccessToken())
@@ -156,6 +165,20 @@ public class Company extends TestBase {
                 .extract()
                 .response();
         if (response.getStatusCode() != 200) System.err.println(response.asString());
+        return response;
+    }
+
+    public static Response getCompanyCategoryById(String id) {
+        Response response = given()
+                .spec(CONST.BASE_SPEC)
+                .header("Authorization", "Bearer " + Auth.getAccessToken())
+                .when()
+                .get("Company/category/" + id)
+                .then()
+                .statusCode(200)
+                .extract()
+                .response();
+        toConsole(response);
         return response;
     }
 }

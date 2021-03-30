@@ -21,5 +21,5 @@ public class ProductCategoryDTO {
     Integer imageId;
 
     @JsonProperty("image")
-    String image;
+    ImageDTO image;
 }

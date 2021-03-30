@@ -1,4 +1,4 @@
-package Action;
+package Pages;
 
 import Constants.CONST;
 import Tests.TestBase;
@@ -22,7 +22,6 @@ public class User extends TestBase {
     public static Response createUser() {
         Response response = given()
                 .spec(CONST.MULTi_DATA_SPEC)
-                .formParam("id", id)
                 .formParam("name", name)
                 .formParam("isMan", isMan)
                 .formParam("playerId", UUID.randomUUID().toString())

@@ -1,6 +1,6 @@
 package Tests;
 
-import Action.Auth;
+import Pages.Auth;
 import Constants.CONST;
 import io.restassured.response.Response;
 import org.junit.Test;

@@ -1,9 +1,14 @@
 package Tests;
 
-import Action.Auth;
+import Pages.Auth;
+import DTO.CompanyDTO;
+import Pages.Company;
+import Pages.ProductCategory;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.restassured.RestAssured;
+import io.restassured.parsing.Parser;
 import io.restassured.response.Response;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -19,6 +24,7 @@ public class TestBase {
 
     @Before
     public void init() {
+        RestAssured.defaultParser = Parser.JSON;
         Auth.accessToken = Auth.getToken();
     }
 
@@ -64,11 +70,11 @@ public class TestBase {
         return null;
     }
 
-    protected static ArrayList getListDTO(Response response) {
+    protected static ArrayList getListCompanyDTO(Response response) {
         ObjectMapper mapper = new ObjectMapper();
         List<Object> list = mapper.convertValue(
                 response.as(JsonNode.class),
-                new TypeReference<List<Object>>() {
+                new TypeReference<List<CompanyDTO>>() {
                 });
         return (ArrayList) list;
     }

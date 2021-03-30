@@ -1,146 +1,116 @@
 package Tests;
 
-import Action.Company;
 import Constants.CONST;
 import DTO.AuthDTO;
 import DTO.CompanyDTO;
 import DTO.FailDTO;
 import Helpers.DBHelpers;
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
-import io.restassured.response.Response;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import Pages.Company;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
-import static io.restassured.RestAssured.given;
-import static io.restassured.config.EncoderConfig.encoderConfig;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static Pages.Company.*;
+import static org.junit.Assert.*;
 
 public class CompanyTest extends TestBase {
 
+    // GET /api/v{version}/Company/{id}
     @Test
-    public void deleteCompanyCascade() {
-        String id = getUniqueNumber(3);
-        String name = "test_name";
-        String nameOfficial = "test_nameOfficial";
-        String latitude = "55.0415000";
-        String longitude = "82.9346000";
-        String representative = "test_representative";
-        String phone = "19770100";
-        String email = getUniqueNumber(6) + "@mail.ru";
-        String inn = getUniqueNumber(10);
-        String password = "test_password";
-        String address = "test_address";
-        String timeOfWork = "8-22";
-        String productCategoryId = "1";
-        String playerId = "2";
-        String fileName = "Kiprensky_Pushkin.jpg";
-        File image = new File("src/test/java/Resources/" + fileName);
+    public void getCompanyById() {
+        String id = DBHelpers.getId("SELECT * FROM company WHERE email = 'nsk_dem@mail.ru';");
+        CompanyDTO dto = Company.getCompanyById(id).as(CompanyDTO.class);
 
-        // POST /api/v{version}/Company
-        Response postResponse = given()
-                .spec(CONST.MULTi_DATA_SPEC)
-                .log().all()
-                .formParam("id", id)
-                .formParam("name", name)
-                .formParam("nameOfficial", nameOfficial)
-                .formParam("Latitude", latitude)
-                .formParam("Longitude", longitude)
-                .formParam("representative", representative)
-                .formParam("phone", phone)
-                .formParam("email", email)
-                .formParam("inn", inn)
-                .formParam("password", password)
-                .formParam("address", address)
-                .formParam("timeOfWork", timeOfWork)
-                .formParam("productCategoryId", productCategoryId)
-                .formParam("playerId", playerId)
-                .multiPart("image", image)
-                .when()
-                .post("Company")
-                .then()
-                .statusCode(200)
-                .extract()
-                .response();
-        toConsole(postResponse);
-
-        Integer returnedId = (Integer) new JSONObject(postResponse.asString()).getJSONObject("company").get("id");
-
-        // DELETE /api/v{version}/Company/cascade/{id}
-        Response deleteResponse = given()
-                .spec(CONST.BASE_SPEC)
-                .log().all()
-                .when()
-                .delete("Company/cascade/" + returnedId)
-                .then()
-                .statusCode(200)
-                .extract()
-                .response();
-        toConsole(deleteResponse);
-
-        Response get2Response = given()
-                .spec(CONST.BASE_SPEC)
-                .log().uri().log().method()
-                .when()
-                .get("Company/" + returnedId)
-                .then()
-                .statusCode(404)
-                .extract()
-                .response();
-        toConsole(get2Response);
+        assertEquals(id, dto.getId().toString());
+        assertEquals((Double) 55.0415, dto.getLatitude());
+        assertEquals((Double) 82.9346, dto.getLongitude());
+        assertEquals("test_company nameOfficial", dto.getNameOfficial());
+        assertEquals("test_company_representative", dto.getRepresentative());
+        assertTrue(Long.parseLong(dto.getPhone()) >= 0);
+        assertTrue(Long.parseLong(dto.getInn()) >= 0);
+        assertEquals("test_company_password", dto.getPassword());
+        assertEquals("test_company_address", dto.getAddress());
+        assertEquals("8-22", dto.getTimeOfWork());
+        assertTrue(dto.getEmailConfirmed());
+        assertTrue(dto.getPlayerId().length() > 20);
+        assertEquals((Integer) 1, dto.getProductCategory().getId());
+        assertEquals((Integer) 3, dto.getImageId());
+        assertNull(dto.getImage()); //TODO: похоже бага
     }
 
-    // /api/v{version}/Company/{id}/number-of-favorites
     @Test
-    public void getCompanyNumberOfFavoritesById() {
-        int max = Integer.MIN_VALUE;
-        for (int i = 0; i < 10; i++) {
-            Response response = given()
-                    .spec(CONST.BASE_SPEC)
-                    .log().uri()
-                    .when()
-                    .get("Company/" + i + "/number-of-favorites")
-                    .then()
-                    .statusCode(200)
-                    .extract()
-                    .response();
-            toConsole(response);
-            int current = Integer.parseInt(response.asString());
-            max = Math.max(max, current);
-        }
-        assertTrue(max > 0);
+    public void putCompanyById() {
+        String email = getUniqueNumber(5) + "@yandex.com";
+
+        AuthDTO authDTO = createCompanyWithEmail(email)
+                .as(AuthDTO.class);
+        CompanyDTO companyDTO = authDTO.getCompany();
+        String id = companyDTO.getId()
+                .toString();
+
+        Map<String, String> map = new HashMap<>();
+        map.put("address", "updateAddress");
+        map.put("nameOfficial", "updateNameNameOfficial");
+        map.put("timeOfWork", "updateNameNameOfficial"); //TODO: bags
+        map.put("productCategoryId", "1");
+
+        updateCompanyById(id, map);
+
+        CompanyDTO getCompanyDTO = Company.getCompanyById(id)
+                .as(CompanyDTO.class);
+
+        assertEquals(map.get("address"), getCompanyDTO.getAddress());
+        assertEquals(map.get("nameOfficial"), getCompanyDTO.getNameOfficial());
+        assertEquals(map.get("timeOfWork"), getCompanyDTO.getTimeOfWork());
+        assertEquals(map.get("productCategoryId"), getCompanyDTO.getProductCategory().getId().toString());
     }
 
-    // /api/v{version}/Company/{id}/notification
-    // пока нет ни одного уведомления - проверяем так.
+    // DELETE /api/v{version}/Company/{id}
     @Test
-    public void getCompanyNotificationById() {
-        for (int i = 0; i < 50; i++) {
-            Response response = given()
-                    .spec(CONST.BASE_SPEC)
-                    .log().uri()
-                    .when()
-                    .get("Company/" + i + "/notification")
-                    .then()
-                    .statusCode(200)
-                    .extract()
-                    .response();
-            toConsole(response);
-        }
+    public void deleteCompanyById() {
+        String email = getUniqueNumber(5) + "@yandex.com";
+
+        AuthDTO authDTO = createCompanyWithEmail(email).as(AuthDTO.class); //TODO: ломаемся, если прогон в группе
+        String companyId = authDTO.getCompany().getId().toString();
+        Company.deleteCompanyById(companyId).as(CompanyDTO.class);
+        FailDTO failDTO = Company.getCompanyById(companyId).as(FailDTO.class);
+        Assert.assertEquals("COMPANY_ERROR", failDTO.getStatus());
+        Assert.assertEquals("Не найдена компания с id = " + companyId, failDTO.getMessage());
+    }
+
+    // POST /api/v{version}/Company
+    @Test
+    public void createCompany() {
+        String email = getUniqueNumber(5) + "@yandex.com";
+
+        AuthDTO authDTO = createCompanyWithEmail(email)
+                .as(AuthDTO.class);
+        CompanyDTO companyDTO = authDTO.getCompany();
+
+        assertEquals(email, companyDTO.getEmail());
+        assertNotNull(companyDTO.getId());
+        assertEquals((Double) 55.0415, companyDTO.getLatitude());
+        assertEquals((Double) 82.9346, companyDTO.getLongitude());
+        assertEquals("test_company nameOfficial", companyDTO.getNameOfficial());
+        assertEquals("test_company_representative", companyDTO.getRepresentative());
+        assertTrue(Long.parseLong(companyDTO.getPhone()) >= 0);
+        assertTrue(Long.parseLong(companyDTO.getInn()) >= 0);
+        assertEquals("test_company_password", companyDTO.getPassword());
+        assertEquals("test_company_address", companyDTO.getAddress());
+        assertEquals("8-22", companyDTO.getTimeOfWork());
+        assertFalse(companyDTO.getEmailConfirmed());
+        assertTrue(companyDTO.getPlayerId().length() > 20);
+        assertTrue(companyDTO.getProductCategory().getId() > 0);
+        assertTrue(companyDTO.getImageId() > 0);
     }
 
     // /api/v{version}/Company
     @Test
     public void getCompanyAll() {
-        ArrayList companyList = getListDTO(Company.getAllCompany());
-
+        ArrayList companyList = getListCompanyDTO(getAllCompany());
         CompanyDTO currentCompany;
 
         for (int i = 0; i < companyList.size(); i++) {
@@ -164,339 +134,39 @@ public class CompanyTest extends TestBase {
                 return;
             }
         }
-        Assert.fail();
+        fail();
     }
 
-    // /api/v1/company/top
-    @Test
-    public void getCompanyTop() {
-        ArrayList companyList = getListDTO(Company.getCompanyTop());
-        assertTrue(companyList.size() > 0); //TODO: пока нет записей
-    }
-
-    // /api/v{version}/Company/{id}/image
-    @Test
-    public void getCompanyImageById() {
-
-        AuthDTO dto = Company.getCompanyImageById(5).as(AuthDTO.class);
-        System.out.println(dto); //TODO: не работает
-    }
-
-    // /api/v{version}/Company/category/{id}
+    // GET /api/v{version}/Company/category/{id}
     @Test
     public void getCompanyCategoryById() {
-        String id = getUniqueNumber(3);
-        String name = "test_name";
-        String nameOfficial = "test_nameOfficial";
-        String latitude = "55.0415000";
-        String longitude = "82.9346000";
-        String representative = "test_representative";
-        String phone = "19770100";
-        String email = getUniqueNumber(6) + "@mail.ru";
-        String inn = getUniqueNumber(10);
-        String password = "test_password";
-        String address = "test_address";
-        String timeOfWork = "8-22";
-        String productCategoryId = "5";
-        String playerId = "2";
-        String fileName = "Kiprensky_Pushkin.jpg";
-        File image = new File("src/test/java/Resources/" + fileName);
+        String id = DBHelpers.getId("SELECT * FROM company WHERE email = 'nsk_dem@mail.ru';");
 
-        // POST /api/v{version}/Company
-        Response postResponse = given()
-                .spec(CONST.MULTi_DATA_SPEC)
-                .log().all()
-                .formParam("id", id)
-                .formParam("name", name)
-                .formParam("nameOfficial", nameOfficial)
-                .formParam("Latitude", latitude)
-                .formParam("Longitude", longitude)
-                .formParam("representative", representative)
-                .formParam("phone", phone)
-                .formParam("email", email)
-                .formParam("inn", inn)
-                .formParam("password", password)
-                .formParam("address", address)
-                .formParam("timeOfWork", timeOfWork)
-                .formParam("productCategoryId", productCategoryId)
-                .formParam("playerId", playerId)
-                .multiPart("image", image)
-                .when()
-                .post("Company")
-                .then()
-                .statusCode(200)
-                .extract()
-                .response();
-        toConsole(postResponse);
+        ArrayList companyList = getListCompanyDTO(Company.getCompanyCategoryById(id));
 
-        Integer returnedId = (Integer) new JSONObject(postResponse.asString()).getJSONObject("company").get("id");
+        assertTrue(companyList.size() > 0);
+        CompanyDTO currentCompany = (CompanyDTO) companyList.get(0);
 
-        Response response = given()
-                .spec(CONST.BASE_SPEC)
-                .log().all()
-                .when()
-                .get("Company/category/" + productCategoryId)
-                .then()
-                .statusCode(200)
-                .extract()
-                .response();
-        toConsole(response);
-
-        JSONArray jsonArray = new JSONArray(response.asString());
-        assertTrue(jsonArray.length() > 0);
-
-        for (int i = 0; i < jsonArray.length(); i++) {
-            JSONObject jsonObject = jsonArray.getJSONObject(i);
-            assertEquals("5", jsonObject.getJSONObject("productCategory").get("id").toString());
-
-            if (jsonObject.get("id").equals(returnedId)) {
-                assertEquals(returnedId, jsonObject.get("id"));
-                assertTrue(latitude.contains(jsonObject.get("latitude").toString()));
-                assertTrue(longitude.contains(jsonObject.get("longitude").toString()));
-                assertEquals(nameOfficial, jsonObject.get("nameOfficial"));
-                assertEquals(name, jsonObject.get("name"));
-                assertEquals(representative, jsonObject.get("representative"));
-                assertEquals(phone, jsonObject.get("phone"));
-                assertEquals(email, jsonObject.get("email"));
-                assertEquals(inn, jsonObject.get("inn"));
-                assertEquals(password, jsonObject.get("password"));
-                assertEquals(address, jsonObject.get("address"));
-                assertEquals(timeOfWork, jsonObject.get("timeOfWork"));
-                assertEquals(false, jsonObject.get("emailConfirmed"));
-                assertEquals(playerId, jsonObject.get("playerId"));
-                assertTrue(jsonObject.get("avatarName").toString().contains(fileName));
-            }
-        }
-
-        // DELETE /api/v{version}/Company/{id}
-        Response deleteResponse = given()
-                .spec(CONST.BASE_SPEC)
-                .log().uri().log().method()
-                .when()
-                .delete("Company/" + returnedId)
-                .then()
-                .statusCode(200)
-                .extract()
-                .response();
-        toConsole(deleteResponse);
+        assertEquals("1", currentCompany.getProductCategory().getId().toString());
+        assertEquals("alcohol", currentCompany.getProductCategory().getName());
+        assertEquals("18", currentCompany.getProductCategory().getAgeLimit().toString());
+        assertEquals(null, currentCompany.getProductCategory().getImage());
     }
 
-    // /api/v{version}/Company/{id}/offer
+    // GET /api/v{version}/Company/top
     @Test
-    public void getCompanyOfferById() {
-        String id = "5";
-        Response response = given()
-                .spec(CONST.BASE_SPEC)
-                .log().uri().log().method()
-                .when()
-                .get("Company/" + id + "/offer")
-                .then()
-                .statusCode(200)
-                .extract()
-                .response();
-        toConsole(response);
+    public void getCompanyTop() {
+        ArrayList companyList = getListCompanyDTO(Company.getCompanyTop());
 
-        JSONObject jsonObject = new JSONObject(response.asString());
-
-        JSONArray preOffer = jsonObject.getJSONArray("preOffer");
-        for (int i = 0; i < preOffer.length(); i++) {
-            assertEquals(id, preOffer.getJSONObject(i).getJSONObject("company").get("id").toString());
-            System.out.println("preOffer - true");
-        }
-
-        JSONArray activeOffer = jsonObject.getJSONArray("activeOffer");
-        for (int i = 0; i < activeOffer.length(); i++) {
-            assertEquals(id, activeOffer.getJSONObject(i).getJSONObject("company").get("id").toString());
-            System.out.println("activeOffer - true");
-        }
-
-        JSONArray inactiveOffer = jsonObject.getJSONArray("inactiveOffer");
-        for (int i = 0; i < inactiveOffer.length(); i++) {
-            assertEquals(id, inactiveOffer.getJSONObject(i).getJSONObject("company").get("id").toString());
-            System.out.println("inactiveOffer - true");
-        }
-
-        try {
-            JSONArray nearbyOffer = jsonObject.getJSONArray("nearbyOffer");
-            for (int i = 0; i < nearbyOffer.length(); i++) {
-                assertEquals(id, nearbyOffer.getJSONObject(i).getJSONObject("company").get("id").toString());
-                System.out.println("nearbyOffer - true");
-            }
-        } catch (JSONException e) {
-            System.out.print(e.getMessage());
-            System.out.println(" is " + jsonObject.get("nearbyOffer"));
-        }
+        assertTrue(companyList.size() > 0);
+        fail();
     }
 
     @Test
-    public void deleteCompany() {
+    public void getCompanyImageById() {
         CompanyDTO companyDTO = Company.createCompany().as(CompanyDTO.class);
-        int companyId = companyDTO.getId();
-        DBHelpers.confirmEmailCompanyById(companyId);
-
-        Company.deleteCompanyById(companyId);
-
-        FailDTO failDTO = Company.getCompanyById(companyId).as(FailDTO.class);
-        System.out.println(failDTO);
-
-    }
-
-    // /api/v{version}/Company/{id}
-    @Test
-    public void putCompanyById() {
-        String id = getUniqueNumber(3);
-        String name = "test_name";
-        String nameOfficial = "test_nameOfficial";
-        String latitude = "55.0415000";
-        String longitude = "82.9346000";
-        String representative = "test_representative";
-        String phone = "19770100";
-        String email = getUniqueNumber(6) + "@mail.ru";
-        String inn = getUniqueNumber(10);
-        String password = "test_password";
-        String address = "test_address";
-        String timeOfWork = "8-22";
-        String productCategoryId = "1";
-        String playerId = "2";
-        String fileName = "Kiprensky_Pushkin.jpg";
-        File image = new File("src/test/java/Resources/" + fileName);
-
-        // POST /api/v{version}/Company
-        Response postResponse = given()
-                .spec(CONST.MULTi_DATA_SPEC)
-                .log().all()
-                .formParam("id", id)
-                .formParam("name", name)
-                .formParam("nameOfficial", nameOfficial)
-                .formParam("Latitude", latitude)
-                .formParam("Longitude", longitude)
-                .formParam("representative", representative)
-                .formParam("phone", phone)
-                .formParam("email", email)
-                .formParam("inn", inn)
-                .formParam("password", password)
-                .formParam("address", address)
-                .formParam("timeOfWork", timeOfWork)
-                .formParam("productCategoryId", productCategoryId)
-                .formParam("playerId", playerId)
-                .multiPart("image", image)
-                .when()
-                .post("Company")
-                .then()
-                .statusCode(200)
-                .extract()
-                .response();
-        toConsole(postResponse);
-
-        Integer returnedId = (Integer) new JSONObject(postResponse.asString()).getJSONObject("company").get("id");
-
-        // PUT /api/v{version}/Company/{id}
-        String newPhone = "1122334455";
-        String newName = "NEW_TEST_NAME";
-        String newAddress = "NEW_TEST_ADDRESS";
-        String newInn = getUniqueNumber(10);
-        Response putResponse = given()
-                .spec(CONST.MULTi_DATA_SPEC)
-                .log().all()
-                .config(RestAssured.config().encoderConfig(encoderConfig().encodeContentTypeAs("multipart/form-data", ContentType.TEXT)))
-                .formParam("id", id)
-                .formParam("name", newName)
-                .formParam("nameOfficial", nameOfficial)
-                .formParam("Latitude", latitude)
-                .formParam("Longitude", longitude)
-                .formParam("representative", representative)
-                .formParam("phone", newPhone)
-                .formParam("email", email)
-                .formParam("inn", newInn)
-                .formParam("password", password)
-                .formParam("address", newAddress)
-                .formParam("timeOfWork", timeOfWork)
-                .formParam("productCategoryId", productCategoryId)
-                .formParam("playerId", playerId)
-                .multiPart("image", image)
-                .when()
-                .put("Company/" + returnedId)
-                .then()
-                .statusCode(200)
-                .extract()
-                .response();
-        toConsole(putResponse);
-
-        // GET /api/v{version}/Company/{id}
-        Response getResponse = given()
-                .spec(CONST.BASE_SPEC)
-                .log().uri().log().method()
-                .when()
-                .get("Company/" + returnedId)
-                .then()
-                .statusCode(200)
-                .extract()
-                .response();
-        toConsole(getResponse);
-
-        JSONObject getJSON = new JSONObject(getResponse.asString());
-        JSONObject productCategory = getJSON.getJSONObject("productCategory");
-
-        assertEquals(returnedId, getJSON.get("id"));
-        assertTrue(latitude.contains(getJSON.get("latitude").toString()));
-        assertTrue(longitude.contains(getJSON.get("longitude").toString()));
-        assertEquals(nameOfficial, getJSON.get("nameOfficial"));
-        assertEquals(newName, getJSON.get("name"));
-        assertEquals(representative, getJSON.get("representative"));
-        assertEquals(newPhone, getJSON.get("phone"));
-        assertEquals(email, getJSON.get("email"));
-        assertEquals(newInn, getJSON.get("inn"));
-        assertEquals(password, getJSON.get("password"));
-        assertEquals(newAddress, getJSON.get("address"));
-        assertEquals(timeOfWork, getJSON.get("timeOfWork"));
-        assertEquals(false, getJSON.get("emailConfirmed"));
-        assertEquals(playerId, getJSON.get("playerId"));
-        assertTrue(getJSON.get("avatarName").toString().contains(fileName));
-
-        assertEquals("1", productCategory.get("id").toString());
-        assertEquals("Аптеки", productCategory.get("name"));
-        assertEquals("1-1.jpg", productCategory.get("imageName"));
-
-        // PUT /api/v{version}/Company/{id}/image
-        String newImageName = "Kiprensky_Pushkin_2.jpg";
-        File newImage = new File("src/test/java/Resources/" + newImageName);
-        Response putImageResponse = given()
-                .spec(CONST.MULTi_DATA_SPEC)
-                .log().all()
-                .multiPart("image", newImage)
-                .when()
-                .put("Company/" + returnedId + "/image")
-                .then()
-                .statusCode(200)
-                .extract()
-                .response();
-        toConsole(putImageResponse);
-
-        // GET /api/v{version}/Company/{id}
-        Response getImageResponse = given()
-                .spec(CONST.BASE_SPEC)
-                .log().uri().log().method()
-                .when()
-                .get("Company/" + returnedId)
-                .then()
-                .statusCode(200)
-                .extract()
-                .response();
-        toConsole(getImageResponse);
-
-        JSONObject getImageJSON = new JSONObject(getImageResponse.asString());
-        assertTrue(getImageJSON.get("avatarName").toString().contains(newImageName));
-
-        // DELETE /api/v{version}/Company/{id}
-        Response deleteResponse = given()
-                .spec(CONST.BASE_SPEC)
-                .log().uri().log().method()
-                .when()
-                .delete("Company/" + returnedId)
-                .then()
-                .statusCode(200)
-                .extract()
-                .response();
-        toConsole(deleteResponse);
+        String id = companyDTO.getId().toString();
+        Company.getCompanyImageById(id);
+        System.out.println();
     }
 }
