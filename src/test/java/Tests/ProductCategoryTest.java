@@ -46,7 +46,6 @@ public class ProductCategoryTest extends TestBase {
         assertNotNull(productCategoryDTO.getImage().getBytes());
     }
 
-
     @Test
     public void getProductCategoryAll() {
         ArrayList list = ProductCategory.getListProductCategory(getAllProductCategory());
@@ -91,10 +90,16 @@ public class ProductCategoryTest extends TestBase {
 
     @Test
     public void putProductCategoryById() {
-        String id = createProductCategory()
+        String categoryId = createProductCategory()
                 .as(ProductCategoryDTO.class)
                 .getId()
                 .toString();
+
+        String imageId = ProductCategory.getProductCategoryById(categoryId)
+                .as(ProductCategoryDTO.class)
+                .getId()
+                .toString();
+
 
         String name = "update_product";
         int age = 6;
@@ -103,7 +108,7 @@ public class ProductCategoryTest extends TestBase {
         params.put("name", name);
         params.put("ageLimit", age);
 
-        ProductCategoryDTO create = updateProductCategory(id, params, image)
+        ProductCategoryDTO create = updateProductCategory(categoryId, params, image)
                 .as(ProductCategoryDTO.class);
 
         ProductCategoryDTO get = ProductCategory

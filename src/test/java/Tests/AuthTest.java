@@ -9,8 +9,7 @@ import org.junit.Test;
 
 import static Helpers.DBHelpers.confirmEmailCompanyById;
 import static Pages.Auth.*;
-import static Pages.Company.createCompany;
-import static Pages.Company.getCompanyById;
+import static Pages.Company.*;
 import static Pages.ProductCategory.createProductCategory;
 import static org.junit.Assert.*;
 
@@ -33,7 +32,7 @@ public class AuthTest extends TestBase {
     public void getCompanyTokenByUsernameAndPassword_200() {
         createProductCategory();
 
-        String companyId = createCompany()
+        String companyId = createCompany(getDefaultParams())
                 .as(AuthDTO.class)
                 .getCompany().getId().toString();
 
@@ -54,7 +53,7 @@ public class AuthTest extends TestBase {
     // POST /api/v{version}/Auth/token/company/{playerId}
     @Test
     public void getTokenForCompanyByCompanyId_200() throws InterruptedException {
-        String companyId = createCompany()
+        String companyId = createCompany(getDefaultParams())
                 .as(AuthDTO.class)
                 .getCompany().getId().toString();
 
@@ -105,7 +104,7 @@ public class AuthTest extends TestBase {
     @Ignore
     @Test
     public void getCompanyRestorePassword_200() {
-        String companyId = createCompany()
+        String companyId = createCompany(getDefaultParams())
                 .as(AuthDTO.class)
                 .getCompany().getId().toString();
 

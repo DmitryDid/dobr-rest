@@ -1,9 +1,6 @@
 package Tests;
 
-import Pages.Auth;
 import DTO.CompanyDTO;
-import Pages.Company;
-import Pages.ProductCategory;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,8 +16,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static Pages.Company.*;
-import static Pages.ProductCategory.*;
+import static Pages.Auth.accessToken;
+import static Pages.Auth.getToken;
+import static Pages.Company.createCompany;
+import static Pages.Company.getDefaultParams;
+import static Pages.ProductCategory.createProductCategory;
 
 public class TestBase {
 
@@ -28,13 +28,13 @@ public class TestBase {
     @Before
     public void init() {
         RestAssured.defaultParser = Parser.JSON;
-        Auth.accessToken = Auth.getToken();
+        accessToken = getToken();
         //createRows();
     }
 
-    private void createRows(){
+    private void createRows() {
         createProductCategory();
-        createCompany();
+        createCompany(getDefaultParams());
     }
 
     protected static void toConsole(Object object) {

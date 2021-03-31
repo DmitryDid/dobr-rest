@@ -164,7 +164,7 @@ public class CompanyTest extends TestBase {
 
     @Test
     public void getCompanyImageById() {
-        CompanyDTO companyDTO = Company.createCompany().as(CompanyDTO.class);
+        CompanyDTO companyDTO = Company.createCompany(getDefaultParams()).as(CompanyDTO.class);
         String id = companyDTO.getId().toString();
         Company.getCompanyImageById(id);
         System.out.println();

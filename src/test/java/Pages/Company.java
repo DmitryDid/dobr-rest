@@ -1,13 +1,11 @@
 package Pages;
 
 import Constants.CONST;
-import DTO.AuthDTO;
-import DTO.CompanyDTO;
-import Helpers.DBHelpers;
 import Tests.TestBase;
 import io.restassured.response.Response;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -15,20 +13,25 @@ import static io.restassured.RestAssured.given;
 
 public class Company extends TestBase {
 
-    static String id = getUniqueNumber(5);
-    static String name = "test_company_name";
-    static String nameOfficial = "test_company nameOfficial";
-    static String latitude = "55.0415000";
-    static String longitude = "82.9346000";
-    static String representative = "test_company_representative";
-    static String phone = getUniqueNumber(9);
-    static String password = "test_company_password";
-    static String address = "test_company_address";
-    static String timeOfWork = "8-22";
-    static int productCategoryId = 1;
-    static String playerId = UUID.randomUUID().toString();
-    static String fileName = "appleGoogle.jpg";
-    static File image = new File("src/test/java/Resources/" + fileName);
+    static public Map getDefaultParams() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("name", "test_company_name");
+        map.put("nameOfficial", "test_company nameOfficial");
+        map.put("inn", getUniqueNumber(9));
+        map.put("latitude", 55.0415000);
+        map.put("longitude", 82.9346000);
+        map.put("representative", "test_company_representative");
+        map.put("phone", getUniqueNumber(9));
+        map.put("password", "test_company_password");
+        map.put("address", "test_company_address");
+        map.put("email", getUniqueNumber(7) + "@mail.ru");
+        map.put("timeOfWork", "8-22");
+        map.put("productCategoryId", 1);
+        map.put("playerId", UUID.randomUUID().toString());
+        return map;
+    }
+
+    static File image = new File("src/test/java/Resources/appleGoogle.jpg");
 
 
     public static Response getAllCompany() {
@@ -70,23 +73,18 @@ public class Company extends TestBase {
         return response;
     }
 
-    public static Response createCompany() {
-        String email = getUniqueNumber(10);
+    public static Response createCompany(Map<String, Object> params) {
+        Map defaultParams = getDefaultParams();
+
+        for (Map.Entry<String, Object> pair : params.entrySet()) {
+            String key = pair.getKey();
+            Object value = pair.getValue();
+            defaultParams.put(key, value);
+        }
+
         Response response = given()
                 .spec(CONST.MULTi_DATA_SPEC)
-                .formParam("name", name)
-                .formParam("nameOfficial", nameOfficial)
-                .formParam("Latitude", latitude)
-                .formParam("Longitude", longitude)
-                .formParam("representative", representative)
-                .formParam("phone", phone)
-                .formParam("email", CONST.EMAIL)
-                .formParam("inn", email)
-                .formParam("password", password)
-                .formParam("address", address)
-                .formParam("timeOfWork", timeOfWork)
-                .formParam("productCategoryId", productCategoryId)
-                .formParam("playerId", playerId)
+                .formParams(defaultParams)
                 .multiPart("image", image)
                 .when()
                 .post("Company")
@@ -96,31 +94,22 @@ public class Company extends TestBase {
         if (response.getStatusCode() != 200) {
             return createCompanyWithEmail(getUniqueNumber(10) + "@mail.ru");
         }
-        System.out.println("Создана компания " + email);
+        System.out.println("Создана компания");
         return response;
     }
 
     public static Response createCompanyWithEmail(String email) {
+        Map params = getDefaultParams();
+        params.put("email", email);
+
         Response response = given()
                 .spec(CONST.MULTi_DATA_SPEC)
-                .formParam("name", name)
-                .formParam("nameOfficial", nameOfficial)
-                .formParam("Latitude", latitude)
-                .formParam("Longitude", longitude)
-                .formParam("representative", representative)
-                .formParam("phone", phone)
-                .formParam("email", email)
-                .formParam("inn", getUniqueNumber(10))
-                .formParam("password", password)
-                .formParam("address", address)
-                .formParam("timeOfWork", timeOfWork)
-                .formParam("productCategoryId", productCategoryId)
-                .formParam("playerId", playerId)
+                .formParams(params)
                 .multiPart("image", image)
                 .when()
                 .post("Company")
                 .then()
-                .statusCode(200)
+                //.statusCode(200)
                 .extract().response();
 
         System.out.println("Создана компания " + email);
