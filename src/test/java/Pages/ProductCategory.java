@@ -55,6 +55,22 @@ public class ProductCategory extends TestBase {
         return response;
     }
 
+    public static Response updateProductCategory(String id, Map params, File image) {
+        Response response = given()
+                .spec(CONST.MULTi_DATA_SPEC)
+                .log().all()
+                .header("Authorization", "Bearer " + getAccessToken())
+                .formParams(params)
+                .multiPart("image", image)
+                .when()
+                .put("ProductCategory/" + id)
+                .then()
+                .statusCode(200)
+                .extract().response();
+        System.out.println("Обновлена категория продукта c id = " + id);
+        return response;
+    }
+
     // GET /api/v{version}/ProductCategory
     public static Response getAllProductCategory() {
         Response response = given()

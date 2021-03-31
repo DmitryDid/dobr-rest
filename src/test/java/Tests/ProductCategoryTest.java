@@ -9,8 +9,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static Pages.ProductCategory.createProductCategory;
-import static Pages.ProductCategory.getAllProductCategory;
+import static Pages.ProductCategory.*;
 import static org.junit.Assert.*;
 
 public class ProductCategoryTest extends TestBase {
@@ -47,7 +46,7 @@ public class ProductCategoryTest extends TestBase {
         assertNotNull(productCategoryDTO.getImage().getBytes());
     }
 
-    // GET /api/v{version}/ProductCategory
+
     @Test
     public void getProductCategoryAll() {
         ArrayList list = ProductCategory.getListProductCategory(getAllProductCategory());
@@ -84,6 +83,35 @@ public class ProductCategoryTest extends TestBase {
 
         assertEquals(name, get.getName());
         assertEquals("8", get.getAgeLimit().toString());
+        assertTrue(get.getId() > 0);
+        assertTrue(get.getImageId() > 0);
+        //assertTrue(get.getImage().getId() > 0); //TODO: почемуто null
+        // assertNotNull(get.getImage().getBytes()); //TODO: почемуто null
+    }
+
+    @Test
+    public void putProductCategoryById() {
+        String id = createProductCategory()
+                .as(ProductCategoryDTO.class)
+                .getId()
+                .toString();
+
+        String name = "update_product";
+        int age = 6;
+        File image = new File("src/test/java/Resources/update-your-content.jpg");
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("name", name);
+        params.put("ageLimit", age);
+
+        ProductCategoryDTO create = updateProductCategory(id, params, image)
+                .as(ProductCategoryDTO.class);
+
+        ProductCategoryDTO get = ProductCategory
+                .getProductCategoryById(create.getId().toString())
+                .as(ProductCategoryDTO.class);
+
+        assertEquals(name, get.getName());
+        assertEquals("6", get.getAgeLimit().toString());
         assertTrue(get.getId() > 0);
         assertTrue(get.getImageId() > 0);
         //assertTrue(get.getImage().getId() > 0); //TODO: почемуто null
