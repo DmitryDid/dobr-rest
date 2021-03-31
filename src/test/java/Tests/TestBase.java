@@ -19,6 +19,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static Pages.Company.*;
+import static Pages.ProductCategory.*;
+
 public class TestBase {
 
 
@@ -26,6 +29,12 @@ public class TestBase {
     public void init() {
         RestAssured.defaultParser = Parser.JSON;
         Auth.accessToken = Auth.getToken();
+        //createRows();
+    }
+
+    private void createRows(){
+        createProductCategory();
+        createCompany();
     }
 
     protected static void toConsole(Object object) {
