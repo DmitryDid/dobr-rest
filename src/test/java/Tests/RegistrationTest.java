@@ -34,6 +34,7 @@ public class RegistrationTest extends TestBase {
     }
 
     // /api/v{version}/Registration/email-confirmation
+    @Ignore
     @Test
     public void emailConfirmation() {
         Response response = given()
