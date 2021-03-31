@@ -1,5 +1,6 @@
 package Tests;
 
+import DTO.AuthDTO;
 import DTO.ProductCategoryDTO;
 import Pages.ProductCategory;
 import io.restassured.response.Response;
@@ -8,13 +9,16 @@ import org.junit.Test;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
+import static Helpers.DBHelpers.confirmEmailCompanyById;
+import static Pages.Company.createCompany;
+import static Pages.Company.getDefaultParams;
 import static Pages.ProductCategory.*;
 import static org.junit.Assert.*;
 
 public class ProductCategoryTest extends TestBase {
 
-    // POST /api/v{version}/ProductCategory
     @Test
     public void postProductCategory() {
         ProductCategoryDTO productCategoryDTO = createProductCategory()
@@ -57,8 +61,7 @@ public class ProductCategoryTest extends TestBase {
                 assertEquals("18", dto.getAgeLimit().toString());
                 assertTrue(dto.getId() > 0);
                 assertTrue(dto.getImageId() > 0);
-                //  assertTrue(dto.getImage().getId() > 0); //TODO: null
-                // assertNotNull(dto.getImage().getBytes()); //TODO: null
+                assertTrue(dto.getImageId() > 0);
             }
         }
     }
@@ -84,8 +87,7 @@ public class ProductCategoryTest extends TestBase {
         assertEquals("8", get.getAgeLimit().toString());
         assertTrue(get.getId() > 0);
         assertTrue(get.getImageId() > 0);
-        //assertTrue(get.getImage().getId() > 0); //TODO: почемуто null
-        // assertNotNull(get.getImage().getBytes()); //TODO: почемуто null
+        assertTrue(get.getImageId() > 0);
     }
 
     @Test
@@ -95,20 +97,25 @@ public class ProductCategoryTest extends TestBase {
                 .getId()
                 .toString();
 
-        String imageId = ProductCategory.getProductCategoryById(categoryId)
-                .as(ProductCategoryDTO.class)
+        Map companyParams = getDefaultParams();
+        companyParams.put("productCategoryId", categoryId);
+
+        String companyId = createCompany(companyParams)
+                .as(AuthDTO.class)
+                .getCompany()
                 .getId()
                 .toString();
 
+        confirmEmailCompanyById(companyId);
 
         String name = "update_product";
         int age = 6;
         File image = new File("src/test/java/Resources/update-your-content.jpg");
-        HashMap<String, Object> params = new HashMap<>();
-        params.put("name", name);
-        params.put("ageLimit", age);
+        HashMap<String, Object> newParams = new HashMap<>();
+        newParams.put("name", name);
+        newParams.put("ageLimit", age);
 
-        ProductCategoryDTO create = updateProductCategory(categoryId, params, image)
+        ProductCategoryDTO create = updateProductCategory(categoryId, newParams, image)
                 .as(ProductCategoryDTO.class);
 
         ProductCategoryDTO get = ProductCategory
@@ -119,8 +126,7 @@ public class ProductCategoryTest extends TestBase {
         assertEquals("6", get.getAgeLimit().toString());
         assertTrue(get.getId() > 0);
         assertTrue(get.getImageId() > 0);
-        //assertTrue(get.getImage().getId() > 0); //TODO: почемуто null
-        // assertNotNull(get.getImage().getBytes()); //TODO: почемуто null
+        assertTrue(get.getImageId() > 0);
     }
 
     @Test

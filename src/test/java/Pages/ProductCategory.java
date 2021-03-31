@@ -58,7 +58,6 @@ public class ProductCategory extends TestBase {
     public static Response updateProductCategory(String id, Map params, File image) {
         Response response = given()
                 .spec(CONST.MULTi_DATA_SPEC)
-                .log().all()
                 .header("Authorization", "Bearer " + getAccessToken())
                 .formParams(params)
                 .multiPart("image", image)
@@ -126,7 +125,7 @@ public class ProductCategory extends TestBase {
                 .when()
                 .put("ProductCategory/" + id + "/image")
                 .then()
-                //.statusCode(200)
+                .statusCode(200)
                 .extract().response();
         System.out.println(response.asString());
         return response;
