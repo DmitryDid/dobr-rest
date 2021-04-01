@@ -1,6 +1,7 @@
 package Pages;
 
 import Constants.CONST;
+import DTO.AuthDTO;
 import Tests.TestBase;
 import io.restassured.response.Response;
 
@@ -13,7 +14,7 @@ import static io.restassured.RestAssured.given;
 
 public class Company extends TestBase {
 
-    static public Map getDefaultParams() {
+    static public Map<String, Object> getDefaultParams() {
         Map<String, Object> map = new HashMap<>();
         map.put("name", "test_company_name");
         map.put("nameOfficial", "test_company nameOfficial");
@@ -53,6 +54,7 @@ public class Company extends TestBase {
                 .when()
                 .get("Company/" + id)
                 .then()
+                .statusCode(200)
                 .extract()
                 .response();
         return response;
@@ -94,12 +96,12 @@ public class Company extends TestBase {
         if (response.getStatusCode() != 200) {
             return createCompanyWithEmail(getUniqueNumber(10) + "@mail.ru");
         }
-        System.out.println("Создана компания");
+        System.out.println("Создана компания " + response.as(AuthDTO.class).getCompany().getEmail());
         return response;
     }
 
     public static Response createCompanyWithEmail(String email) {
-        Map params = getDefaultParams();
+        Map<String, Object> params = getDefaultParams();
         params.put("email", email);
 
         Response response = given()
@@ -109,7 +111,7 @@ public class Company extends TestBase {
                 .when()
                 .post("Company")
                 .then()
-                //.statusCode(200)
+                .statusCode(200)
                 .extract().response();
 
         System.out.println("Создана компания " + email);
@@ -139,7 +141,6 @@ public class Company extends TestBase {
                 .statusCode(200)
                 .extract()
                 .response();
-        System.out.println("Удалена компания " + id);
         return response;
     }
 
@@ -150,10 +151,9 @@ public class Company extends TestBase {
                 .when()
                 .get("Company/" + id + "/image")
                 .then()
-                //.statusCode(200)
+                .statusCode(200)
                 .extract()
                 .response();
-        if (response.getStatusCode() != 200) System.err.println(response.asString());
         return response;
     }
 
@@ -167,7 +167,6 @@ public class Company extends TestBase {
                 .statusCode(200)
                 .extract()
                 .response();
-        toConsole(response);
         return response;
     }
 }
