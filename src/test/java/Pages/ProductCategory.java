@@ -113,7 +113,6 @@ public class ProductCategory extends TestBase {
                 .then()
                 .statusCode(200)
                 .extract().response();
-        System.out.println(response.asString());
         return response;
     }
 
