@@ -19,7 +19,7 @@ import static io.restassured.RestAssured.given;
 public class ProductCategory extends TestBase {
 
 
-    public static Response createProductCategory() {
+    public static ProductCategoryDTO createProductCategory() {
         String name = "alcohol";
         int ageLimit = 18;
         String fileName = "alko.jpg";
@@ -37,10 +37,10 @@ public class ProductCategory extends TestBase {
                 .statusCode(200)
                 .extract().response();
         System.out.println("Создана категория продукта " + name);
-        return response;
+        return response.as(ProductCategoryDTO.class);
     }
 
-    public static Response createProductCategory(Map params, File image) {
+    public static ProductCategoryDTO createProductCategory(Map params, File image) {
         Response response = given()
                 .spec(CONST.MULTi_DATA_SPEC)
                 .header("Authorization", "Bearer " + getAccessToken())
@@ -52,10 +52,10 @@ public class ProductCategory extends TestBase {
                 .statusCode(200)
                 .extract().response();
         System.out.println("Создана категория продукта c параметрами " + params);
-        return response;
+        return response.as(ProductCategoryDTO.class);
     }
 
-    public static Response updateProductCategory(String id, Map params, File image) {
+    public static ProductCategoryDTO updateProductCategory(int id, Map params, File image) {
         Response response = given()
                 .spec(CONST.MULTi_DATA_SPEC)
                 .header("Authorization", "Bearer " + getAccessToken())
@@ -67,10 +67,9 @@ public class ProductCategory extends TestBase {
                 .statusCode(200)
                 .extract().response();
         System.out.println("Обновлена категория продукта c id = " + id);
-        return response;
+        return response.as(ProductCategoryDTO.class);
     }
 
-    // GET /api/v{version}/ProductCategory
     public static Response getAllProductCategory() {
         Response response = given()
                 .spec(CONST.BASE_SPEC)
@@ -92,7 +91,7 @@ public class ProductCategory extends TestBase {
         return (ArrayList) list;
     }
 
-    public static Response getProductCategoryById(String id) {
+    public static ProductCategoryDTO getProductCategoryById(int id) {
         Response response = given()
                 .spec(CONST.BASE_SPEC)
                 .header("Authorization", "Bearer " + getAccessToken())
@@ -101,10 +100,10 @@ public class ProductCategory extends TestBase {
                 .then()
                 .statusCode(200)
                 .extract().response();
-        return response;
+        return response.as(ProductCategoryDTO.class);
     }
 
-    public static Response getProductCategoryImageById(String id) {
+    public static String getProductCategoryImageById(int id) {
         Response response = given()
                 .spec(CONST.BASE_SPEC)
                 .header("Authorization", "Bearer " + getAccessToken())
@@ -113,10 +112,10 @@ public class ProductCategory extends TestBase {
                 .then()
                 .statusCode(200)
                 .extract().response();
-        return response;
+        return response.asString();
     }
 
-    public static Response putProductCategoryImageById(String id, File image) {
+    public static Response putProductCategoryImageById(int id, File image) {
         Response response = given()
                 .spec(CONST.MULTi_DATA_SPEC)
                 .header("Authorization", "Bearer " + getAccessToken())
@@ -126,7 +125,6 @@ public class ProductCategory extends TestBase {
                 .then()
                 .statusCode(200)
                 .extract().response();
-        System.out.println(response.asString());
         return response;
     }
 }

@@ -3,7 +3,6 @@ package Tests;
 import DTO.AuthDTO;
 import DTO.ProductCategoryDTO;
 import Pages.ProductCategory;
-import io.restassured.response.Response;
 import org.junit.Test;
 
 import java.io.File;
@@ -21,8 +20,7 @@ public class ProductCategoryTest extends TestBase {
 
     @Test
     public void postProductCategory() {
-        ProductCategoryDTO productCategoryDTO = createProductCategory()
-                .as(ProductCategoryDTO.class);
+        ProductCategoryDTO productCategoryDTO = createProductCategory();
 
         assertEquals("alcohol", productCategoryDTO.getName());
         assertEquals("18", productCategoryDTO.getAgeLimit().toString());
@@ -39,8 +37,7 @@ public class ProductCategoryTest extends TestBase {
         params.put("ageLimit", 6);
         File image = new File("src/test/java/Resources/vtb.jpg");
 
-        ProductCategoryDTO productCategoryDTO = createProductCategory(params, image)
-                .as(ProductCategoryDTO.class);
+        ProductCategoryDTO productCategoryDTO = createProductCategory(params, image);
 
         assertEquals("super_product", productCategoryDTO.getName());
         assertEquals("6", productCategoryDTO.getAgeLimit().toString());
@@ -76,12 +73,10 @@ public class ProductCategoryTest extends TestBase {
         params.put("name", name);
         params.put("ageLimit", age);
 
-        ProductCategoryDTO create = createProductCategory(params, image)
-                .as(ProductCategoryDTO.class);
+        ProductCategoryDTO create = createProductCategory(params, image);
 
         ProductCategoryDTO get = ProductCategory
-                .getProductCategoryById(create.getId().toString())
-                .as(ProductCategoryDTO.class);
+                .getProductCategoryById(create.getId());
 
         assertEquals(name, get.getName());
         assertEquals("8", get.getAgeLimit().toString());
@@ -92,19 +87,15 @@ public class ProductCategoryTest extends TestBase {
 
     @Test
     public void putProductCategoryById() {
-        String categoryId = createProductCategory()
-                .as(ProductCategoryDTO.class)
-                .getId()
-                .toString();
+        int categoryId = createProductCategory()
+                .getId();
 
         Map companyParams = getDefaultParams();
         companyParams.put("productCategoryId", categoryId);
 
-        String companyId = createCompany(companyParams)
-                .as(AuthDTO.class)
+        int companyId = createCompany(companyParams)
                 .getCompany()
-                .getId()
-                .toString();
+                .getId();
 
         confirmEmailCompanyById(companyId);
 
@@ -115,12 +106,10 @@ public class ProductCategoryTest extends TestBase {
         newParams.put("name", name);
         newParams.put("ageLimit", age);
 
-        ProductCategoryDTO create = updateProductCategory(categoryId, newParams, image)
-                .as(ProductCategoryDTO.class);
+        ProductCategoryDTO create = updateProductCategory(categoryId, newParams, image);
 
         ProductCategoryDTO get = ProductCategory
-                .getProductCategoryById(create.getId().toString())
-                .as(ProductCategoryDTO.class);
+                .getProductCategoryById(create.getId());
 
         assertEquals(name, get.getName());
         assertEquals("6", get.getAgeLimit().toString());
@@ -131,34 +120,24 @@ public class ProductCategoryTest extends TestBase {
 
     @Test
     public void getProductCategoryImageById() {
-        String categoryId = createProductCategory()
-                .as(ProductCategoryDTO.class)
-                .getId()
-                .toString();
+        int categoryId = createProductCategory().getId();
 
-        Response response = ProductCategory.getProductCategoryImageById(categoryId);
-        assertTrue(response.asString().contains("JPEG"));
+        String imageBytes = ProductCategory.getProductCategoryImageById(categoryId);
+        assertTrue(imageBytes.contains("JPEG"));
     }
 
     @Test
     public void putProductCategoryImageById() {
-        String categoryId = createProductCategory()
-                .as(ProductCategoryDTO.class)
-                .getId()
-                .toString();
+        int categoryId = createProductCategory().getId();
 
-        String imageId = ProductCategory.getProductCategoryById(categoryId)
-                .as(ProductCategoryDTO.class)
-                .getImageId()
-                .toString();
+        int imageId = ProductCategory.getProductCategoryById(categoryId)
+                .getImageId();
 
         File newImage = new File("src/test/java/Resources/Malen.jpeg");
         ProductCategory.putProductCategoryImageById(categoryId, newImage);
 
-        String newImageId = ProductCategory.getProductCategoryById(categoryId)
-                .as(ProductCategoryDTO.class)
-                .getImageId()
-                .toString();
+        int newImageId = ProductCategory.getProductCategoryById(categoryId)
+                .getImageId();
 
         assertNotEquals(imageId, newImageId);
     }

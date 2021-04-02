@@ -3,11 +3,9 @@ package Tests;
 import Constants.CONST;
 import DTO.AuthDTO;
 import DTO.CompanyDTO;
-import DTO.ProductCategoryDTO;
-import DTO.UserDTO;
+import DTO.TopDTO;
 import Helpers.DBHelpers;
 import Pages.Company;
-import Pages.ProductCategory;
 import Pages.User;
 import org.junit.Test;
 
@@ -23,19 +21,15 @@ import static org.junit.Assert.*;
 
 public class CompanyTest extends TestBase {
 
-    // GET /api/v{version}/Company/{id}
     @Test
     public void getCompanyById() {
         Map<String, Object> defaultParams = getDefaultParams();
 
-        AuthDTO authDTO = Company.createCompany(defaultParams)
-                .as(AuthDTO.class);
+        AuthDTO authDTO = Company.createCompany(defaultParams);
 
-        String id = authDTO.getCompany().getId()
-                .toString();
+        int id = authDTO.getCompany().getId();
 
-        CompanyDTO createCompany = Company.getCompanyById(id)
-                .as(CompanyDTO.class);
+        CompanyDTO createCompany = Company.getCompanyById(id);
 
         assertEquals(id, createCompany.getId().toString());
         assertEquals(defaultParams.get("latitude"), createCompany.getLatitude());
@@ -55,14 +49,11 @@ public class CompanyTest extends TestBase {
 
     @Test
     public void putCompanyById() {
-        AuthDTO authDTO = Company.createCompany(getDefaultParams())
-                .as(AuthDTO.class);
+        AuthDTO authDTO = Company.createCompany(getDefaultParams());
 
-        String id = authDTO.getCompany().getId()
-                .toString();
+        Integer id = authDTO.getCompany().getId();
 
         Integer productCategoryId = createProductCategory()
-                .as(ProductCategoryDTO.class)
                 .getId();
 
         Integer imageId = authDTO.getCompany().getImageId();
@@ -84,8 +75,7 @@ public class CompanyTest extends TestBase {
 
         updateCompanyById(id, map, new File("src/test/java/Resources/vtb.jpg"));
 
-        CompanyDTO getCompanyDTO = Company.getCompanyById(id)
-                .as(CompanyDTO.class);
+        CompanyDTO getCompanyDTO = Company.getCompanyById(id);
 
         assertEquals(map.get("productCategoryId"), getCompanyDTO.getProductCategory().getId());
         assertEquals(id, getCompanyDTO.getId().toString());
@@ -104,14 +94,11 @@ public class CompanyTest extends TestBase {
         assertEquals(authDTO.getCompany().getNameOfficial(), getCompanyDTO.getNameOfficial());
     }
 
-    // DELETE /api/v{version}/Company/{id}
     @Test
     public void deleteCompanyById() {
-        AuthDTO authDTO = Company.createCompany(getDefaultParams())
-                .as(AuthDTO.class);
+        AuthDTO authDTO = Company.createCompany(getDefaultParams());
 
-        String id = authDTO.getCompany()
-                .getId().toString();
+        int id = authDTO.getCompany().getId();
 
         Company.deleteCompanyById(id, 200);
         Company.deleteCompanyById(id, 404);
@@ -122,30 +109,30 @@ public class CompanyTest extends TestBase {
         fail();
     }
 
-    // GET /api/v{version}/Company/top
     @Test
     public void getCompanyTop() {
-        ArrayList companyList = getListCompanyDTO(Company.getCompanyTop());
-
+        ArrayList<TopDTO> companyList = Company.getCompanyTop();
         assertTrue(companyList.size() > 0);
     }
+
 
     // GET /api/v{version}/Company/{id}/number-of-favorites
     @Test
     public void getCompanyNumberOfFavorites() {
-        int userId = User.createUser().as(AuthDTO.class).getUser().getId();
-        int productId = ProductCategory.createProductCategory().as(ProductCategoryDTO.class).getId();
+        int companyId = Company.createCompany(getDefaultParams()).getCompany().getId();
+        int userId = User.createUser().getUser().getId();
 
-        User.addedFavoriteForUser(userId, productId);
+        //  User.addedFavoriteForUser(userId,)
 
-        ArrayList list = getListCompany(getAllCompany());
 
+        ArrayList<CompanyDTO> list = Company.getAllCompany();
         int max = Integer.MIN_VALUE;
+
         for (int i = 0; i < list.size(); i++) {
-            CompanyDTO companyDTO = (CompanyDTO) list.get(i);
-            int id = companyDTO.getId();
-            int current = Integer.parseInt(Company.getCompanyNumberOfFavorites(id).asString());
-            max = Math.max(max, current);
+            //    int companyId = list.get(i).getId();
+            int number = Company.getCompanyNumberOfFavorites(companyId);
+            max = Math.max(max, number);
+            System.out.println(number);
         }
         assertTrue(max > 0);
     }
@@ -155,8 +142,7 @@ public class CompanyTest extends TestBase {
     public void createCompany() {
         String email = getUniqueNumber(5) + "@yandex.com";
 
-        AuthDTO authDTO = createCompanyWithEmail(email)
-                .as(AuthDTO.class);
+        AuthDTO authDTO = createCompanyWithEmail(email);
         CompanyDTO companyDTO = authDTO.getCompany();
 
         assertEquals(email, companyDTO.getEmail());
@@ -179,13 +165,12 @@ public class CompanyTest extends TestBase {
     // /api/v{version}/Company
     @Test
     public void getCompanyAll() {
-        ArrayList companyList = getListCompanyDTO(getAllCompany());
+        ArrayList<CompanyDTO> companyList = getAllCompany();
         CompanyDTO currentCompany;
 
         for (int i = 0; i < companyList.size(); i++) {
-            currentCompany = (CompanyDTO) companyList.get(i);
-            if (currentCompany.getEmail().equals(CONST.EMAIL)) {
-                assertEquals((Integer) 1, currentCompany.getId());
+            currentCompany = companyList.get(i);
+            if (CONST.EMAIL.equals(currentCompany.getEmail())) {
                 assertEquals((Double) 55.0415, currentCompany.getLatitude());
                 assertEquals((Double) 82.9346, currentCompany.getLongitude());
                 assertEquals("test_company nameOfficial", currentCompany.getNameOfficial());
@@ -198,8 +183,7 @@ public class CompanyTest extends TestBase {
                 assertTrue(currentCompany.getEmailConfirmed());
                 assertTrue(currentCompany.getPlayerId().length() > 20);
                 assertEquals((Integer) 1, currentCompany.getProductCategory().getId());
-                assertEquals((Integer) 3, currentCompany.getImageId());
-                //    assertEquals(currentCompany.getImage().getId(), currentCompany.getImageId()); //TODO: похоже кривая запись. потом проверить
+                assertNotNull(currentCompany.getImageId());
                 return;
             }
         }
@@ -225,11 +209,9 @@ public class CompanyTest extends TestBase {
 
     @Test
     public void getCompanyImageById() {
-        CompanyDTO companyDTO = Company.createCompany(getDefaultParams())
-                .as(CompanyDTO.class);
+        AuthDTO authDTO = Company.createCompany(getDefaultParams());
 
-        String id = companyDTO.getId()
-                .toString();
+        int id = authDTO.getCompany().getId();
 
         Company.getCompanyImageById(id);
         System.out.println();

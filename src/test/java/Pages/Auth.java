@@ -2,13 +2,10 @@ package Pages;
 
 import Constants.CONST;
 import DTO.AuthDTO;
-import DTO.UserDTO;
 import io.restassured.response.Response;
-import lombok.Data;
 
 import static io.restassured.RestAssured.given;
 
-@Data
 public class Auth {
 
     public static String accessToken;
@@ -17,7 +14,7 @@ public class Auth {
         return accessToken;
     }
 
-    public static Response getRefreshToken(String token) {
+    public static AuthDTO getRefreshToken(String token) {
         Response response = given()
                 .spec(CONST.BASE_SPEC)
                 .header("Authorization", "Bearer " + token)
@@ -27,10 +24,10 @@ public class Auth {
                 .statusCode(200)
                 .extract()
                 .response();
-        return response;
+        return response.as(AuthDTO.class);
     }
 
-    public static Response getTokenUserByPlayerId(String id) {
+    public static AuthDTO getTokenUserByPlayerId(String id) {
         Response response = given()
                 .spec(CONST.BASE_SPEC)
                 .when()
@@ -38,10 +35,10 @@ public class Auth {
                 .then()
                 .extract()
                 .response();
-        return response;
+        return response.as(AuthDTO.class);
     }
 
-    public static Response getTokenCompanyByUsernameAndPassword(String username, String password) {
+    public static AuthDTO getTokenCompanyByUsernameAndPassword(String username, String password) {
         Response response = given()
                 .spec(CONST.BASE_SPEC)
                 .body("{\n" +
@@ -53,10 +50,10 @@ public class Auth {
                 .then()
                 .statusCode(200)
                 .extract().response();
-        return response;
+        return response.as(AuthDTO.class);
     }
 
-    public static Response getTokenForCompanyByPlayerId(String id) {
+    public static AuthDTO getTokenForCompanyByPlayerId(String id) {
         Response response = given()
                 .spec(CONST.BASE_SPEC)
                 .when()
@@ -65,10 +62,10 @@ public class Auth {
                 .statusCode(200)
                 .extract()
                 .response();
-        return response;
+        return response.as(AuthDTO.class);
     }
 
-    public static Response getCompanyLostPassword(String email, String token) {
+    public static AuthDTO getCompanyLostPassword(String email, String token) {
         Response response = given()
                 .spec(CONST.BASE_SPEC)
                 .header("Authorization", "Bearer " + token)
@@ -82,30 +79,20 @@ public class Auth {
                 .extract()
                 .response();
         System.out.println(response.asString());
-        return response;
+        return response.as(AuthDTO.class);
     }
 
     public static String getToken() {
         if (accessToken != null) return accessToken;
-        Response response = Auth.getTokenUserByPlayerId(CONST.PLAYER_ID);
-        if (response.getStatusCode() != 200) {
-            String playerId = User.createUser(CONST.PLAYER_ID).as(AuthDTO.class).getUser().getPlayerId();
-
-            return given()
-                    .spec(CONST.BASE_SPEC)
-                    .when()
-                    .post("auth/token/user/" + playerId)
-                    .then()
-                    .statusCode(200)
-                    .extract()
-                    .response()
-                    .as(AuthDTO.class)
-                    .getAccessToken();
+        try {
+            return Auth.getTokenUserByPlayerId(CONST.PLAYER_ID).getAccessToken();
+        } catch (Exception e) {
+            String playerId = User.createUser(CONST.PLAYER_ID).getUser().getPlayerId();
+            return Auth.getTokenUserByPlayerId(playerId).getAccessToken();
         }
-        return response.as(AuthDTO.class).getAccessToken();
     }
 
-    public static Response getCompanyRestorePassword(String email, String password, int code) {
+    public static AuthDTO getCompanyRestorePassword(String email, String password, int code) {
         Response response = given()
                 .spec(CONST.BASE_SPEC)
                 .header("Authorization", "Bearer " + accessToken)
@@ -119,6 +106,6 @@ public class Auth {
                 .then()
                 .statusCode(200)
                 .extract().response();
-        return response;
+        return response.as(AuthDTO.class);
     }
 }

@@ -1,6 +1,6 @@
 package Tests;
 
-import DTO.CompanyDTO;
+import DTO.TopDTO;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,8 +18,7 @@ import java.util.List;
 
 import static Pages.Auth.accessToken;
 import static Pages.Auth.getToken;
-import static Pages.Company.createCompany;
-import static Pages.Company.getDefaultParams;
+import static Pages.Company.createCompanyWithEmail;
 import static Pages.ProductCategory.createProductCategory;
 
 public class TestBase {
@@ -33,8 +32,10 @@ public class TestBase {
     }
 
     private void createRows() {
+        System.out.println("--- init ---");
         createProductCategory();
-        createCompany(getDefaultParams());
+        createCompanyWithEmail(getUniqueNumber(9) + "@init.ru");
+        System.out.println("--- init ---\n");
     }
 
     protected static void toConsole(Object object) {
@@ -79,11 +80,11 @@ public class TestBase {
         return null;
     }
 
-    protected static ArrayList getListCompanyDTO(Response response) {
+    protected static ArrayList<TopDTO> getListCompanyDTO(Response response) {
         ObjectMapper mapper = new ObjectMapper();
         List<Object> list = mapper.convertValue(
                 response.as(JsonNode.class),
-                new TypeReference<List<CompanyDTO>>() {
+                new TypeReference<List<TopDTO>>() {
                 });
         return (ArrayList) list;
     }

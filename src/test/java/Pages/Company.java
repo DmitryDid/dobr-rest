@@ -3,6 +3,7 @@ package Pages;
 import Constants.CONST;
 import DTO.AuthDTO;
 import DTO.CompanyDTO;
+import DTO.TopDTO;
 import Tests.TestBase;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -27,7 +28,7 @@ public class Company extends TestBase {
         map.put("phone", getUniqueNumber(9));
         map.put("password", "test_company_password");
         map.put("address", "test_company_address");
-        map.put("email", getUniqueNumber(7) + "@mail.ru");
+        map.put("email", CONST.EMAIL);
         map.put("timeOfWork", "8-22");
         map.put("productCategoryId", 1);
         map.put("playerId", UUID.randomUUID().toString());
@@ -37,7 +38,7 @@ public class Company extends TestBase {
     static File image = new File("src/test/java/Resources/appleGoogle.jpg");
 
 
-    public static Response getAllCompany() {
+    public static ArrayList<CompanyDTO> getAllCompany() {
         Response response = given()
                 .spec(CONST.BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getAccessToken())
@@ -46,10 +47,10 @@ public class Company extends TestBase {
                 .then()
                 .statusCode(200)
                 .extract().response();
-        return response;
+        return getListCompany(response);
     }
 
-    public static Response getCompanyById(String id) {
+    public static CompanyDTO getCompanyById(int id) {
         Response response = given()
                 .spec(CONST.BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getAccessToken())
@@ -59,10 +60,10 @@ public class Company extends TestBase {
                 .statusCode(200)
                 .extract()
                 .response();
-        return response;
+        return response.as(CompanyDTO.class);
     }
 
-    public static Response updateCompanyById(String id, Map data, File image) {
+    public static Response updateCompanyById(int id, Map data, File image) {
         Response response = given()
                 .spec(CONST.MULTi_DATA_SPEC)
                 .header("Authorization", "Bearer " + Auth.getAccessToken())
@@ -77,34 +78,39 @@ public class Company extends TestBase {
         return response;
     }
 
-    public static Response createCompany(Map<String, Object> params) {
-        Map defaultParams = getDefaultParams();
+    public static AuthDTO createCompany(Map<String, Object> params) {
+        Map<String, Object> defaultParams = getDefaultParams();
 
         for (Map.Entry<String, Object> pair : params.entrySet()) {
             String key = pair.getKey();
             Object value = pair.getValue();
             defaultParams.put(key, value);
         }
+        AuthDTO authDTO;
+        try {
 
-        Response response = given()
-                .spec(CONST.MULTi_DATA_SPEC)
-                .formParams(defaultParams)
-                .multiPart("image", image)
-                .when()
-                .post("Company")
-                .then()
-                .extract().response();
-
-        if (response.getStatusCode() != 200) {
-            return createCompanyWithEmail(getUniqueNumber(10) + "@mail.ru");
+            authDTO = given()
+                    .spec(CONST.MULTi_DATA_SPEC)
+                    .formParams(defaultParams)
+                    .multiPart("image", image)
+                    .when()
+                    .post("Company")
+                    .then()
+                    .statusCode(200)
+                    .extract()
+                    .response().as(AuthDTO.class);
+        } catch (AssertionError e) {
+            authDTO = createCompanyWithEmail(getUniqueNumber(9) + "@create.ru");
         }
-        System.out.println("Создана компания " + response.as(AuthDTO.class).getCompany().getEmail());
-        return response;
+
+        System.out.println("Создана компания " + authDTO.getCompany().getEmail());
+        return authDTO;
     }
 
-    public static Response createCompanyWithEmail(String email) {
+    public static AuthDTO createCompanyWithEmail(String email) {
         Map<String, Object> params = getDefaultParams();
         params.put("email", email);
+        params.put("inn", getUniqueNumber(9));
 
         Response response = given()
                 .spec(CONST.MULTi_DATA_SPEC)
@@ -117,10 +123,10 @@ public class Company extends TestBase {
                 .extract().response();
 
         System.out.println("Создана компания " + email);
-        return response;
+        return response.as(AuthDTO.class);
     }
 
-    public static Response getCompanyTop() {
+    public static ArrayList<TopDTO> getCompanyTop() {
         Response response = given()
                 .spec(CONST.BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getAccessToken())
@@ -130,10 +136,10 @@ public class Company extends TestBase {
                 .statusCode(200)
                 .extract()
                 .response();
-        return response;
+        return getListCompanyDTO(response);
     }
 
-    public static Response deleteCompanyById(String id, int statusCode) {
+    public static Response deleteCompanyById(int id, int statusCode) {
         Response response = given()
                 .spec(CONST.BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getAccessToken())
@@ -146,7 +152,7 @@ public class Company extends TestBase {
         return response;
     }
 
-    public static Response getCompanyImageById(String id) {
+    public static Response getCompanyImageById(int id) {
         Response response = given()
                 .spec(CONST.BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getAccessToken())
@@ -172,8 +178,8 @@ public class Company extends TestBase {
         return response;
     }
 
-    public static Response getCompanyNumberOfFavorites(int id) {
-        Response response = given()
+    public static Integer getCompanyNumberOfFavorites(int id) {
+        String response = given()
                 .spec(CONST.BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getAccessToken())
                 .when()
@@ -181,11 +187,11 @@ public class Company extends TestBase {
                 .then()
                 .statusCode(200)
                 .extract()
-                .response();
-        return response;
+                .response().body().asString();
+        return Integer.valueOf(response);
     }
 
-    public static ArrayList getListCompany(Response response) {
+    public static ArrayList<CompanyDTO> getListCompany(Response response) {
         ObjectMapper mapper = new ObjectMapper();
         List<Object> list = mapper.convertValue(
                 response.as(JsonNode.class),

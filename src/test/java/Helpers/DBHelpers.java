@@ -21,7 +21,7 @@ public class DBHelpers {
         System.out.println();
     }
 
-    public static void confirmEmailCompanyById(String id) {
+    public static void confirmEmailCompanyById(int id) {
         String request = "UPDATE company SET email_confirmed = true WHERE id = " + id + ";";
         executeRequest(request);
         System.out.println("Email компании с id = " + id + " - подтвержден.");

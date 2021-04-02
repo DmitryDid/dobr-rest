@@ -1,6 +1,7 @@
 package Pages;
 
 import Constants.CONST;
+import DTO.AuthDTO;
 import Tests.TestBase;
 import io.restassured.response.Response;
 
@@ -19,7 +20,7 @@ public class User extends TestBase {
     static private String latitude = "55.0415000";
     static private String longitude = "82.9346000";
 
-    public static Response createUser() {
+    public static AuthDTO createUser() {
         Response response = given()
                 .spec(CONST.MULTi_DATA_SPEC)
                 .formParam("name", name)
@@ -35,10 +36,10 @@ public class User extends TestBase {
                 .statusCode(200)
                 .extract().response();
         System.out.println("Создан пользователь " + name);
-        return response;
+        return response.as(AuthDTO.class);
     }
 
-    public static Response createUser(String uuid) {
+    public static AuthDTO createUser(String uuid) {
         Response response = given()
                 .spec(CONST.MULTi_DATA_SPEC)
                 .formParam("id", id)
@@ -55,12 +56,13 @@ public class User extends TestBase {
                 .extract().response();
         if (response.getStatusCode() != 200) return null;
         System.out.println("Создан пользователь " + name);
-        return response;
+        return response.as(AuthDTO.class);
     }
 
     public static Response addedFavoriteForUser(int userId, int favoriteId) {
         Response response = given()
                 .spec(CONST.BASE_SPEC)
+                .log().all()
                 .header("Authorization", "Bearer " + Auth.getToken())
                 .when()
                 .put("User/" + userId + "/favorite/" + favoriteId)
