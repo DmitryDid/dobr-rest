@@ -2,13 +2,15 @@ package Pages;
 
 import Constants.CONST;
 import DTO.AuthDTO;
+import DTO.CompanyDTO;
 import Tests.TestBase;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.response.Response;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static io.restassured.RestAssured.given;
 
@@ -60,7 +62,7 @@ public class Company extends TestBase {
         return response;
     }
 
-    public static Response updateCompanyById(String id, Map data) {
+    public static Response updateCompanyById(String id, Map data, File image) {
         Response response = given()
                 .spec(CONST.MULTi_DATA_SPEC)
                 .header("Authorization", "Bearer " + Auth.getAccessToken())
@@ -69,9 +71,9 @@ public class Company extends TestBase {
                 .when()
                 .put("Company/" + id)
                 .then()
+                .statusCode(200)
                 .extract().response();
 
-        if (response.getStatusCode() != 200) System.err.println(response.body().asString());
         return response;
     }
 
@@ -131,14 +133,14 @@ public class Company extends TestBase {
         return response;
     }
 
-    public static Response deleteCompanyById(String id) {
+    public static Response deleteCompanyById(String id, int statusCode) {
         Response response = given()
                 .spec(CONST.BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getAccessToken())
                 .when()
                 .delete("Company/" + id)
                 .then()
-                .statusCode(200)
+                .statusCode(statusCode)
                 .extract()
                 .response();
         return response;
@@ -168,5 +170,27 @@ public class Company extends TestBase {
                 .extract()
                 .response();
         return response;
+    }
+
+    public static Response getCompanyNumberOfFavorites(int id) {
+        Response response = given()
+                .spec(CONST.BASE_SPEC)
+                .header("Authorization", "Bearer " + Auth.getAccessToken())
+                .when()
+                .get("Company/" + id + "/number-of-favorites")
+                .then()
+                .statusCode(200)
+                .extract()
+                .response();
+        return response;
+    }
+
+    public static ArrayList getListCompany(Response response) {
+        ObjectMapper mapper = new ObjectMapper();
+        List<Object> list = mapper.convertValue(
+                response.as(JsonNode.class),
+                new TypeReference<List<CompanyDTO>>() {
+                });
+        return (ArrayList) list;
     }
 }

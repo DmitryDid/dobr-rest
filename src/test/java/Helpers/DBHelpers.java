@@ -1,7 +1,5 @@
 package Helpers;
 
-import org.junit.Test;
-
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -11,7 +9,6 @@ public class DBHelpers {
     static String user = "master";
     static String password = "zJ8LLfsuBLC8w";
 
-    String confirmEmailCompanyById1 = "UPDATE company SET email_confirmed = true WHERE id = 1;";
 
     public static void executeRequest(String request) {
         try (Connection con = DriverManager.getConnection(url, user, password); Statement st = con.createStatement()) {
@@ -27,6 +24,7 @@ public class DBHelpers {
     public static void confirmEmailCompanyById(String id) {
         String request = "UPDATE company SET email_confirmed = true WHERE id = " + id + ";";
         executeRequest(request);
+        System.out.println("Email компании с id = " + id + " - подтвержден.");
     }
 
     public static ArrayList<String> getConfirmCode() {
@@ -52,10 +50,5 @@ public class DBHelpers {
         System.out.println("Выполнен запрос в БД:\n" + request);
         System.out.println();
         return request;
-    }
-
-    @Test
-    public void name() {
-        getId("SELECT * FROM company WHERE email = nsk_dem@mail.ru;");
     }
 }

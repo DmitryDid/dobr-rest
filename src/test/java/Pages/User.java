@@ -57,4 +57,17 @@ public class User extends TestBase {
         System.out.println("Создан пользователь " + name);
         return response;
     }
+
+    public static Response addedFavoriteForUser(int userId, int favoriteId) {
+        Response response = given()
+                .spec(CONST.BASE_SPEC)
+                .header("Authorization", "Bearer " + Auth.getToken())
+                .when()
+                .put("User/" + userId + "/favorite/" + favoriteId)
+                .then()
+                .statusCode(200)
+                .extract()
+                .response();
+        return response;
+    }
 }

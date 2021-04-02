@@ -29,7 +29,7 @@ public class TestBase {
     public void init() {
         RestAssured.defaultParser = Parser.JSON;
         accessToken = getToken();
-        //createRows();
+        createRows();
     }
 
     private void createRows() {
