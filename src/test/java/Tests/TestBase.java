@@ -1,9 +1,7 @@
 package Tests;
 
-import DTO.TopDTO;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import Pages.Company;
+import Pages.ProductCategory;
 import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
 import io.restassured.response.Response;
@@ -12,9 +10,7 @@ import org.junit.Before;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import static Pages.Auth.accessToken;
 import static Pages.Auth.getToken;
@@ -32,10 +28,10 @@ public class TestBase {
     }
 
     private void createRows() {
-        System.out.println("--- init ---");
-        createProductCategory();
-        createCompanyWithEmail(getUniqueNumber(9) + "@init.ru");
-        System.out.println("--- init ---\n");
+        if (ProductCategory.getCountProductCategory() < 3)
+            createProductCategory();
+        if (Company.getCountCompany() < 3)
+            createCompanyWithEmail(getUniqueNumber(9) + "@init.ru");
     }
 
     protected static void toConsole(Object object) {
@@ -80,12 +76,5 @@ public class TestBase {
         return null;
     }
 
-    protected static ArrayList<TopDTO> getListCompanyDTO(Response response) {
-        ObjectMapper mapper = new ObjectMapper();
-        List<Object> list = mapper.convertValue(
-                response.as(JsonNode.class),
-                new TypeReference<List<TopDTO>>() {
-                });
-        return (ArrayList) list;
-    }
+
 }

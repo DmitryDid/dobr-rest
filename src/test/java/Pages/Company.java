@@ -50,7 +50,7 @@ public class Company extends TestBase {
         return getListCompany(response);
     }
 
-    public static CompanyDTO getCompanyById(int id) {
+    public static CompanyDTO getCompany(int id) {
         Response response = given()
                 .spec(CONST.BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getAccessToken())
@@ -63,7 +63,7 @@ public class Company extends TestBase {
         return response.as(CompanyDTO.class);
     }
 
-    public static Response updateCompanyById(int id, Map data, File image) {
+    public static Response updateCompany(int id, Map data, File image) {
         Response response = given()
                 .spec(CONST.MULTi_DATA_SPEC)
                 .header("Authorization", "Bearer " + Auth.getAccessToken())
@@ -78,17 +78,10 @@ public class Company extends TestBase {
         return response;
     }
 
-    public static AuthDTO createCompany(Map<String, Object> params) {
+    public static AuthDTO createCompany() {
         Map<String, Object> defaultParams = getDefaultParams();
-
-        for (Map.Entry<String, Object> pair : params.entrySet()) {
-            String key = pair.getKey();
-            Object value = pair.getValue();
-            defaultParams.put(key, value);
-        }
         AuthDTO authDTO;
         try {
-
             authDTO = given()
                     .spec(CONST.MULTi_DATA_SPEC)
                     .formParams(defaultParams)
@@ -102,6 +95,30 @@ public class Company extends TestBase {
         } catch (AssertionError e) {
             authDTO = createCompanyWithEmail(getUniqueNumber(9) + "@create.ru");
         }
+
+        System.out.println("Создана компания " + authDTO.getCompany().getEmail());
+        return authDTO;
+    }
+
+    public static AuthDTO createCompany(Map<String, Object> params) {
+        Map<String, Object> defaultParams = getDefaultParams();
+
+        for (Map.Entry<String, Object> pair : params.entrySet()) {
+            String key = pair.getKey();
+            Object value = pair.getValue();
+            defaultParams.put(key, value);
+        }
+
+        AuthDTO authDTO = given()
+                .spec(CONST.MULTi_DATA_SPEC)
+                .formParams(defaultParams)
+                .multiPart("image", image)
+                .when()
+                .post("Company")
+                .then()
+                .statusCode(200)
+                .extract()
+                .response().as(AuthDTO.class);
 
         System.out.println("Создана компания " + authDTO.getCompany().getEmail());
         return authDTO;
@@ -136,10 +153,10 @@ public class Company extends TestBase {
                 .statusCode(200)
                 .extract()
                 .response();
-        return getListCompanyDTO(response);
+        return getListCompanyTop(response);
     }
 
-    public static Response deleteCompanyById(int id, int statusCode) {
+    public static Response deleteCompany(int id, int statusCode) {
         Response response = given()
                 .spec(CONST.BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getAccessToken())
@@ -152,7 +169,7 @@ public class Company extends TestBase {
         return response;
     }
 
-    public static Response getCompanyImageById(int id) {
+    public static Response getCompanyImage(int id) {
         Response response = given()
                 .spec(CONST.BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getAccessToken())
@@ -198,5 +215,84 @@ public class Company extends TestBase {
                 new TypeReference<List<CompanyDTO>>() {
                 });
         return (ArrayList) list;
+    }
+
+    public static ArrayList<TopDTO> getListCompanyTop(Response response) {
+        ObjectMapper mapper = new ObjectMapper();
+        List<Object> list = mapper.convertValue(
+                response.as(JsonNode.class),
+                new TypeReference<List<TopDTO>>() {
+                });
+        return (ArrayList) list;
+    }
+
+    public static CompanyDTO getRandomCompany() {
+        Integer countCompany = Company.getAllCompany().size();
+        Integer companyId = (int) (Math.random() * (countCompany - 1));
+        if (companyId <= 0) companyId = 1;
+        return Company.getCompany(companyId);
+    }
+
+    public static Response updateCompanyImage(int id, File image) {
+        Response response = given()
+                .spec(CONST.MULTi_DATA_SPEC)
+                .header("Authorization", "Bearer " + Auth.getAccessToken())
+                .multiPart("image", image)
+                .when()
+                .put("Company/" + id + "/image")
+                .then()
+                .statusCode(200)
+                .extract().response();
+
+        return response;
+    }
+
+    public static ArrayList<CompanyDTO> getListCompanyCategory(int id) {
+        Response response = given()
+                .spec(CONST.BASE_SPEC)
+                .header("Authorization", "Bearer " + Auth.getAccessToken())
+                .when()
+                .get("Company/category/" + id)
+                .then()
+                .statusCode(200)
+                .extract()
+                .response();
+
+        ObjectMapper mapper = new ObjectMapper();
+        List<Object> list = mapper.convertValue(
+                response.as(JsonNode.class),
+                new TypeReference<List<CompanyDTO>>() {
+                });
+        return (ArrayList) list;
+    }
+
+    public static int getCountCompany() {
+        return getAllCompany().size();
+    }
+
+    public static Response deleteCompanyCascade(int id, int statusCode) {
+        Response response = given()
+                .spec(CONST.BASE_SPEC)
+                .header("Authorization", "Bearer " + Auth.getAccessToken())
+                .when()
+                .delete("Company/cascade/" + id)
+                .then()
+                .statusCode(statusCode)
+                .extract()
+                .response();
+        return response;
+    }
+
+    public static void getCompanyNotification(int id) {
+        Response response = given()
+                .spec(CONST.BASE_SPEC)
+                .header("Authorization", "Bearer " + Auth.getAccessToken())
+                .when()
+                .get("Company/" +id+ "/notification")
+                .then()
+                .statusCode(200)
+                .extract()
+                .response();
+        toConsole(response);
     }
 }

@@ -33,6 +33,9 @@
                     <includes>
                         <include>AuthTest</include>
                         <include>ProductCategoryTest</include>
+                        <include>FiasTest</include>
+                        <include>FileTest</include>
+                        <include>RegistrationTest</include>
                     </includes>
                 </configuration>
             </plugin>

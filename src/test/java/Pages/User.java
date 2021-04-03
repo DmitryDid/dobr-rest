@@ -2,10 +2,16 @@ package Pages;
 
 import Constants.CONST;
 import DTO.AuthDTO;
+import DTO.UserDTO;
 import Tests.TestBase;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.response.Response;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
@@ -39,6 +45,46 @@ public class User extends TestBase {
         return response.as(AuthDTO.class);
     }
 
+    public static AuthDTO getRandomUser() {
+        Integer countUsers = User.getAllUser().size();
+        Integer userId = (int) (Math.random() * (countUsers - 1));
+        if (userId <= 0) userId = 1;
+        return User.getUser(userId);
+    }
+
+    public static ArrayList<UserDTO> getAllUser() {
+        Response response = given()
+                .spec(CONST.BASE_SPEC)
+                .header("Authorization", "Bearer " + Auth.getAccessToken())
+                .when()
+                .get("User")
+                .then()
+                .statusCode(200)
+                .extract().response();
+        return getListUser(response);
+    }
+
+    public static ArrayList<UserDTO> getListUser(Response response) {
+        ObjectMapper mapper = new ObjectMapper();
+        List<Object> list = mapper.convertValue(
+                response.as(JsonNode.class),
+                new TypeReference<List<UserDTO>>() {
+                });
+        return (ArrayList) list;
+    }
+
+    public static AuthDTO getUser(int id) {
+        return given()
+                .spec(CONST.BASE_SPEC)
+                .header("Authorization", "Bearer " + Auth.getToken())
+                .when()
+                .get("User/" + id)
+                .then()
+                .statusCode(200)
+                .extract()
+                .response().as(AuthDTO.class);
+    }
+
     public static AuthDTO createUser(String uuid) {
         Response response = given()
                 .spec(CONST.MULTi_DATA_SPEC)
@@ -59,10 +105,9 @@ public class User extends TestBase {
         return response.as(AuthDTO.class);
     }
 
-    public static Response addedFavoriteForUser(int userId, int favoriteId) {
+    public static UserDTO addedFavoriteForUser(int userId, int favoriteId) {
         Response response = given()
                 .spec(CONST.BASE_SPEC)
-                .log().all()
                 .header("Authorization", "Bearer " + Auth.getToken())
                 .when()
                 .put("User/" + userId + "/favorite/" + favoriteId)
@@ -70,6 +115,6 @@ public class User extends TestBase {
                 .statusCode(200)
                 .extract()
                 .response();
-        return response;
+        return response.as(UserDTO.class);
     }
 }

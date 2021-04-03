@@ -21,6 +21,7 @@ public class DBHelpers {
         System.out.println();
     }
 
+
     public static void confirmEmailCompanyById(int id) {
         String request = "UPDATE company SET email_confirmed = true WHERE id = " + id + ";";
         executeRequest(request);
@@ -39,16 +40,18 @@ public class DBHelpers {
         return list;
     }
 
-    public static String getId(String request) {
+    public static String getConfirmCode(String email) {
+        String request = String.format("SELECT * FROM email_code WHERE email = '%s';", email);
+        String code = null;
         try (Connection con = DriverManager.getConnection(url, user, password); Statement st = con.createStatement()) {
             ResultSet rs = st.executeQuery(request);
             rs.next();
-            return rs.getString("id");
+            code = rs.getString("code");
         } catch (SQLException e) {
-            e.getMessage();
+            e.printStackTrace();
         }
         System.out.println("Выполнен запрос в БД:\n" + request);
         System.out.println();
-        return request;
+        return code;
     }
 }

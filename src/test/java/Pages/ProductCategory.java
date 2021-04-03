@@ -82,7 +82,7 @@ public class ProductCategory extends TestBase {
         return response;
     }
 
-    public static ArrayList getListProductCategory(Response response) {
+    public static ArrayList<ProductCategoryDTO> getListProductCategory(Response response) {
         ObjectMapper mapper = new ObjectMapper();
         List<Object> list = mapper.convertValue(
                 response.as(JsonNode.class),
@@ -91,7 +91,11 @@ public class ProductCategory extends TestBase {
         return (ArrayList) list;
     }
 
-    public static ProductCategoryDTO getProductCategoryById(int id) {
+    public static int getCountProductCategory() {
+        return getListProductCategory(getAllProductCategory()).size();
+    }
+
+    public static ProductCategoryDTO getProductCategory(int id) {
         Response response = given()
                 .spec(CONST.BASE_SPEC)
                 .header("Authorization", "Bearer " + getAccessToken())
@@ -103,7 +107,7 @@ public class ProductCategory extends TestBase {
         return response.as(ProductCategoryDTO.class);
     }
 
-    public static String getProductCategoryImageById(int id) {
+    public static String getProductCategoryImage(int id) {
         Response response = given()
                 .spec(CONST.BASE_SPEC)
                 .header("Authorization", "Bearer " + getAccessToken())
@@ -115,7 +119,7 @@ public class ProductCategory extends TestBase {
         return response.asString();
     }
 
-    public static Response putProductCategoryImageById(int id, File image) {
+    public static Response putProductCategoryImage(int id, File image) {
         Response response = given()
                 .spec(CONST.MULTi_DATA_SPEC)
                 .header("Authorization", "Bearer " + getAccessToken())
@@ -126,5 +130,11 @@ public class ProductCategory extends TestBase {
                 .statusCode(200)
                 .extract().response();
         return response;
+    }
+
+    public static ProductCategoryDTO getRandomProdCat() {
+        ArrayList<ProductCategoryDTO> list = getListProductCategory(getAllProductCategory());
+        Integer id = (int) (Math.random() * list.size());
+        return getProductCategory(id);
     }
 }

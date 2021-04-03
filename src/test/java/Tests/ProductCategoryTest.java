@@ -1,6 +1,5 @@
 package Tests;
 
-import DTO.AuthDTO;
 import DTO.ProductCategoryDTO;
 import Pages.ProductCategory;
 import org.junit.Test;
@@ -10,7 +9,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static Helpers.DBHelpers.confirmEmailCompanyById;
 import static Pages.Company.createCompany;
 import static Pages.Company.getDefaultParams;
 import static Pages.ProductCategory.*;
@@ -49,7 +47,7 @@ public class ProductCategoryTest extends TestBase {
 
     @Test
     public void getProductCategoryAll() {
-        ArrayList list = ProductCategory.getListProductCategory(getAllProductCategory());
+        ArrayList<ProductCategoryDTO> list = ProductCategory.getListProductCategory(getAllProductCategory());
         assertTrue(list.size() > 0);
 
         for (Object o : list) {
@@ -76,7 +74,7 @@ public class ProductCategoryTest extends TestBase {
         ProductCategoryDTO create = createProductCategory(params, image);
 
         ProductCategoryDTO get = ProductCategory
-                .getProductCategoryById(create.getId());
+                .getProductCategory(create.getId());
 
         assertEquals(name, get.getName());
         assertEquals("8", get.getAgeLimit().toString());
@@ -93,11 +91,9 @@ public class ProductCategoryTest extends TestBase {
         Map companyParams = getDefaultParams();
         companyParams.put("productCategoryId", categoryId);
 
-        int companyId = createCompany(companyParams)
+        int companyId = createCompany()
                 .getCompany()
                 .getId();
-
-        confirmEmailCompanyById(companyId);
 
         String name = "update_product";
         int age = 6;
@@ -109,7 +105,7 @@ public class ProductCategoryTest extends TestBase {
         ProductCategoryDTO create = updateProductCategory(categoryId, newParams, image);
 
         ProductCategoryDTO get = ProductCategory
-                .getProductCategoryById(create.getId());
+                .getProductCategory(create.getId());
 
         assertEquals(name, get.getName());
         assertEquals("6", get.getAgeLimit().toString());
@@ -122,7 +118,7 @@ public class ProductCategoryTest extends TestBase {
     public void getProductCategoryImageById() {
         int categoryId = createProductCategory().getId();
 
-        String imageBytes = ProductCategory.getProductCategoryImageById(categoryId);
+        String imageBytes = ProductCategory.getProductCategoryImage(categoryId);
         assertTrue(imageBytes.contains("JPEG"));
     }
 
@@ -130,13 +126,13 @@ public class ProductCategoryTest extends TestBase {
     public void putProductCategoryImageById() {
         int categoryId = createProductCategory().getId();
 
-        int imageId = ProductCategory.getProductCategoryById(categoryId)
+        int imageId = ProductCategory.getProductCategory(categoryId)
                 .getImageId();
 
         File newImage = new File("src/test/java/Resources/Malen.jpeg");
-        ProductCategory.putProductCategoryImageById(categoryId, newImage);
+        ProductCategory.putProductCategoryImage(categoryId, newImage);
 
-        int newImageId = ProductCategory.getProductCategoryById(categoryId)
+        int newImageId = ProductCategory.getProductCategory(categoryId)
                 .getImageId();
 
         assertNotEquals(imageId, newImageId);

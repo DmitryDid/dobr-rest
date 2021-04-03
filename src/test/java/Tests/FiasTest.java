@@ -1,44 +1,46 @@
 package Tests;
 
-import Pages.Auth;
 import Constants.CONST;
-import io.restassured.response.Response;
 import org.junit.Test;
 
 import static io.restassured.RestAssured.given;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class FiasTest extends TestBase {
 
-    // /api/v{version}/Fias/address/{text}
     @Test
     public void getFiasAddressText() {
-        String text = "test_address";
-        Response response = given()
+        String text = "город Новосибирск, улица Фрунзе, дом 5";
+        String[] words = text.split(" ");
+
+        String response = given()
                 .spec(CONST.BASE_SPEC)
-                .header("Authorization", "Bearer " + Auth.getToken())
-                .log().all()
                 .when()
                 .get("Fias/address/" + text)
                 .then()
                 .statusCode(200)
                 .extract()
-                .response();
-        toConsole(response);
+                .response().asString();
+
+        for (String word : words) {
+            assertTrue(response.contains(word));
+        }
     }
 
-    // /api/v{version}/Fias/inn/{inn}
     @Test
     public void getFiasInn() {
-        Response response = given()
+        String response = given()
                 .spec(CONST.BASE_SPEC)
-                .header("Authorization", "Bearer " + Auth.getToken())
-                .log().all()
                 .when()
-                .get("Fias/inn/" + "6240283167")
+                .get("Fias/inn/" + "5401309211")
                 .then()
                 .statusCode(200)
                 .extract()
-                .response();
-        toConsole(response);
+                .response().asString();
+
+        assertEquals(
+                "[{\"name\":\"ООО \\\"ЭЛИТА-ВОСТОК\\\"\",\"inn\":\"5401309211\",\"management\":\"Леонов Александр Владимирович\"}]",
+                response);
     }
 }

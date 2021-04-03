@@ -26,10 +26,10 @@ public class AuthTest extends TestBase {
     // POST /api/v{version}/Auth/company
     @Test
     public void getCompanyTokenByUsernameAndPassword_200() {
-        Integer companyId = createCompany(getDefaultParams())
+        Integer companyId = createCompany()
                 .getCompany().getId();
 
-        CompanyDTO companyDTO = getCompanyById(companyId);
+        CompanyDTO companyDTO = getCompany(companyId);
 
         AuthDTO authDTO = getTokenCompanyByUsernameAndPassword(companyDTO.getEmail(), companyDTO.getPassword());
 
@@ -42,10 +42,10 @@ public class AuthTest extends TestBase {
     // POST /api/v{version}/Auth/token/company/{playerId}
     @Test
     public void getTokenForCompanyByCompanyId_200() throws InterruptedException {
-        Integer companyId = createCompany(getDefaultParams())
+        Integer companyId = createCompany()
                 .getCompany().getId();
 
-        CompanyDTO companyDTO = getCompanyById(companyId);
+        CompanyDTO companyDTO = getCompany(companyId);
 
         AuthDTO authDTO = getTokenForCompanyByPlayerId(companyDTO.getPlayerId());
 
@@ -74,7 +74,7 @@ public class AuthTest extends TestBase {
     @Test
     public void getCompanyLostPassword_200() {
         int companyId = 1;
-        CompanyDTO companyDTO = getCompanyById(companyId);
+        CompanyDTO companyDTO = getCompany(companyId);
 
         AuthDTO authDTO = getCompanyLostPassword(companyDTO.getEmail(), getToken());
         //TODO: дописать
@@ -88,7 +88,7 @@ public class AuthTest extends TestBase {
         int companyId = createCompany(getDefaultParams())
                 .getCompany().getId();
 
-        CompanyDTO companyDTO = getCompanyById(companyId);
+        CompanyDTO companyDTO = getCompany(companyId);
 
         AuthDTO authDTO = getTokenCompanyByUsernameAndPassword(
                 companyDTO.getEmail(), companyDTO.getPassword());
