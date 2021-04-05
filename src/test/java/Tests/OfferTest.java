@@ -3,9 +3,11 @@ package Tests;
 import Pages.Auth;
 import Constants.CONST;
 import io.restassured.response.Response;
+import org.junit.Assert;
 import org.junit.Test;
 
 import static io.restassured.RestAssured.given;
+import static org.junit.Assert.*;
 
 public class OfferTest extends TestBase {
 
@@ -22,14 +24,14 @@ public class OfferTest extends TestBase {
                 .statusCode(200)
                 .extract()
                 .response();
-
         toConsole(response);
+        fail();
     }
 
     // /api/v1/offer/55/image
     @Test
     public void getOfferImage() {
-        String id = "96";
+        String id = "1";
 
         Response response = given()
                 .spec(CONST.BASE_SPEC)
@@ -42,5 +44,6 @@ public class OfferTest extends TestBase {
                 .response();
 
         toConsole(response);
+        fail();
     }
 }

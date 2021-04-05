@@ -54,6 +54,7 @@ public class Company extends TestBase {
         Response response = given()
                 .spec(CONST.BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getAccessToken())
+                .log().all()
                 .when()
                 .get("Company/" + id)
                 .then()
@@ -227,10 +228,11 @@ public class Company extends TestBase {
     }
 
     public static CompanyDTO getRandomCompany() {
-        Integer countCompany = Company.getAllCompany().size();
-        Integer companyId = (int) (Math.random() * (countCompany - 1));
-        if (companyId <= 0) companyId = 1;
-        return Company.getCompany(companyId);
+        ArrayList<CompanyDTO> list = Company.getAllCompany();
+        int countCompany = list.size();
+        int index = (int) (Math.random() * (countCompany - 1));
+        if (index <= 0) index = 1;
+        return list.get(index);
     }
 
     public static Response updateCompanyImage(int id, File image) {
@@ -288,7 +290,7 @@ public class Company extends TestBase {
                 .spec(CONST.BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getAccessToken())
                 .when()
-                .get("Company/" +id+ "/notification")
+                .get("Company/" + id + "/notification")
                 .then()
                 .statusCode(200)
                 .extract()

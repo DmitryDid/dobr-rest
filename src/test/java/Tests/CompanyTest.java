@@ -1,10 +1,7 @@
 package Tests;
 
 import Constants.CONST;
-import DTO.AuthDTO;
-import DTO.CompanyDTO;
-import DTO.ProductCategoryDTO;
-import DTO.TopDTO;
+import DTO.*;
 import Pages.Company;
 import Pages.User;
 import org.junit.Test;
@@ -108,9 +105,9 @@ public class CompanyTest extends TestBase {
 
     @Test
     public void getCompanyNotification() {
-        AuthDTO userDTO = getRandomUser();
+        UserDTO userDTO = getRandomUser();
         ProductCategoryDTO productCategoryDTO = getRandomProdCat();
-        addedFavoriteForUser(userDTO.getUser().getId(), productCategoryDTO.getId());
+        addedFavoriteForUser(userDTO.getId(), productCategoryDTO.getId());
 
         Company.getCompanyNotification(1);
         // []
@@ -119,10 +116,10 @@ public class CompanyTest extends TestBase {
 
     @Test
     public void getCompanyTop() {
-        AuthDTO userDTO = getRandomUser();
+        UserDTO userDTO = getRandomUser();
         ProductCategoryDTO productCategoryDTO = getRandomProdCat();
 
-        addedFavoriteForUser(userDTO.getUser().getId(), productCategoryDTO.getId());
+        addedFavoriteForUser(userDTO.getId(), productCategoryDTO.getId());
 
         ArrayList<TopDTO> list = Company.getCompanyTop();
 

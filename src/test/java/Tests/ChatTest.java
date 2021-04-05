@@ -1,194 +1,97 @@
 package Tests;
 
-import Pages.Auth;
-import Constants.CONST;
-import io.restassured.response.Response;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import DTO.ChatsDTO;
+import DTO.MessageDTO;
+import DTO.MessagesDTO;
+import Pages.Chat;
+import Pages.Company;
+import Pages.User;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Date;
 
-import static io.restassured.RestAssured.given;
-import static org.junit.Assert.*;
+import static Pages.Chat.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ChatTest extends TestBase {
 
-    // GET /api/v{version}/Chat/user/{userId}
     @Test
     public void getChatUserById() {
-        String userId = "15";
-        Response response = given()
-                .spec(CONST.BASE_SPEC)
-                .header("Authorization", "Bearer " + Auth.getToken())
-                .log().uri().log().method()
-                .when()
-                .get("Chat/user/" + userId)
-                .then()
-                .statusCode(200)
-                .extract()
-                .response();
-        toConsole(response);
+        String text = "testText" + getUniqueNumber(4);
+        Integer userId = User.getRandomUser().getId();
+        Integer companyId = Company.getRandomCompany().getId();
 
-        assertTrue(((Integer) new JSONObject(response.asString()).get("lastId")) > 0);
+        postUserMessage(userId, companyId, text);
 
-        JSONObject jsonObject = new JSONObject(response.asString());
-        JSONArray chats = jsonObject.getJSONArray("chats");
+        ChatsDTO chatsDTO = Chat.getChatUser(userId, -1);
 
-        assertTrue(chats.length() > 0);
-        for (int i = 0; i < chats.length(); i++) {
-            JSONObject company = chats.getJSONObject(i).getJSONObject("company");
-            assertNotNull(company.get("id"));
-            assertNotNull(company.get("latitude"));
-            assertNotNull(company.get("longitude"));
-            assertNotNull(company.get("nameOfficial"));
-            assertNotNull(company.get("name"));
-            assertNotNull(company.get("representative"));
-            assertNotNull(company.get("phone"));
-            assertNotNull(company.get("email"));
-            assertNotNull(company.get("inn"));
-            assertNotNull(company.get("password"));
-            assertNotNull(company.get("address"));
-            assertNotNull(company.get("timeOfWork"));
-            assertNotNull(company.get("emailConfirmed"));
-            assertNotNull(company.get("playerId"));
-            assertNotNull(company.get("playerId"));
-            assertNotNull(company.get("productCategory"));
-            assertNotNull(company.get("avatarName"));
-
-            String lastMessage = (String) chats.getJSONObject(i).get("lastMessage");
-            String dateTime = (String) chats.getJSONObject(i).get("dateTime");
-
-            assertTrue(lastMessage.length() > 0);
-            assertTrue(dateTime.length() > 0);
-
-            System.out.println(lastMessage);
-        }
+        assertTrue(chatsDTO.getChats().size() > 0);
+        assertTrue(chatsDTO.getLastId() > 0);
     }
 
-    // GET /api/v{version}/Chat/company/{companyId}
     @Test
-    public void getChatCompanyById() {
-        String companyId = "5";
-        Response response = given()
-                .spec(CONST.BASE_SPEC)
-                .header("Authorization", "Bearer " + Auth.getToken())
-                .log().uri().log().method()
-                .when()
-                .get("Chat/company/" + companyId)
-                .then()
-                .statusCode(200)
-                .extract()
-                .response();
-        toConsole(response);
+    public void getChatCompany() {
+        String text = "testText" + getUniqueNumber(4);
+        Integer userId = User.getRandomUser().getId();
+        Integer companyId = Company.getRandomCompany().getId();
 
-        assertTrue(((Integer) new JSONObject(response.asString()).get("lastId")) > 0);
+        postUserMessage(userId, companyId, text);
 
-        JSONObject jsonObject = new JSONObject(response.asString());
-        JSONArray chats = jsonObject.getJSONArray("chats");
+        ChatsDTO chatsDTO = Chat.getChatCompany(companyId, -1);
 
-        for (int i = 0; i < chats.length(); i++) {
-            JSONObject users = chats.getJSONObject(i).getJSONObject("user");
-            assertNotNull(users.get("id"));
-            assertNotNull(users.get("name"));
-            assertNotNull(users.get("isMan"));
-            assertNotNull(users.get("latitude"));
-            assertNotNull(users.get("longitude"));
-            assertNotNull(users.get("birthYear"));
-            assertNotNull(users.get("avatarName"));
-            assertNotNull(users.get("playerId"));
-
-            String lastMessage = (String) chats.getJSONObject(i).get("lastMessage");
-            String dateTime = (String) chats.getJSONObject(i).get("dateTime");
-
-            assertTrue(lastMessage.length() > 0);
-            assertTrue(dateTime.length() > 0);
-
-            System.out.println(lastMessage);
-        }
+        assertTrue(chatsDTO.getChats().size() > 0);
+        assertTrue(chatsDTO.getLastId() > 0);
     }
 
-    // не работает
-    // GET /api/v{version}/Chat/message
     @Test
     public void getChatMessage() {
-        String token = Auth.getToken();
-        Response response = given()
-                .spec(CONST.BASE_SPEC)
-                .header("Authorization", "Bearer " + token)
-                .log().all()
-                .when()
-                .get("Chat/message")
-                .then()
-                .statusCode(200)
-                .extract()
-                .response();
-        toConsole(response);
+        String text = "testText" + getUniqueNumber(4);
+        Integer userId = User.getRandomUser().getId();
+        Integer companyId = Company.getRandomCompany().getId();
+
+        postUserMessage(userId, companyId, text);
+
+        ArrayList<MessagesDTO> list = getMessage(userId, companyId, -1);
+        assertTrue(list.size() > 0);
+
+        for (int i = 0; i < list.size(); i++) {
+            MessagesDTO messages = list.get(i);
+            MessageDTO message = messages.getMessages().get(i);
+            assertEquals(message.getCompany().getId(), companyId);
+            assertEquals(message.getUser().getId(), userId);
+            assertTrue(message.getText().startsWith("testText"));
+        }
     }
 
-    // /api/v{version}/Chat/message
     @Test
     public void postChatMessage() {
-        String text = "testText" + getUniqueNumber(4);
-        int companyId = 5;
-        int userId = 15;
-        boolean isUserMessage = true;
-        Response response = given()
-                .spec(CONST.BASE_SPEC)
-                .header("Authorization", "Bearer " + Auth.getToken())
-                .body("{\n" +
-                        "  \"text\": \"" + text + "\",\n" +
-                        "  \"companyId\": " + companyId + ",\n" +
-                        "  \"userId\": " + userId + ",\n" +
-                        "  \"isUserMessage\": " + isUserMessage + "\n" +
-                        "}")
-                .log().all()
-                .when()
-                .post("Chat/message")
-                .then()
-                .statusCode(200)
-                .extract()
-                .response();
-        toConsole(response);
+        String userText = "testText" + getUniqueNumber(4);
+        String companyText = "testText" + getUniqueNumber(5);
+        Integer userId = User.getRandomUser().getId();
+        Integer companyId = Company.getRandomCompany().getId();
 
-        JSONObject jsonObject = new JSONObject(response.asString());
-        Integer id = (Integer) jsonObject.get("id");
-        assertTrue(id > 0);
+        MessageDTO userPost = postUserMessage(userId, companyId, userText);
+        Date postUserDate = getDate(userPost.getSendingTime());
 
-        Date sendingTime = getDate((String) jsonObject.get("sendingTime"));
-        assertEquals(sendingTime.getYear(), new Date().getYear());
-        assertEquals(sendingTime.getMonth(), new Date().getMonth());
-        assertEquals(sendingTime.getDate(), new Date().getDate());
+        assertEquals(postUserDate.getYear(), new Date().getYear());
+        assertEquals(postUserDate.getMonth(), new Date().getMonth());
+        assertEquals(postUserDate.getDay(), new Date().getDay());
+        assertEquals(userPost.getUser().getId(), userId);
+        assertEquals(userPost.getCompany().getId(), companyId);
+        assertEquals(userPost.getText(), userText);
+        assertEquals(userPost.getIsUserMessage(), true);
 
-        assertEquals(isUserMessage, jsonObject.get("isUserMessage"));
-        assertEquals(text, jsonObject.get("text"));
+        MessageDTO companyPost = postCompanyMessage(userId, companyId, companyText);
+        Date posCompanyDate = getDate(userPost.getSendingTime());
 
-        JSONObject user = jsonObject.getJSONObject("user");
-        assertEquals(userId, user.get("id"));
-        assertNotNull(user.get("name"));
-        assertNotNull(user.get("isMan"));
-        assertNotNull(user.get("latitude"));
-        assertNotNull(user.get("longitude"));
-        assertNotNull(user.get("birthYear"));
-        assertNotNull(user.get("avatarName"));
-        assertNotNull(user.get("playerId"));
-
-        JSONObject company = jsonObject.getJSONObject("company");
-        assertEquals(companyId, company.get("id"));
-        assertNotNull(company.get("latitude"));
-        assertNotNull(company.get("longitude"));
-        assertNotNull(company.get("nameOfficial"));
-        assertNotNull(company.get("name"));
-        assertNotNull(company.get("representative"));
-        assertNotNull(company.get("phone"));
-        assertNotNull(company.get("email"));
-        assertNotNull(company.get("inn"));
-        assertNotNull(company.get("password"));
-        assertNotNull(company.get("address"));
-        assertNotNull(company.get("timeOfWork"));
-        assertNotNull(company.get("emailConfirmed"));
-        assertNotNull(company.get("playerId"));
-        assertNotNull(company.get("productCategory"));
-        assertNotNull(company.get("avatarName"));
+        assertEquals(posCompanyDate.getYear(), new Date().getYear());
+        assertEquals(posCompanyDate.getMonth(), new Date().getMonth());
+        assertEquals(posCompanyDate.getDay(), new Date().getDay());
+        assertEquals(companyPost.getCompany().getId(), companyId);
+        assertEquals(companyPost.getUser().getId(), userId);
+        assertEquals(companyPost.getText(), companyText);
+        assertEquals(companyPost.getIsUserMessage(), false);
     }
 }

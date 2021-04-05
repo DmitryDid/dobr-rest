@@ -3,6 +3,7 @@ package Tests;
 import Constants.CONST;
 import DTO.AuthDTO;
 import DTO.CompanyDTO;
+import Pages.Auth;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -14,8 +15,8 @@ public class AuthTest extends TestBase {
 
     // POST /api/v{version}/Auth/token/user/{playerId}
     @Test
-    public void getTokenUserByPlayerId_200() {
-        AuthDTO auth = getTokenUserByPlayerId(CONST.PLAYER_ID);
+    public void getTokenUserByPlayerId() {
+        AuthDTO auth = Auth.getTokenUserByPlayerId(CONST.PLAYER_ID);
 
         assertNotNull(auth.getAccessToken());
         assertEquals("bearer", auth.getTokenType());
@@ -25,7 +26,7 @@ public class AuthTest extends TestBase {
 
     // POST /api/v{version}/Auth/company
     @Test
-    public void getCompanyTokenByUsernameAndPassword_200() {
+    public void getCompanyTokenByUsernameAndPassword() {
         Integer companyId = createCompany()
                 .getCompany().getId();
 
@@ -41,7 +42,7 @@ public class AuthTest extends TestBase {
 
     // POST /api/v{version}/Auth/token/company/{playerId}
     @Test
-    public void getTokenForCompanyByCompanyId_200() throws InterruptedException {
+    public void getTokenForCompanyByCompanyId() throws InterruptedException {
         Integer companyId = createCompany()
                 .getCompany().getId();
 
@@ -57,11 +58,11 @@ public class AuthTest extends TestBase {
 
     // /api/v{version}/Auth/refresh-token
     @Test
-    public void getRefreshToken_200() {
-        String token = getTokenUserByPlayerId(CONST.PLAYER_ID)
+    public void getRefreshToken() {
+        String token = Auth.getTokenUserByPlayerId(CONST.PLAYER_ID)
                 .getAccessToken();
 
-        String refreshToken = getRefreshToken(token)
+        String refreshToken = Auth.getRefreshToken(token)
                 .getAccessToken();
 
         assertNotNull(token);
@@ -72,11 +73,11 @@ public class AuthTest extends TestBase {
     // POST /api/v{version}/Auth/company/lost-password
     @Ignore
     @Test
-    public void getCompanyLostPassword_200() {
+    public void getCompanyLostPassword() {
         int companyId = 1;
         CompanyDTO companyDTO = getCompany(companyId);
 
-        AuthDTO authDTO = getCompanyLostPassword(companyDTO.getEmail(), getToken());
+        AuthDTO authDTO = Auth.getCompanyLostPassword(companyDTO.getEmail(), getToken());
         //TODO: дописать
         toConsole(authDTO);
     }
@@ -84,7 +85,7 @@ public class AuthTest extends TestBase {
     // POST /api/v{version}/Auth/company/restore-password
     @Ignore
     @Test
-    public void getCompanyRestorePassword_200() {
+    public void getCompanyRestorePassword() {
         int companyId = createCompany(getDefaultParams())
                 .getCompany().getId();
 
@@ -95,7 +96,7 @@ public class AuthTest extends TestBase {
 
         String newPassword = "NEW_test_company_password" + getUniqueNumber(3);
 
-        AuthDTO newAuthDTO = getCompanyRestorePassword(CONST.EMAIL, newPassword, 0000);   //TODO: доработать когда заработает
+        AuthDTO newAuthDTO = Auth.getCompanyRestorePassword(CONST.EMAIL, newPassword, 0000);   //TODO: доработать когда заработает
         assertEquals("Success", newAuthDTO.getStatus());
         assertEquals(newPassword, newAuthDTO.getCompany().getPassword());
     }
