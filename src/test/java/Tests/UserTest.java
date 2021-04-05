@@ -1,7 +1,6 @@
 package Tests;
 
 import Pages.Auth;
-import Constants.CONST;
 import io.restassured.response.Response;
 import org.json.JSONObject;
 import org.junit.Test;
@@ -28,7 +27,7 @@ public class UserTest extends TestBase {
         String longitude = "82.9346000";
 
         Response response = given()
-                .spec(CONST.MULTi_DATA_SPEC)
+                .spec(MULTI_DATA_SPEC)
                 //.header("Authorization", "Bearer " + getToken())
                 .log().all()
                 .formParam("name", name)
@@ -52,7 +51,7 @@ public class UserTest extends TestBase {
     public void getUserImageById() {
         String id = "14";
         Response response = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getToken())
                 .log().all()
                 .when()
@@ -68,7 +67,7 @@ public class UserTest extends TestBase {
     @Test
     public void getUsersAll() {
         Response response = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getToken())
                 .log().all()
                 .when()
@@ -94,7 +93,7 @@ public class UserTest extends TestBase {
         String longitude = "82.9346000";
 
         Response response = given()
-                .spec(CONST.MULTi_DATA_SPEC)
+                .spec(MULTI_DATA_SPEC)
                 .header("Authorization", "Bearer " + Auth.getToken())
                 .log().all()
                 .formParam("name", name)
@@ -127,7 +126,7 @@ public class UserTest extends TestBase {
 
         // GET /api/v{version}/User/{id}
         Response getResponse = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getToken())
                 .log().all()
                 .when()
@@ -165,7 +164,7 @@ public class UserTest extends TestBase {
         String userId = "22";
         String favoriteId = "1";
         Response response = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getToken())
                 .log().all()
                 .when()
@@ -182,7 +181,7 @@ public class UserTest extends TestBase {
     public void getUserFavorite() {
         String id = "22";
         Response response = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getToken())
                 .log().all()
                 .when()
@@ -199,7 +198,7 @@ public class UserTest extends TestBase {
     public void getUserStories() {
         String id = "22";
         Response response = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getToken())
                 .log().all()
                 .when()
@@ -218,7 +217,7 @@ public class UserTest extends TestBase {
         String favoriteId = "5";
 
         Response response = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getToken())
                 .log().uri().log().method()
                 .when()
@@ -232,7 +231,7 @@ public class UserTest extends TestBase {
         assertEquals("Already exist", response.asString());
 
         Response deleteResponse = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getToken())
                 .log().uri().log().method()
                 .when()
@@ -244,7 +243,7 @@ public class UserTest extends TestBase {
         toConsole(deleteResponse);
 
         Response putAgainResponse = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getToken())
                 .log().uri().log().method()
                 .when()

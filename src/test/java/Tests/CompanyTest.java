@@ -1,6 +1,5 @@
 package Tests;
 
-import Constants.CONST;
 import DTO.*;
 import Pages.Company;
 import Pages.User;
@@ -203,7 +202,7 @@ public class CompanyTest extends TestBase {
 
         for (int i = 0; i < companyList.size(); i++) {
             currentCompany = companyList.get(i);
-            if (CONST.EMAIL.equals(currentCompany.getEmail())) {
+            if (EMAIL.equals(currentCompany.getEmail())) {
                 assertEquals((Double) 55.0415, currentCompany.getLatitude());
                 assertEquals((Double) 82.9346, currentCompany.getLongitude());
                 assertEquals("test_company nameOfficial", currentCompany.getNameOfficial());

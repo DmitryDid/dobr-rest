@@ -1,6 +1,5 @@
 package Tests;
 
-import Constants.CONST;
 import Helpers.DBHelpers;
 import Pages.Registration;
 import org.junit.Test;
@@ -10,9 +9,9 @@ public class RegistrationTest extends TestBase {
 
     @Test
     public void emailConfirmation() {
-        String email = CONST.EMAIL;
+        String email = EMAIL;
         Registration.emailConfirmation(email);
-        String code = DBHelpers.getConfirmCode(CONST.EMAIL);
+        String code = DBHelpers.getConfirmCode(EMAIL);
         Registration.emailAcceptance(email, code);
     }
 }

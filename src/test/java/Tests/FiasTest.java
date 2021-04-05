@@ -1,6 +1,5 @@
 package Tests;
 
-import Constants.CONST;
 import org.junit.Test;
 
 import static io.restassured.RestAssured.given;
@@ -15,7 +14,7 @@ public class FiasTest extends TestBase {
         String[] words = text.split(" ");
 
         String response = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .when()
                 .get("Fias/address/" + text)
                 .then()
@@ -31,7 +30,7 @@ public class FiasTest extends TestBase {
     @Test
     public void getFiasInn() {
         String response = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .when()
                 .get("Fias/inn/" + "5401309211")
                 .then()

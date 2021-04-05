@@ -1,6 +1,5 @@
 package Pages;
 
-import Constants.CONST;
 import DTO.AuthDTO;
 import DTO.UserDTO;
 import Tests.TestBase;
@@ -33,7 +32,7 @@ public class User extends TestBase {
     public static AuthDTO createUser() {
         Map<String, Object> params = getDefaultUserParams();
         Response response = given()
-                .spec(CONST.MULTi_DATA_SPEC)
+                .spec(MULTI_DATA_SPEC)
                 .formParams(params)
                 .multiPart("image", image)
                 .when()
@@ -55,7 +54,7 @@ public class User extends TestBase {
 
     public static ArrayList<UserDTO> getAllUser() {
         Response response = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getAccessToken())
                 .when()
                 .get("User")
@@ -76,7 +75,7 @@ public class User extends TestBase {
 
     public static AuthDTO getUser(int id) {
         return given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getToken())
                 .when()
                 .get("User/" + id)
@@ -91,7 +90,7 @@ public class User extends TestBase {
         params.put("playerId", uuid);
 
         Response response = given()
-                .spec(CONST.MULTi_DATA_SPEC)
+                .spec(MULTI_DATA_SPEC)
                 .formParams(params)
                 .multiPart("image", image)
                 .when()
@@ -105,7 +104,7 @@ public class User extends TestBase {
 
     public static UserDTO addedFavoriteForUser(int userId, int favoriteId) {
         Response response = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getToken())
                 .when()
                 .put("User/" + userId + "/favorite/" + favoriteId)

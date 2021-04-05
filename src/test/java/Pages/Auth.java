@@ -1,12 +1,12 @@
 package Pages;
 
-import Constants.CONST;
 import DTO.AuthDTO;
+import Tests.TestBase;
 import io.restassured.response.Response;
 
 import static io.restassured.RestAssured.given;
 
-public class Auth {
+public class Auth extends TestBase {
 
     public static String accessToken;
 
@@ -16,7 +16,7 @@ public class Auth {
 
     public static AuthDTO getRefreshToken(String token) {
         Response response = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + token)
                 .when()
                 .get("Auth/refresh-token")
@@ -29,7 +29,7 @@ public class Auth {
 
     public static AuthDTO getTokenUserByPlayerId(String id) {
         Response response = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .when()
                 .post("Auth/token/user/" + id)
                 .then()
@@ -40,7 +40,7 @@ public class Auth {
 
     public static AuthDTO getTokenCompanyByUsernameAndPassword(String username, String password) {
         Response response = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .body("{\n" +
                         "  \"username\": \"" + username + "\",\n" +
                         "  \"password\": \"" + password + "\"\n" +
@@ -55,7 +55,7 @@ public class Auth {
 
     public static AuthDTO getTokenForCompanyByPlayerId(String id) {
         Response response = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .when()
                 .post("Auth/token/company/" + id)
                 .then()
@@ -67,7 +67,7 @@ public class Auth {
 
     public static AuthDTO getCompanyLostPassword(String email, String token) {
         Response response = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + token)
                 .when()
                 .body("{\n" +
@@ -85,16 +85,16 @@ public class Auth {
     public static String getToken() {
         if (accessToken != null) return accessToken;
         try {
-            return Auth.getTokenUserByPlayerId(CONST.PLAYER_ID).getAccessToken();
+            return Auth.getTokenUserByPlayerId(PLAYER_ID).getAccessToken();
         } catch (Exception e) {
-            String playerId = User.createUser(CONST.PLAYER_ID).getUser().getPlayerId();
+            String playerId = User.createUser(PLAYER_ID).getUser().getPlayerId();
             return Auth.getTokenUserByPlayerId(playerId).getAccessToken();
         }
     }
 
     public static AuthDTO getCompanyRestorePassword(String email, String password, int code) {
         Response response = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + accessToken)
                 .when()
                 .body("{\n" +

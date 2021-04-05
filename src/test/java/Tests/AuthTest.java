@@ -1,6 +1,5 @@
 package Tests;
 
-import Constants.CONST;
 import DTO.AuthDTO;
 import DTO.CompanyDTO;
 import Pages.Auth;
@@ -16,12 +15,12 @@ public class AuthTest extends TestBase {
     // POST /api/v{version}/Auth/token/user/{playerId}
     @Test
     public void getTokenUserByPlayerId() {
-        AuthDTO auth = Auth.getTokenUserByPlayerId(CONST.PLAYER_ID);
+        AuthDTO auth = Auth.getTokenUserByPlayerId(PLAYER_ID);
 
         assertNotNull(auth.getAccessToken());
         assertEquals("bearer", auth.getTokenType());
         assertEquals("Success", auth.getStatus());
-        assertEquals(CONST.PLAYER_ID, auth.getUser().getPlayerId());
+        assertEquals(PLAYER_ID, auth.getUser().getPlayerId());
     }
 
     // POST /api/v{version}/Auth/company
@@ -59,7 +58,7 @@ public class AuthTest extends TestBase {
     // /api/v{version}/Auth/refresh-token
     @Test
     public void getRefreshToken() {
-        String token = Auth.getTokenUserByPlayerId(CONST.PLAYER_ID)
+        String token = Auth.getTokenUserByPlayerId(PLAYER_ID)
                 .getAccessToken();
 
         String refreshToken = Auth.getRefreshToken(token)
@@ -96,7 +95,7 @@ public class AuthTest extends TestBase {
 
         String newPassword = "NEW_test_company_password" + getUniqueNumber(3);
 
-        AuthDTO newAuthDTO = Auth.getCompanyRestorePassword(CONST.EMAIL, newPassword, 0000);   //TODO: доработать когда заработает
+        AuthDTO newAuthDTO = Auth.getCompanyRestorePassword(EMAIL, newPassword, 0000);   //TODO: доработать когда заработает
         assertEquals("Success", newAuthDTO.getStatus());
         assertEquals(newPassword, newAuthDTO.getCompany().getPassword());
     }

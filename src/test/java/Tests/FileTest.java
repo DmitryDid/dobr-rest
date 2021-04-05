@@ -1,6 +1,5 @@
 package Tests;
 
-import Constants.CONST;
 import org.junit.Test;
 
 import static Pages.Auth.getAccessToken;
@@ -14,7 +13,7 @@ public class FileTest extends TestBase {
         int id = 2;
 
         String response = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + getAccessToken())
                 .when()
                 .get("File/" + id)

@@ -1,6 +1,5 @@
 package Pages;
 
-import Constants.CONST;
 import DTO.AuthDTO;
 import DTO.CompanyDTO;
 import DTO.TopDTO;
@@ -28,7 +27,7 @@ public class Company extends TestBase {
         map.put("phone", getUniqueNumber(9));
         map.put("password", "test_company_password");
         map.put("address", "test_company_address");
-        map.put("email", CONST.EMAIL);
+        map.put("email", EMAIL);
         map.put("timeOfWork", "8-22");
         map.put("productCategoryId", 1);
         map.put("playerId", UUID.randomUUID().toString());
@@ -40,7 +39,7 @@ public class Company extends TestBase {
 
     public static ArrayList<CompanyDTO> getAllCompany() {
         Response response = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getAccessToken())
                 .when()
                 .get("Company")
@@ -52,7 +51,7 @@ public class Company extends TestBase {
 
     public static CompanyDTO getCompany(int id) {
         Response response = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getAccessToken())
                 .log().all()
                 .when()
@@ -66,7 +65,7 @@ public class Company extends TestBase {
 
     public static Response updateCompany(int id, Map data, File image) {
         Response response = given()
-                .spec(CONST.MULTi_DATA_SPEC)
+                .spec(MULTI_DATA_SPEC)
                 .header("Authorization", "Bearer " + Auth.getAccessToken())
                 .formParams(data)
                 .multiPart("image", image)
@@ -84,7 +83,7 @@ public class Company extends TestBase {
         AuthDTO authDTO;
         try {
             authDTO = given()
-                    .spec(CONST.MULTi_DATA_SPEC)
+                    .spec(MULTI_DATA_SPEC)
                     .formParams(defaultParams)
                     .multiPart("image", image)
                     .when()
@@ -111,7 +110,7 @@ public class Company extends TestBase {
         }
 
         AuthDTO authDTO = given()
-                .spec(CONST.MULTi_DATA_SPEC)
+                .spec(MULTI_DATA_SPEC)
                 .formParams(defaultParams)
                 .multiPart("image", image)
                 .when()
@@ -131,7 +130,7 @@ public class Company extends TestBase {
         params.put("inn", getUniqueNumber(9));
 
         Response response = given()
-                .spec(CONST.MULTi_DATA_SPEC)
+                .spec(MULTI_DATA_SPEC)
                 .formParams(params)
                 .multiPart("image", image)
                 .when()
@@ -146,7 +145,7 @@ public class Company extends TestBase {
 
     public static ArrayList<TopDTO> getCompanyTop() {
         Response response = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getAccessToken())
                 .when()
                 .get("Company/top")
@@ -159,7 +158,7 @@ public class Company extends TestBase {
 
     public static Response deleteCompany(int id, int statusCode) {
         Response response = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getAccessToken())
                 .when()
                 .delete("Company/" + id)
@@ -172,7 +171,7 @@ public class Company extends TestBase {
 
     public static Response getCompanyImage(int id) {
         Response response = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getAccessToken())
                 .when()
                 .get("Company/" + id + "/image")
@@ -185,7 +184,7 @@ public class Company extends TestBase {
 
     public static Response getCompanyCategoryById(String id) {
         Response response = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getAccessToken())
                 .when()
                 .get("Company/category/" + id)
@@ -198,7 +197,7 @@ public class Company extends TestBase {
 
     public static Integer getCompanyNumberOfFavorites(int id) {
         String response = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getAccessToken())
                 .when()
                 .get("Company/" + id + "/number-of-favorites")
@@ -237,7 +236,7 @@ public class Company extends TestBase {
 
     public static Response updateCompanyImage(int id, File image) {
         Response response = given()
-                .spec(CONST.MULTi_DATA_SPEC)
+                .spec(MULTI_DATA_SPEC)
                 .header("Authorization", "Bearer " + Auth.getAccessToken())
                 .multiPart("image", image)
                 .when()
@@ -251,7 +250,7 @@ public class Company extends TestBase {
 
     public static ArrayList<CompanyDTO> getListCompanyCategory(int id) {
         Response response = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getAccessToken())
                 .when()
                 .get("Company/category/" + id)
@@ -274,7 +273,7 @@ public class Company extends TestBase {
 
     public static Response deleteCompanyCascade(int id, int statusCode) {
         Response response = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getAccessToken())
                 .when()
                 .delete("Company/cascade/" + id)
@@ -287,7 +286,7 @@ public class Company extends TestBase {
 
     public static void getCompanyNotification(int id) {
         Response response = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getAccessToken())
                 .when()
                 .get("Company/" + id + "/notification")

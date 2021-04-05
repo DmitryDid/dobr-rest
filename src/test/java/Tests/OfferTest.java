@@ -1,21 +1,25 @@
 package Tests;
 
 import Pages.Auth;
-import Constants.CONST;
 import io.restassured.response.Response;
-import org.junit.Assert;
 import org.junit.Test;
 
 import static io.restassured.RestAssured.given;
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 public class OfferTest extends TestBase {
 
-    // /api/v1/offer/top
+    //GET /api/v{version}/Offer/{id}
+    @Test
+    public void getOfferById() {
+        fail();
+    }
+
+    //GET /api/v{version}/Offer/top
     @Test
     public void getOfferTop() {
         Response response = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getToken())
                 .log().all()
                 .when()
@@ -28,13 +32,31 @@ public class OfferTest extends TestBase {
         fail();
     }
 
-    // /api/v1/offer/55/image
+    //GET /api/v{version}/Offer
+    @Test
+    public void getOffer() {
+        fail();
+    }
+
+    //POST /api/v{version}/Offer
+    @Test
+    public void postOffer() {
+        fail();
+    }
+
+    //GET /api/v{version}/Offer/category/{id}
+    @Test
+    public void getOfferCategoryById() {
+        fail();
+    }
+
+    //GET /api/v{version}/Offer/{id}/image
     @Test
     public void getOfferImage() {
         String id = "1";
 
         Response response = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .log().all()
                 .when()
                 .get("Offer/" + id + "/image")
@@ -44,6 +66,24 @@ public class OfferTest extends TestBase {
                 .response();
 
         toConsole(response);
+        fail();
+    }
+
+    //PUT /api/v{version}/Offer/{id}/image
+    @Test
+    public void putOfferImageById() {
+        fail();
+    }
+
+    //POST /api/v{version}/Offer/like
+    @Test
+    public void postOfferLike() {
+        fail();
+    }
+
+    //POST /api/v{version}/Offer/dislike
+    @Test
+    public void postOfferDisLike() {
         fail();
     }
 }

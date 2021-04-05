@@ -1,6 +1,5 @@
 package Pages;
 
-import Constants.CONST;
 import DTO.ChatsDTO;
 import DTO.MessageDTO;
 import DTO.MessagesDTO;
@@ -19,7 +18,7 @@ public class Chat extends TestBase {
 
     public static MessageDTO postUserMessage(int userId, int companyId, String text) {
         Response response = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getToken())
                 .body("{\n" +
                         "  \"text\": \"" + text + "\",\n" +
@@ -38,7 +37,7 @@ public class Chat extends TestBase {
 
     public static MessageDTO postCompanyMessage(int userId, int companyId, String text) {
         Response response = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getToken())
                 .body("{\n" +
                         "  \"text\": \"" + text + "\",\n" +
@@ -57,7 +56,7 @@ public class Chat extends TestBase {
 
     public static ArrayList<MessagesDTO> getMessage(int userId, int companyId, int lastMessageId) {
         Response response = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getToken())
                 .queryParam("userId", userId)
                 .queryParam("companyId", companyId)
@@ -82,7 +81,7 @@ public class Chat extends TestBase {
 
     public static ChatsDTO getChatCompany(int companyId, int lastId) {
         Response response = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getToken())
                 .queryParam("lastId", lastId)
                 .when()
@@ -96,7 +95,7 @@ public class Chat extends TestBase {
 
     public static ChatsDTO getChatUser(int userId, int lastId) {
         Response response = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getToken())
                 .queryParam("lastId", lastId)
                 .when()

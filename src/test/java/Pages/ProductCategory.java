@@ -1,6 +1,5 @@
 package Pages;
 
-import Constants.CONST;
 import DTO.ProductCategoryDTO;
 import Tests.TestBase;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -26,7 +25,7 @@ public class ProductCategory extends TestBase {
         File image = new File("src/test/java/Resources/" + fileName);
 
         Response response = given()
-                .spec(CONST.MULTi_DATA_SPEC)
+                .spec(MULTI_DATA_SPEC)
                 .header("Authorization", "Bearer " + getAccessToken())
                 .formParam("name", name)
                 .formParam("ageLimit", ageLimit)
@@ -42,7 +41,7 @@ public class ProductCategory extends TestBase {
 
     public static ProductCategoryDTO createProductCategory(Map params, File image) {
         Response response = given()
-                .spec(CONST.MULTi_DATA_SPEC)
+                .spec(MULTI_DATA_SPEC)
                 .header("Authorization", "Bearer " + getAccessToken())
                 .formParams(params)
                 .multiPart("image", image)
@@ -57,7 +56,7 @@ public class ProductCategory extends TestBase {
 
     public static ProductCategoryDTO updateProductCategory(int id, Map params, File image) {
         Response response = given()
-                .spec(CONST.MULTi_DATA_SPEC)
+                .spec(MULTI_DATA_SPEC)
                 .header("Authorization", "Bearer " + getAccessToken())
                 .formParams(params)
                 .multiPart("image", image)
@@ -72,7 +71,7 @@ public class ProductCategory extends TestBase {
 
     public static Response getAllProductCategory() {
         Response response = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + getAccessToken())
                 .when()
                 .get("productCategory")
@@ -97,7 +96,7 @@ public class ProductCategory extends TestBase {
 
     public static ProductCategoryDTO getProductCategory(int id) {
         Response response = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + getAccessToken())
                 .when()
                 .get("productCategory/" + id)
@@ -109,7 +108,7 @@ public class ProductCategory extends TestBase {
 
     public static String getProductCategoryImage(int id) {
         Response response = given()
-                .spec(CONST.BASE_SPEC)
+                .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + getAccessToken())
                 .when()
                 .get("productCategory/" + id + "/image")
@@ -121,7 +120,7 @@ public class ProductCategory extends TestBase {
 
     public static Response putProductCategoryImage(int id, File image) {
         Response response = given()
-                .spec(CONST.MULTi_DATA_SPEC)
+                .spec(MULTI_DATA_SPEC)
                 .header("Authorization", "Bearer " + getAccessToken())
                 .multiPart("image", image)
                 .when()
