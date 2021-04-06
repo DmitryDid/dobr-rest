@@ -2,6 +2,7 @@ package Tests;
 
 import DTO.*;
 import Pages.Company;
+import Pages.Offer;
 import Pages.User;
 import org.junit.Test;
 
@@ -147,6 +148,8 @@ public class CompanyTest extends TestBase {
 
     @Test
     public void getCompanyOfferLimit() {
+
+
         fail();
     }
 
@@ -177,8 +180,29 @@ public class CompanyTest extends TestBase {
 
     @Test
     public void getCompanyOffer() {
+        int companyId = Company.getRandomCompany().getId();
+        Map<String, Object> params = Offer.getDefaultOfferParams();
+        params.put("companyId", companyId);
 
-        fail();
+        Offer.postOffer(params);
+        CompanyOfferDTO companyOffer = Company.getCompanyOffer(companyId);
+        OfferDTO inactiveOffer = companyOffer.getInactiveOffer().get(0);
+
+        assertTrue(inactiveOffer.getId() > 0);
+        assertEquals(0, (int) inactiveOffer.getLikeCounter());
+        assertEquals(params.get("text"), inactiveOffer.getText());
+        assertNotNull(inactiveOffer.getCreateDate());
+        assertEquals(params.get("sendingTime"), inactiveOffer.getSendingTime().replaceAll("T", " "));
+        assertEquals(params.get("dateStart"), inactiveOffer.getDateStart().replaceAll("T", " "));
+        assertEquals(params.get("dateEnd"), inactiveOffer.getDateEnd().replaceAll("T", " "));
+        assertEquals(params.get("timeEnd"), inactiveOffer.getTimeEnd().replaceAll("T", " "));
+        assertEquals(params.get("companyId"), inactiveOffer.getCompany().getId());
+        assertEquals(params.get("percentage"), inactiveOffer.getPercentage());
+        assertEquals(params.get("forMan"), inactiveOffer.getForMan());
+        assertEquals(params.get("forWoman"), inactiveOffer.getForWoman());
+        assertEquals(params.get("upperAgeLimit"), inactiveOffer.getUpperAgeLimit());
+        assertEquals(params.get("lowerAgeLimit"), inactiveOffer.getLowerAgeLimit());
+        assertEquals(inactiveOffer.getUserLike(), false);
     }
 
     @Test

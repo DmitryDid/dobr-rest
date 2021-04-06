@@ -133,7 +133,8 @@ public class ProductCategory extends TestBase {
 
     public static ProductCategoryDTO getRandomProdCat() {
         ArrayList<ProductCategoryDTO> list = getListProductCategory(getAllProductCategory());
-        Integer id = (int) (Math.random() * list.size());
+        int index = (int) (Math.random() * list.size());
+        int id = list.get(index).getId();
         return getProductCategory(id);
     }
 }

@@ -2,6 +2,7 @@ package Pages;
 
 import DTO.AuthDTO;
 import DTO.CompanyDTO;
+import DTO.CompanyOfferDTO;
 import DTO.TopDTO;
 import Tests.TestBase;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -295,5 +296,18 @@ public class Company extends TestBase {
                 .extract()
                 .response();
         toConsole(response);
+    }
+
+    public static CompanyOfferDTO getCompanyOffer(int id) {
+        Response response = given()
+                .spec(BASE_SPEC)
+                .header("Authorization", "Bearer " + Auth.getAccessToken())
+                .when()
+                .get("Company/" + id + "/offer")
+                .then()
+                .statusCode(200)
+                .extract()
+                .response();
+        return response.as(CompanyOfferDTO.class);
     }
 }

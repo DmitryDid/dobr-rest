@@ -1,11 +1,15 @@
 package Tests;
 
+import DTO.OfferDTO;
 import Pages.Auth;
+import Pages.Offer;
 import io.restassured.response.Response;
 import org.junit.Test;
 
+import java.util.Map;
+
 import static io.restassured.RestAssured.given;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class OfferTest extends TestBase {
 
@@ -38,10 +42,26 @@ public class OfferTest extends TestBase {
         fail();
     }
 
+
     //POST /api/v{version}/Offer
     @Test
     public void postOffer() {
-        fail();
+        Map<String, Object> params = Offer.getDefaultOfferParams();
+        OfferDTO offerDTO = Offer.postOffer(params);
+
+        assertEquals(params.get("text"), offerDTO.getText());
+        assertEquals(params.get("sendingTime"), offerDTO.getSendingTime().replaceAll("T", " "));
+        assertEquals(params.get("timeStart"), offerDTO.getTimeStart().replaceAll("T", " "));
+        assertEquals(params.get("timeEnd"), offerDTO.getTimeEnd().replaceAll("T", " "));
+        assertEquals(params.get("dateEnd"), offerDTO.getDateEnd().replaceAll("T", " "));
+        assertEquals(params.get("dateStart"), offerDTO.getDateStart().replaceAll("T", " "));
+        assertEquals(params.get("companyId"), offerDTO.getCompany().getId());
+        assertEquals(params.get("percentage"), offerDTO.getPercentage());
+        assertEquals(params.get("forMan"), offerDTO.getForMan());
+        assertEquals(params.get("forWoman"), offerDTO.getForWoman());
+        assertEquals(params.get("UpperAgeLimit"), offerDTO.getUpperAgeLimit());
+        assertEquals(params.get("LowerAgeLimit"), offerDTO.getLowerAgeLimit());
+        assertTrue(offerDTO.getImage().getId() > 0);
     }
 
     //GET /api/v{version}/Offer/category/{id}
