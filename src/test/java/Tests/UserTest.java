@@ -1,267 +1,189 @@
 package Tests;
 
-import Pages.Auth;
+import DTO.AuthDTO;
+import DTO.CompanyDTO;
+import DTO.UserDTO;
 import Pages.User;
-import io.restassured.response.Response;
-import org.json.JSONObject;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
-import static io.restassured.RestAssured.given;
+import static Pages.Company.getRandomCompany;
+import static Pages.User.*;
 import static org.junit.Assert.*;
 
 public class UserTest extends TestBase {
 
-    // POST /api/v{version}/User
     @Test
     public void postUser() {
-        String id = "22";
-        String name = "Did";
-        boolean isMan = true;
-        String playerId = UUID.randomUUID().toString();
-        String birthYear = "1986-07-10T12:59:18.99";
-        String fileName = "hacker.jpg";
-        File image = new File("src/test/java/Resources/" + fileName);
-        String latitude = "55.0415000";
-        String longitude = "82.9346000";
+        File image = new File("src/test/java/Resources/MarinaC.jpeg");
 
-        Response response = given()
-                .spec(MULTI_DATA_SPEC)
-                //.header("Authorization", "Bearer " + getToken())
-                .log().all()
-                .formParam("name", name)
-                .formParam("isMan", isMan)
-                .formParam("playerId", playerId)
-                .formParam("BirthYear", birthYear)
-                .formParam("latitude", latitude)
-                .formParam("longitude", longitude)
-                .multiPart("image", image)
-                .when()
-                .post("User")
-                .then()
-                .statusCode(200)
-                .extract()
-                .response();
-        toConsole(response);
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", "Marina_" + getUniqueNumber(4));
+        params.put("isMan", false);
+        params.put("playerId", UUID.randomUUID().toString());
+        params.put("birthYear", "1984-08-01T12:59:18.99");
+        params.put("latitude", "56.0415000");
+        params.put("longitude", "83.9346000");
+
+        AuthDTO user = createUser(params, image);
+
+        assertEquals(params.get("name"), user.getUser().getName());
+        assertEquals(params.get("isMan"), user.getUser().getIsMan());
+        assertEquals(params.get("playerId"), user.getUser().getPlayerId());
+        assertEquals(params.get("birthYear"), user.getUser().getBirthYear());
+        assertTrue(params.get("latitude").toString().startsWith(user.getUser().getLatitude().toString()));
+        assertTrue(params.get("longitude").toString().startsWith(user.getUser().getLongitude().toString()));
+
+        assertEquals("Success", user.getStatus());
+        assertEquals("bearer", user.getTokenType());
+        assertTrue(user.getAccessToken().length() > 100);
     }
 
-    // /api/v{version}/User/{id}/image
     @Test
     public void getUserImageById() {
-        int id = User.getRandomUser().getId();
-        Response response = given()
-                .spec(BASE_SPEC)
-                .header("Authorization", "Bearer " + Auth.getToken())
-                .log().all()
-                .when()
-                .get("User/" + id + "/image")
-                .then()
-                .statusCode(200)
-                .extract()
-                .response();
-        toConsole(response);
+        File image = new File("src/test/java/Resources/MarinaC.jpeg");
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", "Marina_" + getUniqueNumber(4));
+        params.put("isMan", false);
+        params.put("playerId", UUID.randomUUID().toString());
+        params.put("birthYear", "1984-08-01T12:59:18.99");
+        params.put("latitude", "56.0415000");
+        params.put("longitude", "83.9346000");
+
+        AuthDTO createdUser = createUser(params, image);
+        int userId = createdUser.getUser().getId();
+        AuthDTO receivedAuth = getUser(userId);
+        UserDTO receivedUser = receivedAuth.getUser();
+
+        assertEquals(params.get("name"), receivedUser.getName());
+        assertEquals(params.get("isMan"), receivedUser.getIsMan());
+        assertEquals(params.get("playerId"), receivedUser.getPlayerId());
+        assertEquals(params.get("birthYear"), receivedUser.getBirthYear());
+        assertTrue(params.get("latitude").toString().startsWith(receivedUser.getLatitude().toString()));
+        assertTrue(params.get("longitude").toString().startsWith(receivedUser.getLongitude().toString()));
+        assertTrue(receivedUser.getImageId() > 0);
+        assertNull(receivedUser.getImage());
+
+        assertEquals("Success", receivedAuth.getStatus());
+        assertEquals("bearer", receivedAuth.getTokenType());
+        assertTrue(receivedAuth.getAccessToken().length() > 100);
     }
 
-    // /api/v{version}/User
     @Test
     public void getUsersAll() {
-        Response response = given()
-                .spec(BASE_SPEC)
-                .header("Authorization", "Bearer " + Auth.getToken())
-                .log().all()
-                .when()
-                .get("User")
-                .then()
-                .statusCode(200)
-                .extract()
-                .response();
-        toConsole(response);
+        File image = new File("src/test/java/Resources/MarinaC.jpeg");
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", "Marina_" + getUniqueNumber(4));
+        params.put("isMan", false);
+        params.put("playerId", UUID.randomUUID().toString());
+        params.put("birthYear", "1984-08-01T12:59:18.99");
+        params.put("latitude", "56.0415000");
+        params.put("longitude", "83.9346000");
+
+        AuthDTO createdUser = createUser(params, image);
+        ArrayList<UserDTO> list = getAllUser();
+
+        assertTrue(list.size() > 0);
+
+        for (UserDTO current : list) {
+            if (current.getId().equals(createdUser.getUser().getId())) {
+                assertEquals(params.get("name"), current.getName());
+                assertEquals(params.get("isMan"), current.getIsMan());
+                assertEquals(params.get("playerId"), current.getPlayerId());
+                assertEquals(params.get("birthYear"), current.getBirthYear());
+                assertTrue(params.get("latitude").toString().startsWith(current.getLatitude().toString()));
+                assertTrue(params.get("longitude").toString().startsWith(current.getLongitude().toString()));
+                assertTrue(current.getImageId() > 0);
+                assertNull(current.getImage());
+            }
+        }
     }
 
-    // PUT /api/v{version}/User/{id}   пересмотреть весь тест
     @Test
     public void putUserById() {
-        int id = User.getRandomUser().getId();
-        String name = "Did";
-        boolean isMan = true;
-        String playerId = UUID.randomUUID().toString();
-        String birthYear = "1986-07-10T12:59:18.99";
-        String fileName = "hacker.jpg";
-        File image = new File("src/test/java/Resources/" + fileName);
-        String latitude = "55.0415000";
-        String longitude = "82.9346000";
+        File image = new File("src/test/java/Resources/MarinaC.jpeg");
 
-        Response response = given()
-                .spec(MULTI_DATA_SPEC)
-                .header("Authorization", "Bearer " + Auth.getToken())
-                .log().all()
-                .formParam("name", name)
-                .formParam("isMan", isMan)
-                .formParam("playerId", playerId)
-                .formParam("BirthYear", birthYear)
-                .formParam("latitude", latitude)
-                .formParam("longitude", longitude)
-                .multiPart("image", image)
-                .when()
-                .put("User/" + id)
-                .then()
-                .statusCode(200)
-                .extract()
-                .response();
-        toConsole(response);
+        Map<String, Object> createParams = new HashMap<>();
+        createParams.put("name", "Marina_" + getUniqueNumber(4));
+        createParams.put("isMan", false);
+        createParams.put("playerId", UUID.randomUUID().toString());
+        createParams.put("birthYear", "1984-08-01T12:59:18.99");
+        createParams.put("latitude", "56.0415000");
+        createParams.put("longitude", "83.9346000");
 
-        JSONObject postJSON = new JSONObject(response.asString());
-        assertEquals(postJSON.getString("status"), "Success");
-        JSONObject user = postJSON.getJSONObject("user");
+        AuthDTO created = createUser(createParams, image);
+        Integer id = created.getUser().getId();
+        Map<String, Object> updateParams = getDefaultUserParams();
+        AuthDTO updated = updateUser(id, updateParams, IMAGE);
 
-        assertEquals(id, user.get("id"));
-        assertEquals(name, user.get("name"));
-        assertEquals(isMan, user.get("isMan"));
-        assertTrue(latitude.contains(user.get("latitude").toString()));
-        assertTrue(longitude.contains(user.get("longitude").toString()));
-        assertEquals(birthYear, user.get("birthYear"));
-        assertEquals(playerId, user.get("playerId"));
-
-        // GET /api/v{version}/User/{id}
-        Response getResponse = given()
-                .spec(BASE_SPEC)
-                .header("Authorization", "Bearer " + Auth.getToken())
-                .log().all()
-                .when()
-                .get("User/" + id)
-                .then()
-                .statusCode(200)
-                .extract()
-                .response();
-        toConsole(getResponse);
-
-        JSONObject jsonObject = new JSONObject(response.asString());
-
-        assertEquals("Success", jsonObject.getString("status"));
-        assertEquals("bearer", jsonObject.getString("token_type"));
-        assertNotNull(jsonObject.getString("access_token"));
-
-        user = jsonObject.getJSONObject("user");
-
-        assertEquals(id, user.get("id"));
-        assertEquals("Did", user.get("name"));
-        assertEquals(true, user.get("isMan"));
-        assertEquals(true, user.get("isMan"));
-        assertEquals(55.0415, user.get("latitude"));
-        assertEquals(82.9346, user.get("longitude"));
-        assertEquals("1986-07-10T12:59:18.99", user.get("birthYear"));
-        assertEquals("", user.get("avatarName")); // предположительно бага
-        assertEquals("3af5b06b-7e51-4056-9704-976a727de7ee", user.get("playerId")); // предположительно бага
-
-
+        assertEquals("Success", updated.getStatus());
+        assertEquals(id, updated.getUser().getId());
+        assertEquals(updateParams.get("name"), updated.getUser().getName());
+        assertEquals(updateParams.get("isMan"), updated.getUser().getIsMan());
+        assertEquals(updateParams.get("playerId"), updated.getUser().getPlayerId());
+        assertEquals(updateParams.get("birthYear"), updated.getUser().getBirthYear());
+        assertTrue(updateParams.get("latitude").toString().startsWith(updated.getUser().getLatitude().toString()));
+        assertTrue(updateParams.get("longitude").toString().startsWith(updated.getUser().getLongitude().toString()));
     }
 
-    // /api/v{version}/User/{id}/favorite/{favoriteId}
     @Test
     public void deleteUserFavorite() {
-        String userId = "22";
-        String favoriteId = "1";
-        Response response = given()
-                .spec(BASE_SPEC)
-                .header("Authorization", "Bearer " + Auth.getToken())
-                .log().all()
-                .when()
-                .delete("User/" + userId + "/favorite/" + favoriteId)
-                .then()
-                .statusCode(200)
-                .extract()
-                .response();
-        toConsole(response);
+        Integer userId = getRandomUser().getId();
+        Integer companyId = getRandomCompany().getId();
+
+        addedFavoriteForUser(userId, companyId);
+        ArrayList<CompanyDTO> listFavorite = User.getUserFavorite(userId);
+
+        int count = 0;
+        for (CompanyDTO current : listFavorite) {
+            if (current.getId().equals(companyId)) count++;
+        }
+        assertTrue(count > 0);
+
+        deleteFavorite(userId, companyId);
+
+        listFavorite = User.getUserFavorite(userId);
+
+        for (CompanyDTO current : listFavorite) {
+            if (current.getId().equals(count)) fail();
+        }
     }
 
-    // /api/v{version}/User/{id}/favorite
     @Test
     public void getUserFavorite() {
-        String id = "22";
-        Response response = given()
-                .spec(BASE_SPEC)
-                .header("Authorization", "Bearer " + Auth.getToken())
-                .log().all()
-                .when()
-                .get("User/" + id + "/favorite")
-                .then()
-                .statusCode(200)
-                .extract()
-                .response();
-        toConsole(response);
+        putUserFavorite();
     }
 
-    // /api/v{version}/User/{id}/stories
     @Test
     public void getUserStories() {
-        int id = User.getRandomUser().getId();
-        Response response = given()
-                .spec(BASE_SPEC)
-                .header("Authorization", "Bearer " + Auth.getToken())
-                .log().all()
-                .when()
-                .get("User/" + id + "/stories")
-                .then()
-                .statusCode(200)
-                .extract()
-                .response();
-        toConsole(response);
+        int id = getRandomUser().getId();
+        ArrayList<UserDTO> listUser = User.getAllUser();
+
+        int count = 0;
+        for (UserDTO currentUser : listUser) {
+            if (User.getStories(currentUser.getId()).size() > 0) count++;
+        }
+        assertTrue(count > 0);
     }
 
-    // /api/v{version}/User/{id}/favorite/{favoriteId}
-    @Test // ЗДЕСЬ Я ЗАКОНЧИЛ
+    @Test
     public void putUserFavorite() {
-        String userId = "1";
-        String favoriteId = "5";
+        Integer userId = getRandomUser().getId();
+        Integer companyId = getRandomCompany().getId();
 
-        Response response = given()
-                .spec(BASE_SPEC)
-                .header("Authorization", "Bearer " + Auth.getToken())
-                .log().uri().log().method()
-                .when()
-                .put("User/" + userId + "/favorite/" + favoriteId)
-                .then()
-                //.statusCode(200)
-                .extract()
-                .response();
-        toConsole(response);
+        addedFavoriteForUser(userId, companyId);
+        ArrayList<CompanyDTO> listFavorite = User.getUserFavorite(userId);
 
-        assertEquals("Already exist", response.asString());
-
-        Response deleteResponse = given()
-                .spec(BASE_SPEC)
-                .header("Authorization", "Bearer " + Auth.getToken())
-                .log().uri().log().method()
-                .when()
-                .delete("User/" + userId + "/favorite/" + favoriteId)
-                .then()
-                .statusCode(200)
-                .extract()
-                .response();
-        toConsole(deleteResponse);
-
-        Response putAgainResponse = given()
-                .spec(BASE_SPEC)
-                .header("Authorization", "Bearer " + Auth.getToken())
-                .log().uri().log().method()
-                .when()
-                .put("User/" + userId + "/favorite/" + favoriteId)
-                .then()
-                .statusCode(200)
-                .extract()
-                .response();
-        toConsole(putAgainResponse);
-
-        JSONObject jsonObject = new JSONObject(putAgainResponse.asString());
-        assertEquals(userId, jsonObject.get("id"));
-        assertNotNull(jsonObject.get("namej"));
-        assertNotNull(jsonObject.get("isMan"));
-        assertNotNull(jsonObject.get("latitude"));
-        assertNotNull(jsonObject.get("longitude"));
-        assertNotNull(jsonObject.get("birthYear"));
-        assertNotNull(jsonObject.get("avatarName"));
-        assertNotNull(jsonObject.get("playerId"));
+        for (CompanyDTO current : listFavorite) {
+            if (current.getId().equals(companyId)) return;
+        }
+        fail();
     }
 }

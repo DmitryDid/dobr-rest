@@ -1,9 +1,6 @@
 package Pages;
 
-import DTO.AuthDTO;
-import DTO.CompanyDTO;
-import DTO.CompanyOfferDTO;
-import DTO.TopDTO;
+import DTO.*;
 import Tests.TestBase;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -214,6 +211,15 @@ public class Company extends TestBase {
         List<Object> list = mapper.convertValue(
                 response.as(JsonNode.class),
                 new TypeReference<List<CompanyDTO>>() {
+                });
+        return (ArrayList) list;
+    }
+
+    public static ArrayList<CompanyListDTO> getListStories(Response response) {
+        ObjectMapper mapper = new ObjectMapper();
+        List<Object> list = mapper.convertValue(
+                response.as(JsonNode.class),
+                new TypeReference<List<CompanyListDTO>>() {
                 });
         return (ArrayList) list;
     }

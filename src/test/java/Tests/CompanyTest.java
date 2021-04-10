@@ -42,6 +42,7 @@ public class CompanyTest extends TestBase {
         assertEquals(map.get("phone"), getCompany.getPhone());
         assertEquals(map.get("inn"), getCompany.getInn());
         assertEquals(map.get("email"), getCompany.getEmail());
+        assertEquals(map.get("timeZone"), getCompany.getTimeZone());
         assertTrue(getCompany.getEmailConfirmed());
         assertNotNull(getCompany.getImageId());
     }
