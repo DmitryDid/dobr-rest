@@ -32,6 +32,7 @@ public class Company extends TestBase {
         map.put("timeOfWork", "8-22");
         map.put("productCategoryId", 1);
         map.put("playerId", UUID.randomUUID().toString());
+        map.put("timeZone", "Europe/Moscow");
         return map;
     }
 
@@ -54,7 +55,6 @@ public class Company extends TestBase {
         Response response = given()
                 .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getAccessToken())
-                .log().all()
                 .when()
                 .get("Company/" + id)
                 .then()
@@ -305,7 +305,7 @@ public class Company extends TestBase {
                 .when()
                 .get("Company/" + id + "/offer")
                 .then()
-                .statusCode(200)
+//                .statusCode(200)
                 .extract()
                 .response();
         return response.as(CompanyOfferDTO.class);

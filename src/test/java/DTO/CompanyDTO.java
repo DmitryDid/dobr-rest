@@ -58,4 +58,7 @@ public class CompanyDTO {
 
     @JsonProperty("timeOfWork")
     String timeOfWork;
+
+    @JsonProperty("timeZone")
+    String timeZone;
 }

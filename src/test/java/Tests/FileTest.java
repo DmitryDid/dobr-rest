@@ -23,6 +23,7 @@ public class FileTest extends TestBase {
                 .response()
                 .asString();
 
-        assertTrue(response.contains("JPEG"));
+
+        assertTrue(response.contains("JPEG") || response.contains("JFIF"));
     }
 }

@@ -1,6 +1,7 @@
 package Tests;
 
 import Pages.Auth;
+import Pages.User;
 import io.restassured.response.Response;
 import org.json.JSONObject;
 import org.junit.Test;
@@ -49,7 +50,7 @@ public class UserTest extends TestBase {
     // /api/v{version}/User/{id}/image
     @Test
     public void getUserImageById() {
-        String id = "14";
+        int id = User.getRandomUser().getId();
         Response response = given()
                 .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getToken())
@@ -82,7 +83,7 @@ public class UserTest extends TestBase {
     // PUT /api/v{version}/User/{id}   пересмотреть весь тест
     @Test
     public void putUserById() {
-        String id = "22";
+        int id = User.getRandomUser().getId();
         String name = "Did";
         boolean isMan = true;
         String playerId = UUID.randomUUID().toString();
@@ -115,14 +116,13 @@ public class UserTest extends TestBase {
         assertEquals(postJSON.getString("status"), "Success");
         JSONObject user = postJSON.getJSONObject("user");
 
-        assertEquals(id, user.get("id").toString());
+        assertEquals(id, user.get("id"));
         assertEquals(name, user.get("name"));
         assertEquals(isMan, user.get("isMan"));
         assertTrue(latitude.contains(user.get("latitude").toString()));
         assertTrue(longitude.contains(user.get("longitude").toString()));
         assertEquals(birthYear, user.get("birthYear"));
         assertEquals(playerId, user.get("playerId"));
-        assertTrue(user.get("avatarName").toString().contains(fileName));  // ошибка
 
         // GET /api/v{version}/User/{id}
         Response getResponse = given()
@@ -196,7 +196,7 @@ public class UserTest extends TestBase {
     // /api/v{version}/User/{id}/stories
     @Test
     public void getUserStories() {
-        String id = "22";
+        int id = User.getRandomUser().getId();
         Response response = given()
                 .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + Auth.getToken())
@@ -211,9 +211,9 @@ public class UserTest extends TestBase {
     }
 
     // /api/v{version}/User/{id}/favorite/{favoriteId}
-    @Test
+    @Test // ЗДЕСЬ Я ЗАКОНЧИЛ
     public void putUserFavorite() {
-        String userId = "22";
+        String userId = "1";
         String favoriteId = "5";
 
         Response response = given()

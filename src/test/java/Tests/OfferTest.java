@@ -59,8 +59,8 @@ public class OfferTest extends TestBase {
         assertEquals(params.get("percentage"), offerDTO.getPercentage());
         assertEquals(params.get("forMan"), offerDTO.getForMan());
         assertEquals(params.get("forWoman"), offerDTO.getForWoman());
-        assertEquals(params.get("UpperAgeLimit"), offerDTO.getUpperAgeLimit());
-        assertEquals(params.get("LowerAgeLimit"), offerDTO.getLowerAgeLimit());
+        assertEquals(params.get("upperAgeLimit"), offerDTO.getUpperAgeLimit());
+        assertEquals(params.get("lowerAgeLimit"), offerDTO.getLowerAgeLimit());
         assertTrue(offerDTO.getImage().getId() > 0);
     }
 
