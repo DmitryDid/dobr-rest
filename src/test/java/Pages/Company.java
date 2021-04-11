@@ -25,11 +25,10 @@ public class Company extends TestBase {
         map.put("phone", getUniqueNumber(9));
         map.put("password", "test_company_password");
         map.put("address", "test_company_address");
-        map.put("email", EMAIL);
+        map.put("email", getUniqueNumber(5) + EMAIL);
         map.put("timeOfWork", "8-22");
         map.put("productCategoryId", 1);
         map.put("playerId", UUID.randomUUID().toString());
-        map.put("timeZone", "Europe/Moscow");
         return map;
     }
 

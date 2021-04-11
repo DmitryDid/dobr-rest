@@ -21,30 +21,43 @@ import static org.junit.Assert.*;
 public class CompanyTest extends TestBase {
 
     @Test
-    public void getCompanyById() {
-        Map<String, Object> map = getDefaultParams();
-        map.put("email", getUniqueNumber(6) + "@testGetCompanyById.ru");
+    public void postCompany() {
+        String email = getUniqueNumber(6) + "@list.ru";
 
-        Integer companyId = createCompany(map).getCompany().getId();
+        AuthDTO authDTO = createCompanyWithEmail(email);
+        CompanyDTO companyDTO = authDTO.getCompany();
 
-        CompanyDTO getCompany = getCompany(companyId);
+        assertEquals(email, companyDTO.getEmail());
+        assertNotNull(companyDTO.getId());
+        assertEquals((Double) 55.0415, companyDTO.getLatitude());
+        assertEquals((Double) 82.9346, companyDTO.getLongitude());
+        assertEquals("test_company nameOfficial", companyDTO.getNameOfficial());
+        assertEquals("test_company_representative", companyDTO.getRepresentative());
+        assertTrue(Long.parseLong(companyDTO.getPhone()) >= 0);
+        assertTrue(Long.parseLong(companyDTO.getInn()) >= 0);
+        assertEquals("test_company_password", companyDTO.getPassword());
+        assertEquals("test_company_address", companyDTO.getAddress());
+        assertEquals("8-22", companyDTO.getTimeOfWork());
+        assertEquals("Asia/Novosibirsk", companyDTO.getTimeZone());
+        assertTrue(companyDTO.getEmailConfirmed());
+        assertTrue(companyDTO.getPlayerId().length() > 20);
+        assertTrue(companyDTO.getProductCategory().getId() > 0);
+        assertTrue(companyDTO.getImageId() > 0);
+    }
 
-        assertEquals(companyId, getCompany.getId());
-        assertEquals(map.get("latitude"), getCompany.getLatitude());
-        assertEquals(map.get("longitude"), getCompany.getLongitude());
-        assertEquals(map.get("nameOfficial"), getCompany.getNameOfficial());
-        assertEquals(map.get("representative"), getCompany.getRepresentative());
-        assertEquals(map.get("password"), getCompany.getPassword());
-        assertEquals(map.get("address"), getCompany.getAddress());
-        assertEquals(map.get("timeOfWork"), getCompany.getTimeOfWork());
-        assertEquals(map.get("playerId"), getCompany.getPlayerId());
-        assertEquals(map.get("productCategoryId"), getCompany.getProductCategory().getId());
-        assertEquals(map.get("phone"), getCompany.getPhone());
-        assertEquals(map.get("inn"), getCompany.getInn());
-        assertEquals(map.get("email"), getCompany.getEmail());
-        assertEquals(map.get("timeZone"), getCompany.getTimeZone());
-        assertTrue(getCompany.getEmailConfirmed());
-        assertNotNull(getCompany.getImageId());
+    @Test
+    public void postCompany_timeZone() {
+        Map<String, Object> params = new HashMap<>();
+        params.put("timeZone", "Europe/Moscow");
+
+        CompanyDTO companyDTO = createCompany(params).getCompany();
+        assertEquals("Europe/Moscow", companyDTO.getTimeZone());
+    }
+
+    @Test
+    public void postCompany_default_timeZone() {
+        CompanyDTO company = createCompany().getCompany();
+        assertEquals("Asia/Novosibirsk", company.getTimeZone());
     }
 
     @Test
@@ -72,6 +85,7 @@ public class CompanyTest extends TestBase {
         map.put("address", "putCompanyById_address");
         map.put("timeOfWork", "0-24");
         map.put("playerId", UUID.randomUUID().toString());
+        map.put("timeZone", "Europe/Moscow");
 
         updateCompany(id, map, new File("src/test/java/Resources/vtb.jpg"));
 
@@ -89,19 +103,51 @@ public class CompanyTest extends TestBase {
         assertEquals(map.get("productCategoryId"), getCompanyDTO.getProductCategory().getId());
         assertEquals(map.get("phone"), getCompanyDTO.getPhone());
         assertEquals(map.get("inn"), getCompanyDTO.getInn());
+        assertEquals(map.get("timeZone"), getCompanyDTO.getTimeZone());
         assertTrue(getCompanyDTO.getEmailConfirmed());
         assertNotEquals(imageId, getCompanyDTO.getImageId());
         assertEquals(authDTO.getCompany().getNameOfficial(), getCompanyDTO.getNameOfficial());
     }
 
     @Test
-    public void deleteCompanyById() {
-        AuthDTO authDTO = createCompany();
+    public void putCompanyImage() {
+        AuthDTO company = createCompany();
+        Integer companyId = company.getCompany().getId();
+        Integer oldImageId = company.getCompany().getImageId();
 
-        int id = authDTO.getCompany().getId();
+        updateCompanyImage(companyId, new File("src/test/java/Resources/Kiprensky_Pushkin_2.jpg"));
 
-        deleteCompany(id, 200);
-        deleteCompany(id, 404);
+        CompanyDTO updateCompany = getCompany(companyId);
+        Integer newImageId = updateCompany.getImageId();
+
+        assertEquals(company.getCompany().getId(), updateCompany.getId());
+        assertNotEquals(oldImageId, newImageId);
+    }
+
+    @Test
+    public void getCompanyById() {
+        Map<String, Object> map = getDefaultParams();
+
+        Integer companyId = createCompany(map).getCompany().getId();
+
+        CompanyDTO getCompany = getCompany(companyId);
+
+        assertEquals(companyId, getCompany.getId());
+        assertEquals(map.get("latitude"), getCompany.getLatitude());
+        assertEquals(map.get("longitude"), getCompany.getLongitude());
+        assertEquals(map.get("nameOfficial"), getCompany.getNameOfficial());
+        assertEquals(map.get("representative"), getCompany.getRepresentative());
+        assertEquals(map.get("password"), getCompany.getPassword());
+        assertEquals(map.get("address"), getCompany.getAddress());
+        assertEquals(map.get("timeOfWork"), getCompany.getTimeOfWork());
+        assertEquals(map.get("playerId"), getCompany.getPlayerId());
+        assertEquals(map.get("productCategoryId"), getCompany.getProductCategory().getId());
+        assertEquals(map.get("phone"), getCompany.getPhone());
+        assertEquals(map.get("inn"), getCompany.getInn());
+        assertEquals(map.get("email"), getCompany.getEmail());
+        assertEquals("Asia/Novosibirsk", getCompany.getTimeZone());
+        assertTrue(getCompany.getEmailConfirmed());
+        assertNotNull(getCompany.getImageId());
     }
 
     @Test
@@ -149,8 +195,6 @@ public class CompanyTest extends TestBase {
 
     @Test
     public void getCompanyOfferLimit() {
-
-
         fail();
     }
 
@@ -162,21 +206,6 @@ public class CompanyTest extends TestBase {
 
         Company.getCompanyImage(id);
         System.out.println();
-    }
-
-    @Test
-    public void putCompanyImage() {
-        AuthDTO company = createCompany();
-        Integer companyId = company.getCompany().getId();
-        Integer oldImageId = company.getCompany().getImageId();
-
-        updateCompanyImage(companyId, new File("src/test/java/Resources/Kiprensky_Pushkin_2.jpg"));
-
-        CompanyDTO updateCompany = getCompany(companyId);
-        Integer newImageId = updateCompany.getImageId();
-
-        assertEquals(company.getCompany().getId(), updateCompany.getId());
-        assertNotEquals(oldImageId, newImageId);
     }
 
     @Test
@@ -248,27 +277,13 @@ public class CompanyTest extends TestBase {
     }
 
     @Test
-    public void postCompany() {
-        String email = getUniqueNumber(5) + "@yandex.com";
+    public void deleteCompanyById() {
+        AuthDTO authDTO = createCompany();
 
-        AuthDTO authDTO = createCompanyWithEmail(email);
-        CompanyDTO companyDTO = authDTO.getCompany();
+        int id = authDTO.getCompany().getId();
 
-        assertEquals(email, companyDTO.getEmail());
-        assertNotNull(companyDTO.getId());
-        assertEquals((Double) 55.0415, companyDTO.getLatitude());
-        assertEquals((Double) 82.9346, companyDTO.getLongitude());
-        assertEquals("test_company nameOfficial", companyDTO.getNameOfficial());
-        assertEquals("test_company_representative", companyDTO.getRepresentative());
-        assertTrue(Long.parseLong(companyDTO.getPhone()) >= 0);
-        assertTrue(Long.parseLong(companyDTO.getInn()) >= 0);
-        assertEquals("test_company_password", companyDTO.getPassword());
-        assertEquals("test_company_address", companyDTO.getAddress());
-        assertEquals("8-22", companyDTO.getTimeOfWork());
-        assertTrue(companyDTO.getEmailConfirmed());
-        assertTrue(companyDTO.getPlayerId().length() > 20);
-        assertTrue(companyDTO.getProductCategory().getId() > 0);
-        assertTrue(companyDTO.getImageId() > 0);
+        deleteCompany(id, 200);
+        deleteCompany(id, 404);
     }
 
     @Test
