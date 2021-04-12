@@ -236,7 +236,7 @@ public class Company extends TestBase {
         ArrayList<CompanyDTO> list = Company.getAllCompany();
         int countCompany = list.size();
         int index = (int) (Math.random() * (countCompany - 1));
-        if (index <= 0) index = 1;
+        if (index <= 0) index = 0;
         return list.get(index);
     }
 
@@ -250,7 +250,6 @@ public class Company extends TestBase {
                 .then()
                 .statusCode(200)
                 .extract().response();
-
         return response;
     }
 

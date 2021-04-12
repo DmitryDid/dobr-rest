@@ -48,10 +48,31 @@ public class CompanyTest extends TestBase {
     @Test
     public void postCompany_timeZone() {
         Map<String, Object> params = new HashMap<>();
-        params.put("timeZone", "Europe/Moscow");
+        params.put("latitude", 56.0183900);
+        params.put("longitude", 92.8671700);
 
         CompanyDTO companyDTO = createCompany(params).getCompany();
-        assertEquals("Europe/Moscow", companyDTO.getTimeZone());
+        assertEquals("Asia/Krasnoyarsk", companyDTO.getTimeZone());
+    }
+
+    @Test
+    public void postCompany_timeZone_barabinsk() {
+        Map<String, Object> params = new HashMap<>();
+        params.put("latitude", 55.3570900);
+        params.put("longitude", 78.3569700);
+
+        CompanyDTO companyDTO = createCompany(params).getCompany();
+        assertEquals("Asia/Novosibirsk", companyDTO.getTimeZone());
+    }
+
+    @Test
+    public void postCompany_timeZone_tumen() {
+        Map<String, Object> params = new HashMap<>();
+        params.put("latitude", 57.1522200);
+        params.put("longitude", 65.5272200);
+
+        CompanyDTO companyDTO = createCompany(params).getCompany();
+        assertEquals("Asia/Yekaterinburg", companyDTO.getTimeZone());
     }
 
     @Test
@@ -75,8 +96,8 @@ public class CompanyTest extends TestBase {
         map.put("productCategoryId", productCategoryId);
         map.put("name", "putCompanyById_newName");
         map.put("nameOfficial", "putCompanyById_nameOfficial");
-        map.put("Latitude", 56.0183900);
-        map.put("Longitude", 92.8671700);
+        map.put("Latitude", 55.7522200);
+        map.put("Longitude", 37.6155600);
         map.put("representative", "putCompanyById_representative");
         map.put("phone", getUniqueNumber(7));
         map.put("email", getUniqueNumber(8) + "@gmail.ru");
@@ -85,7 +106,6 @@ public class CompanyTest extends TestBase {
         map.put("address", "putCompanyById_address");
         map.put("timeOfWork", "0-24");
         map.put("playerId", UUID.randomUUID().toString());
-        map.put("timeZone", "Europe/Moscow");
 
         updateCompany(id, map, new File("src/test/java/Resources/vtb.jpg"));
 
@@ -103,7 +123,7 @@ public class CompanyTest extends TestBase {
         assertEquals(map.get("productCategoryId"), getCompanyDTO.getProductCategory().getId());
         assertEquals(map.get("phone"), getCompanyDTO.getPhone());
         assertEquals(map.get("inn"), getCompanyDTO.getInn());
-        assertEquals(map.get("timeZone"), getCompanyDTO.getTimeZone());
+        assertEquals("Asia/Novosibirsk", getCompanyDTO.getTimeZone());
         assertTrue(getCompanyDTO.getEmailConfirmed());
         assertNotEquals(imageId, getCompanyDTO.getImageId());
         assertEquals(authDTO.getCompany().getNameOfficial(), getCompanyDTO.getNameOfficial());
@@ -155,6 +175,8 @@ public class CompanyTest extends TestBase {
         UserDTO userDTO = getRandomUser();
         ProductCategoryDTO productCategoryDTO = getRandomProdCat();
         addedFavoriteForUser(userDTO.getId(), productCategoryDTO.getId());
+
+
 
         Company.getCompanyNotification(1);
         // []

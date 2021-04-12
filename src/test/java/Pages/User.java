@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.response.Response;
+import org.junit.Assert;
 
 import java.io.File;
 import java.util.*;
@@ -97,7 +98,7 @@ public class User extends TestBase {
         ArrayList<UserDTO> list = User.getAllUser();
         int countUsers = list.size();
         int index = (int) (Math.random() * (countUsers - 1));
-        if (index <= 0) index = 1;
+        if (index <= 0) index = 0;
         return list.get(index);
     }
 
@@ -135,13 +136,13 @@ public class User extends TestBase {
     }
 
     public static void addedFavoriteForUser(int userId, int companyId) {
-        given()
+        Response response = given()
                 .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + getToken())
                 .when()
-                .put("User/" + userId + "/favorite/" + companyId)
-                .then()
-                .statusCode(200);
+                .put("User/" + userId + "/favorite/" + companyId);
+        toConsole(response);
+        Assert.assertEquals(200, response.getStatusCode());
         System.out.printf("Добавлена связка пользователя %s и компании %s%n", userId, companyId);
     }
 

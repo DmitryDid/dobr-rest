@@ -29,7 +29,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0-M5</version>
-                <configuration>
+              <!--  <configuration>
                     <includes>
                         <include>AuthTest</include>
                         <include>ProductCategoryTest</include>
@@ -37,7 +37,7 @@
                         <include>FileTest</include>
                         <include>RegistrationTest</include>
                     </includes>
-                </configuration>
+                </configuration>-->
             </plugin>
         </plugins>
     </build>

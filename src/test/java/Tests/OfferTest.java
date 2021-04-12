@@ -1,52 +1,22 @@
 package Tests;
 
 import DTO.OfferDTO;
-import Pages.Auth;
 import Pages.Offer;
-import io.restassured.response.Response;
+import Pages.User;
 import org.junit.Test;
 
+import java.io.File;
 import java.util.Map;
 
-import static io.restassured.RestAssured.given;
+import static Pages.Offer.*;
 import static org.junit.Assert.*;
 
 public class OfferTest extends TestBase {
 
-    //GET /api/v{version}/Offer/{id}
-    @Test
-    public void getOfferById() {
-        fail();
-    }
-
-    //GET /api/v{version}/Offer/top
-    @Test
-    public void getOfferTop() {
-        Response response = given()
-                .spec(BASE_SPEC)
-                .header("Authorization", "Bearer " + Auth.getToken())
-                .log().all()
-                .when()
-                .get("Offer/top")
-                .then()
-                .statusCode(200)
-                .extract()
-                .response();
-        toConsole(response);
-        fail();
-    }
-
-    //GET /api/v{version}/Offer
-    @Test
-    public void getOffer() {
-        fail();
-    }
-
-
     //POST /api/v{version}/Offer
     @Test
     public void postOffer() {
-        Map<String, Object> params = Offer.getDefaultOfferParams();
+        Map<String, Object> params = getDefaultOfferParams();
         OfferDTO offerDTO = Offer.postOffer(params);
 
         assertEquals(params.get("text"), offerDTO.getText());
@@ -64,46 +34,64 @@ public class OfferTest extends TestBase {
         assertTrue(offerDTO.getImage().getId() > 0);
     }
 
+    //GET /api/v{version}/Offer/{id}
+    @Test
+    public void getOfferById() {
+        Integer id = getRandomOffer().getId();
+        getOffer(id);
+    }
+
+    //GET /api/v{version}/Offer/top
+    @Test
+    public void getOfferTop() {
+        getOfferTOP();
+    }
+
+    //GET /api/v{version}/Offer
+    @Test
+    public void getAllOffer() {
+        Offer.getAllOffer();
+    }
+
     //GET /api/v{version}/Offer/category/{id}
     @Test
     public void getOfferCategoryById() {
-        fail();
+        Integer id = getRandomOffer().getId();
+        getOfferByCategory(id);
     }
 
     //GET /api/v{version}/Offer/{id}/image
     @Test
     public void getOfferImage() {
-        String id = "1";
-
-        Response response = given()
-                .spec(BASE_SPEC)
-                .log().all()
-                .when()
-                .get("Offer/" + id + "/image")
-                .then()
-                .statusCode(200)
-                .extract()
-                .response();
-
-        toConsole(response);
-        fail();
+        Integer id = getRandomOffer().getId();
+        Offer.getOfferImage(id);
     }
 
     //PUT /api/v{version}/Offer/{id}/image
     @Test
     public void putOfferImageById() {
-        fail();
+        Integer id = getRandomOffer().getId();
+        File image = new File("src/test/java/Resources/newOffer.jpeg");
+        putOfferImage(id, image);
     }
 
     //POST /api/v{version}/Offer/like
     @Test
     public void postOfferLike() {
-        fail();
+        Integer userId = User.getRandomUser().getId();
+        Integer OfferId = Offer.getRandomOffer().getId();
+        Offer.addLike(userId, OfferId);
+        Offer.addLike(userId, OfferId);
+        Offer.addLike(userId, OfferId);
+
     }
 
     //POST /api/v{version}/Offer/dislike
     @Test
     public void postOfferDisLike() {
-        fail();
+        Integer userId = User.getRandomUser().getId();
+        Integer OfferId = Offer.getRandomOffer().getId();
+        Offer.addDislike(userId, OfferId);
+        Offer.addDislike(userId, OfferId);
     }
 }
