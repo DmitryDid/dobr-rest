@@ -23,6 +23,9 @@ public class Offer extends TestBase {
 
     public static File offerImage = new File("src/test/java/Resources/offer1.jpg");
 
+    /*
+    Возвращает параметры предстоящего оффера
+    */
     public static Map<String, Object> getDefaultOfferParams() {
         Map<String, Object> map = new HashMap<>();
         map.put("text", "offer_text" + getUniqueNumber(5));
@@ -40,7 +43,65 @@ public class Offer extends TestBase {
         return map;
     }
 
-    public static OfferDTO postOffer(Map<String, Object> params) {
+    public static OfferDTO createInactiveOffer(int companyId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("text", "offer_text" + getUniqueNumber(5));
+        params.put("sendingTime", DateHelper.getDate(NOW - (DAY * 10)));
+        params.put("timeStart", DateHelper.getDate(NOW - (DAY * 9)));
+        params.put("timeEnd", DateHelper.getDate(NOW - (DAY * 8)));
+        params.put("dateEnd", DateHelper.getDate(NOW - (DAY * 8)));
+        params.put("dateStart", DateHelper.getDate(NOW - (DAY * 9)));
+        params.put("companyId", companyId);
+        params.put("percentage", 7);
+        params.put("forMan", true);
+        params.put("forWoman", true);
+        params.put("upperAgeLimit", 60);
+        params.put("lowerAgeLimit", 0);
+
+        Response response = given()
+                .spec(MULTI_DATA_SPEC)
+                .header("Authorization", "Bearer " + getAccessToken())
+                .formParams(params)
+                .multiPart("image", offerImage)
+                .when()
+                .post("offer")
+                .then()
+                .statusCode(200)
+                .extract().response();
+        System.out.println("Создан неактивный оффер");
+        return response.as(OfferDTO.class);
+    }
+
+    public static OfferDTO createActiveOffer(int companyId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("text", "offer_text" + getUniqueNumber(5));
+        params.put("sendingTime", DateHelper.getDate(NOW + DAY * 5));
+        params.put("timeStart", DateHelper.getDate(NOW + DAY * 5));
+        params.put("timeEnd", DateHelper.getDate(NOW + DAY * 5));
+        params.put("dateEnd", DateHelper.getDate(NOW + DAY * 5));
+        params.put("dateStart", DateHelper.getDate(NOW + DAY * 5));
+        params.put("companyId", companyId);
+        params.put("percentage", 7);
+        params.put("forMan", true);
+        params.put("forWoman", true);
+        params.put("upperAgeLimit", 60);
+        params.put("lowerAgeLimit", 0);
+
+        Response response = given()
+                .spec(MULTI_DATA_SPEC)
+                .header("Authorization", "Bearer " + getAccessToken())
+                .formParams(params)
+                .multiPart("image", offerImage)
+                .when()
+                .post("offer")
+                .then()
+                .statusCode(200)
+                .extract().response();
+        System.out.println("Создан активный оффер");
+        return response.as(OfferDTO.class);
+    }
+
+    public static OfferDTO createOffer(Map<String, Object> params) {
         Response response = given()
                 .spec(MULTI_DATA_SPEC)
                 .header("Authorization", "Bearer " + getAccessToken())
@@ -55,7 +116,7 @@ public class Offer extends TestBase {
         return response.as(OfferDTO.class);
     }
 
-    public static OfferDTO postOffer() {
+    public static OfferDTO createOffer() {
         Response response = given()
                 .spec(MULTI_DATA_SPEC)
                 .header("Authorization", "Bearer " + getAccessToken())

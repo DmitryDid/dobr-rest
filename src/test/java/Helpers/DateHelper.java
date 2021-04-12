@@ -1,5 +1,6 @@
 package Helpers;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -28,5 +29,16 @@ public class DateHelper {
         SimpleDateFormat simpleDateFormat =
                 new SimpleDateFormat(pattern);
         return simpleDateFormat.format(new Date(date));
+    }
+
+    public static Date parse(String stringDate) {
+        String string = stringDate.replaceAll("T", " ");
+        Date date = null;
+        try {
+            date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(string);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date;
     }
 }

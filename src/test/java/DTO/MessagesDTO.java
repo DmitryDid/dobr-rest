@@ -15,4 +15,8 @@ public class MessagesDTO {
 
     @JsonProperty("day")
     String day;
+
+    @JsonProperty("lastMessage")
+    String lastMessage;
+
 }

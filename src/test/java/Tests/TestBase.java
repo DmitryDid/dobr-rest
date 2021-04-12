@@ -1,8 +1,6 @@
 package Tests;
 
 import Pages.Base;
-import Pages.Company;
-import Pages.ProductCategory;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.config.MultiPartConfig;
@@ -13,8 +11,10 @@ import org.junit.Before;
 
 import static Pages.Auth.accessToken;
 import static Pages.Auth.getToken;
-import static Pages.Company.createCompanyWithEmail;
+import static Pages.Company.*;
+import static Pages.Offer.createInactiveOffer;
 import static Pages.ProductCategory.createProductCategory;
+import static Pages.ProductCategory.getCountProductCategory;
 import static io.restassured.config.EncoderConfig.encoderConfig;
 
 public class TestBase extends Base {
@@ -34,10 +34,11 @@ public class TestBase extends Base {
     }
 
     private void createRows() {
-        if (ProductCategory.getCountProductCategory() < 3)
+        if (getCountProductCategory() < 3)
             createProductCategory();
-        if (Company.getCountCompany() < 3)
+        if (getCountCompany() < 3)
             createCompanyWithEmail(getUniqueNumber(9) + "@init.ru");
+        createInactiveOffer(getRandomCompany().getId());
     }
 
     public static final RequestSpecification BASE_SPEC = new RequestSpecBuilder()

@@ -236,7 +236,7 @@ public class CompanyTest extends TestBase {
         Map<String, Object> params = Offer.getDefaultOfferParams();
         params.put("companyId", companyId);
 
-        Offer.postOffer(params);
+        Offer.createOffer(params);
         CompanyOfferDTO companyOffer = Company.getCompanyOffer(companyId);
         OfferDTO inactiveOffer = companyOffer.getInactiveOffer().get(0);
 

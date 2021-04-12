@@ -309,7 +309,7 @@ public class Company extends TestBase {
                 .when()
                 .get("Company/" + id + "/offer")
                 .then()
-//                .statusCode(200)
+                .statusCode(200)
                 .extract()
                 .response();
         return response.as(CompanyOfferDTO.class);
