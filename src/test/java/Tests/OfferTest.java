@@ -66,7 +66,7 @@ public class OfferTest extends TestBase {
     //GET /api/v{version}/Offer/top
     @Test
     public void getOfferTop() {
-        for (int i = 0; i < 500; i++) {
+        for (int i = 0; i < 50; i++) {
             Integer offerId = Offer.getRandomOffer().getId();
             Integer userId = User.getRandomUser().getId();
 
