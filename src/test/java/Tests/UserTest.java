@@ -20,7 +20,7 @@ public class UserTest extends TestBase {
 
     @Test
     public void postUser() {
-        File image = new File("src/test/java/Resources/MarinaC.jpeg");
+        File image = new File("src/test/java/resources/MarinaC.jpeg");
 
         Map<String, Object> params = new HashMap<>();
         params.put("name", "Marina_" + getUniqueNumber(4));
@@ -46,7 +46,7 @@ public class UserTest extends TestBase {
 
     @Test
     public void getUserImageById() {
-        File image = new File("src/test/java/Resources/MarinaC.jpeg");
+        File image = new File("src/test/java/resources/MarinaC.jpeg");
 
         Map<String, Object> params = new HashMap<>();
         params.put("name", "Marina_" + getUniqueNumber(4));
@@ -77,7 +77,7 @@ public class UserTest extends TestBase {
 
     @Test
     public void getUsersAll() {
-        File image = new File("src/test/java/Resources/MarinaC.jpeg");
+        File image = new File("src/test/java/resources/MarinaC.jpeg");
 
         Map<String, Object> params = new HashMap<>();
         params.put("name", "Marina_" + getUniqueNumber(4));
@@ -108,7 +108,7 @@ public class UserTest extends TestBase {
 
     @Test
     public void putUserById() {
-        File image = new File("src/test/java/Resources/MarinaC.jpeg");
+        File image = new File("src/test/java/resources/MarinaC.jpeg");
 
         Map<String, Object> createParams = new HashMap<>();
         createParams.put("name", "Marina_" + getUniqueNumber(4));

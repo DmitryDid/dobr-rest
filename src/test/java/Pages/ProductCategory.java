@@ -22,7 +22,7 @@ public class ProductCategory extends TestBase {
         String name = "alcohol";
         int ageLimit = 18;
         String fileName = "alko.jpg";
-        File image = new File("src/test/java/Resources/" + fileName);
+        File image = new File("src/test/java/resources/" + fileName);
 
         Response response = given()
                 .spec(MULTI_DATA_SPEC)

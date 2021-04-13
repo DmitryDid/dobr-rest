@@ -21,7 +21,7 @@ import static io.restassured.RestAssured.given;
 public class User extends TestBase {
 
     static public final String FILE_NAME = "hacker.jpg";
-    static public final File IMAGE = new File("src/test/java/Resources/" + FILE_NAME);
+    static public final File IMAGE = new File("src/test/java/resources/" + FILE_NAME);
 
     public static Map<String, Object> getDefaultUserParams() {
         Map<String, Object> map = new HashMap<>();

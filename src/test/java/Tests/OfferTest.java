@@ -2,12 +2,10 @@ package Tests;
 
 import DTO.CompanyOfferDTO;
 import DTO.OfferDTO;
-import DTO.UserDTO;
 import Helpers.DateHelper;
-import Pages.Company;
 import Pages.Offer;
+import Pages.ProductCategory;
 import Pages.User;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
@@ -23,7 +21,6 @@ import static org.junit.Assert.*;
 
 public class OfferTest extends TestBase {
 
-    //POST /api/v{version}/Offer
     @Test
     public void postOffer() {
         Map<String, Object> params = getDefaultOfferParams();
@@ -44,7 +41,6 @@ public class OfferTest extends TestBase {
         assertTrue(offerDTO.getImageId() > 0);
     }
 
-    //GET /api/v{version}/Offer/{id}
     @Test
     public void getOfferById() {
         Map<String, Object> params = getDefaultOfferParams();
@@ -70,20 +66,16 @@ public class OfferTest extends TestBase {
     //GET /api/v{version}/Offer/top
     @Test
     public void getOfferTop() {
-        Integer companyId = Company.getRandomCompany().getId();
-        Integer offerId = Offer.createInactiveOffer(companyId).getId();
-        ArrayList<UserDTO> listUsers = User.getAllUser();
+        for (int i = 0; i < 500; i++) {
+            Integer offerId = Offer.getRandomOffer().getId();
+            Integer userId = User.getRandomUser().getId();
 
-        for (UserDTO listUser : listUsers) {
-            addLike(listUser.getId(), offerId);
+            addLike(userId, offerId);
         }
         ArrayList<OfferDTO> topOffers = getOfferTOP();
-        Assert.assertTrue(topOffers.size() > 0);
+        assertTrue(topOffers.size() > 0);
     }
 
-    /*
-    Только будующие офферы
-     */
     @Test
     public void getAllOffer() {
         Offer.createOffer();
@@ -92,9 +84,7 @@ public class OfferTest extends TestBase {
 
         for (OfferDTO offer : list) {
             Date now = new Date();
-            Date dateStart = DateHelper.parse(offer.getDateStart());
             Date dateEnd = DateHelper.parse(offer.getDateEnd());
-            Date timeStart = DateHelper.parse(offer.getTimeStart());
             Date timeEnd = DateHelper.parse(offer.getTimeEnd());
 
             assertTrue(dateEnd.after(now));
@@ -102,46 +92,73 @@ public class OfferTest extends TestBase {
         }
     }
 
-    //GET /api/v{version}/Offer/category/{id}
     @Test
     public void getOfferCategoryById() {
-        Integer id = getRandomOffer().getId();
-        getOfferByCategory(id);
+        ArrayList<OfferDTO> list;
+        Integer id;
+
+        do {
+            id = ProductCategory.getRandomProdCat().getId();
+            list = getOfferByCategory(id);
+        } while (list.size() <= 0);
+
+        for (OfferDTO offer : list) {
+            assertSame(offer.getCompany().getProductCategory().getId(), id);
+
+            Date now = new Date();
+            Date dateEnd = DateHelper.parse(offer.getDateEnd());
+            Date timeEnd = DateHelper.parse(offer.getTimeEnd());
+
+            assertTrue(dateEnd.after(now));
+            assertTrue(timeEnd.after(now));
+        }
     }
 
-    //GET /api/v{version}/Offer/{id}/image
     @Test
     public void getOfferImage() {
         Integer id = getRandomOffer().getId();
-        Offer.getOfferImage(id);
+        String image = Offer.getOfferImage(id);
+        assertTrue(image.contains("JPEG") || image.contains("JFIF"));
     }
 
-    //PUT /api/v{version}/Offer/{id}/image
     @Test
     public void putOfferImageById() {
-        Integer id = getRandomOffer().getId();
-        File image = new File("src/test/java/Resources/newOffer.jpeg");
+        OfferDTO offer = getRandomOffer();
+        Integer id = offer.getId();
+        File image = new File("src/test/java/resources/newOffer.jpeg");
+
         putOfferImage(id, image);
+        Integer newImageId = Offer.getOffer(id).getImageId();
+
+        assertNotEquals(offer.getImageId(), newImageId);
     }
 
-    //POST /api/v{version}/Offer/like
     @Test
     public void postOfferLike() {
         Integer userId = User.getRandomUser().getId();
-        Integer OfferId = getRandomOffer().getId();
-        addLike(userId, OfferId);
-        addLike(userId, OfferId);
-        addLike(userId, OfferId);
+        Integer offerId = getRandomOffer().getId();
+        Integer countBefore = Offer.getOffer(offerId).getLikeCounter();
 
+        addLike(userId, offerId);
+        addLike(userId, offerId);
+
+        Integer countAfter = Offer.getOffer(offerId).getLikeCounter();
+
+        assertEquals(++countBefore, countAfter);
     }
 
-    //POST /api/v{version}/Offer/dislike
     @Test
     public void postOfferDisLike() {
         Integer userId = User.getRandomUser().getId();
-        Integer OfferId = getRandomOffer().getId();
-        addDislike(userId, OfferId);
-        addDislike(userId, OfferId);
+        Integer offerId = getRandomOffer().getId();
+        Integer countBefore = Offer.getOffer(offerId).getLikeCounter();
+
+        addLike(userId, offerId);
+        addDislike(userId, offerId);
+
+        Integer countAfter = Offer.getOffer(offerId).getLikeCounter();
+
+        assertEquals(countBefore, countAfter);
     }
 
     @Test
@@ -171,16 +188,6 @@ public class OfferTest extends TestBase {
         for (OfferDTO offerDTO : list) {
             if (offerDTO.getId().equals(offerId)) return;
         }
-        fail();
-    }
-
-    @Test
-    public void nearbyOffer() {
-        fail();
-    }
-
-    @Test
-    public void preOffer() {
         fail();
     }
 }

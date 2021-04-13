@@ -107,7 +107,7 @@ public class CompanyTest extends TestBase {
         map.put("timeOfWork", "0-24");
         map.put("playerId", UUID.randomUUID().toString());
 
-        updateCompany(id, map, new File("src/test/java/Resources/vtb.jpg"));
+        updateCompany(id, map, new File("src/test/java/resources/vtb.jpg"));
 
         CompanyDTO getCompanyDTO = getCompany(id);
 
@@ -135,7 +135,7 @@ public class CompanyTest extends TestBase {
         Integer companyId = company.getCompany().getId();
         Integer oldImageId = company.getCompany().getImageId();
 
-        updateCompanyImage(companyId, new File("src/test/java/Resources/Kiprensky_Pushkin_2.jpg"));
+        updateCompanyImage(companyId, new File("src/test/java/resources/Kiprensky_Pushkin_2.jpg"));
 
         CompanyDTO updateCompany = getCompany(companyId);
         Integer newImageId = updateCompany.getImageId();

@@ -21,7 +21,7 @@ import static io.restassured.RestAssured.given;
 
 public class Offer extends TestBase {
 
-    public static File offerImage = new File("src/test/java/Resources/offer1.jpg");
+    public static File offerImage = new File("src/test/java/resources/offer1.jpg");
 
     /*
     Возвращает параметры предстоящего оффера
@@ -187,15 +187,12 @@ public class Offer extends TestBase {
     public static String getOfferImage(int id) {
         Response response = given()
                 .spec(BASE_SPEC)
-                .log().all()
                 .when()
                 .get("Offer/" + id + "/image")
                 .then()
                 .statusCode(200)
                 .extract()
                 .response();
-
-        toConsole(response);
         return response.asString();
     }
 

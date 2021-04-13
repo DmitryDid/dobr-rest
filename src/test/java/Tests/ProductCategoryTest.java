@@ -33,7 +33,7 @@ public class ProductCategoryTest extends TestBase {
         HashMap<String, Object> params = new HashMap<>();
         params.put("name", "super_product");
         params.put("ageLimit", 6);
-        File image = new File("src/test/java/Resources/vtb.jpg");
+        File image = new File("src/test/java/resources/vtb.jpg");
 
         ProductCategoryDTO productCategoryDTO = createProductCategory(params, image);
 
@@ -65,7 +65,7 @@ public class ProductCategoryTest extends TestBase {
     public void getProductCategoryById() {
         String name = "new_product";
         int age = 8;
-        File image = new File("src/test/java/Resources/vtb.jpg");
+        File image = new File("src/test/java/resources/vtb.jpg");
 
         HashMap<String, Object> params = new HashMap<>();
         params.put("name", name);
@@ -97,7 +97,7 @@ public class ProductCategoryTest extends TestBase {
 
         String name = "update_product";
         int age = 6;
-        File image = new File("src/test/java/Resources/update-your-content.jpg");
+        File image = new File("src/test/java/resources/update-your-content.jpg");
         HashMap<String, Object> newParams = new HashMap<>();
         newParams.put("name", name);
         newParams.put("ageLimit", age);
@@ -129,7 +129,7 @@ public class ProductCategoryTest extends TestBase {
         int imageId = ProductCategory.getProductCategory(categoryId)
                 .getImageId();
 
-        File newImage = new File("src/test/java/Resources/Malen.jpeg");
+        File newImage = new File("src/test/java/resources/Malen.jpeg");
         ProductCategory.putProductCategoryImage(categoryId, newImage);
 
         int newImageId = ProductCategory.getProductCategory(categoryId)

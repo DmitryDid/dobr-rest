@@ -32,7 +32,7 @@ public class Company extends TestBase {
         return map;
     }
 
-    static File image = new File("src/test/java/Resources/appleGoogle.jpg");
+    static File image = new File("src/test/java/resources/appleGoogle.jpg");
 
 
     public static ArrayList<CompanyDTO> getAllCompany() {
