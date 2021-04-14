@@ -17,6 +17,7 @@ import static Pages.Company.getCompanyOffer;
 import static Pages.Company.getRandomCompany;
 import static Pages.Offer.*;
 import static Pages.User.createUser;
+import static Pages.User.getRandomUser;
 import static org.junit.Assert.*;
 
 public class OfferTest extends TestBase {
@@ -143,6 +144,22 @@ public class OfferTest extends TestBase {
 
         Integer countBefore = Offer.getOffer(offerId).getLikeCounter();
 
+        addLike(userId, offerId);
+        countBefore++;
+
+        Integer countAfter = Offer.getOffer(offerId).getLikeCounter();
+
+        assertEquals(countBefore, countAfter);
+    }
+
+    @Test
+    public void postOfferLike_BlockChek() {
+        Integer userId = getRandomUser().getId();
+        Integer offerId = getRandomOffer().getId();
+
+        Integer countBefore = Offer.getOffer(offerId).getLikeCounter();
+
+        addLike(userId, offerId);
         addLike(userId, offerId);
         countBefore++;
 

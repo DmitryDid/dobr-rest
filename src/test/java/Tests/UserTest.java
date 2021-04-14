@@ -19,32 +19,6 @@ import static org.junit.Assert.*;
 public class UserTest extends TestBase {
 
     @Test
-    public void postUser() {
-        File image = new File("src/test/java/resources/MarinaC.jpeg");
-
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", "Marina_" + getUniqueNumber(4));
-        params.put("isMan", false);
-        params.put("playerId", UUID.randomUUID().toString());
-        params.put("birthYear", "1984-08-01T12:59:18.99");
-        params.put("latitude", "56.0415000");
-        params.put("longitude", "83.9346000");
-
-        AuthDTO user = createUser(params, image);
-
-        assertEquals(params.get("name"), user.getUser().getName());
-        assertEquals(params.get("isMan"), user.getUser().getIsMan());
-        assertEquals(params.get("playerId"), user.getUser().getPlayerId());
-        assertEquals(params.get("birthYear"), user.getUser().getBirthYear());
-        assertTrue(params.get("latitude").toString().startsWith(user.getUser().getLatitude().toString()));
-        assertTrue(params.get("longitude").toString().startsWith(user.getUser().getLongitude().toString()));
-
-        assertEquals("Success", user.getStatus());
-        assertEquals("bearer", user.getTokenType());
-        assertTrue(user.getAccessToken().length() > 100);
-    }
-
-    @Test
     public void getUserImageById() {
         File image = new File("src/test/java/resources/MarinaC.jpeg");
 
@@ -73,6 +47,51 @@ public class UserTest extends TestBase {
         assertEquals("Success", receivedAuth.getStatus());
         assertEquals("bearer", receivedAuth.getTokenType());
         assertTrue(receivedAuth.getAccessToken().length() > 100);
+    }
+
+    @Test
+    public void putUserById() {
+        File image = new File("src/test/java/resources/MarinaC.jpeg");
+
+        Map<String, Object> createParams = new HashMap<>();
+        createParams.put("name", "Marina_" + getUniqueNumber(4));
+        createParams.put("isMan", false);
+        createParams.put("playerId", UUID.randomUUID().toString());
+        createParams.put("birthYear", "1984-08-01T12:59:18.99");
+        createParams.put("latitude", "56.0415000");
+        createParams.put("longitude", "83.9346000");
+
+        AuthDTO created = createUser(createParams, image);
+        Integer id = created.getUser().getId();
+        Map<String, Object> updateParams = getDefaultUserParams();
+        AuthDTO updated = updateUser(id, updateParams, IMAGE);
+
+        assertEquals("Success", updated.getStatus());
+        assertEquals(id, updated.getUser().getId());
+        assertEquals(updateParams.get("name"), updated.getUser().getName());
+        assertEquals(updateParams.get("isMan"), updated.getUser().getIsMan());
+        assertEquals(updateParams.get("playerId"), updated.getUser().getPlayerId());
+        assertEquals(updateParams.get("birthYear"), updated.getUser().getBirthYear());
+        assertTrue(updateParams.get("latitude").toString().startsWith(updated.getUser().getLatitude().toString()));
+        assertTrue(updateParams.get("longitude").toString().startsWith(updated.getUser().getLongitude().toString()));
+    }
+
+    // GET /api/v{version}/User/{id}/offer
+    @Test
+    public void getUserOffer() {
+        fail();
+    }
+
+    // GET /api/v{version}/User/{id}/company/{companyId}/offer
+    @Test
+    public void getUserCompanyOffer() {
+        fail();
+    }
+
+    // GET /api/v{version}/User/{id}/favarite-offer
+    @Test
+    public void getUserFavoriteOffer() {
+        fail();
     }
 
     @Test
@@ -107,30 +126,84 @@ public class UserTest extends TestBase {
     }
 
     @Test
-    public void putUserById() {
+    public void postUser() {
         File image = new File("src/test/java/resources/MarinaC.jpeg");
 
-        Map<String, Object> createParams = new HashMap<>();
-        createParams.put("name", "Marina_" + getUniqueNumber(4));
-        createParams.put("isMan", false);
-        createParams.put("playerId", UUID.randomUUID().toString());
-        createParams.put("birthYear", "1984-08-01T12:59:18.99");
-        createParams.put("latitude", "56.0415000");
-        createParams.put("longitude", "83.9346000");
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", "Marina_" + getUniqueNumber(4));
+        params.put("isMan", false);
+        params.put("playerId", UUID.randomUUID().toString());
+        params.put("birthYear", "1984-08-01T12:59:18.99");
+        params.put("latitude", "56.0415000");
+        params.put("longitude", "83.9346000");
 
-        AuthDTO created = createUser(createParams, image);
-        Integer id = created.getUser().getId();
-        Map<String, Object> updateParams = getDefaultUserParams();
-        AuthDTO updated = updateUser(id, updateParams, IMAGE);
+        AuthDTO user = createUser(params, image);
 
-        assertEquals("Success", updated.getStatus());
-        assertEquals(id, updated.getUser().getId());
-        assertEquals(updateParams.get("name"), updated.getUser().getName());
-        assertEquals(updateParams.get("isMan"), updated.getUser().getIsMan());
-        assertEquals(updateParams.get("playerId"), updated.getUser().getPlayerId());
-        assertEquals(updateParams.get("birthYear"), updated.getUser().getBirthYear());
-        assertTrue(updateParams.get("latitude").toString().startsWith(updated.getUser().getLatitude().toString()));
-        assertTrue(updateParams.get("longitude").toString().startsWith(updated.getUser().getLongitude().toString()));
+        assertEquals(params.get("name"), user.getUser().getName());
+        assertEquals(params.get("isMan"), user.getUser().getIsMan());
+        assertEquals(params.get("playerId"), user.getUser().getPlayerId());
+        assertEquals(params.get("birthYear"), user.getUser().getBirthYear());
+        assertTrue(params.get("latitude").toString().startsWith(user.getUser().getLatitude().toString()));
+        assertTrue(params.get("longitude").toString().startsWith(user.getUser().getLongitude().toString()));
+
+        assertEquals("Success", user.getStatus());
+        assertEquals("bearer", user.getTokenType());
+        assertTrue(user.getAccessToken().length() > 100);
+    }
+
+    // GET /api/v{version}/User/{id}/image
+    @Test
+    public void getUserImage() {
+        fail();
+    }
+
+    // PUT /api/v{version}/User/{id}/image
+    @Test
+    public void putUserImage() {
+        fail();
+    }
+
+    @Test
+    public void getUserStories() {
+        int id = getRandomUser().getId();
+        ArrayList<UserDTO> listUser = User.getAllUser();
+
+        int count = 0;
+        for (UserDTO currentUser : listUser) {
+            if (User.getStories(currentUser.getId()).size() > 0) count++;
+        }
+        assertTrue(count > 0);
+    }
+
+    // DELETE /api/v{version}/User/{id}/stories/company/{companyId}
+    @Test
+    public void deleteUserStoriesCompany() {
+        fail();
+    }
+
+    // GET /api/v{version}/User/{userId}/company/{companyId}/distance
+    @Test
+    public void getUserCompanyDistance() {
+        fail();
+    }
+
+    @Test
+    public void getUserFavorite() {
+        putUserFavorite();
+    }
+
+    @Test
+    public void putUserFavorite() {
+        Integer userId = getRandomUser().getId();
+        Integer companyId = getRandomCompany().getId();
+
+        addedFavoriteForUser(userId, companyId);
+        ArrayList<CompanyDTO> listFavorite = User.getUserFavorite(userId);
+
+        for (CompanyDTO current : listFavorite) {
+            if (current.getId().equals(companyId)) return;
+        }
+        fail();
     }
 
     @Test
@@ -154,36 +227,5 @@ public class UserTest extends TestBase {
         for (CompanyDTO current : listFavorite) {
             if (current.getId().equals(count)) fail();
         }
-    }
-
-    @Test
-    public void getUserFavorite() {
-        putUserFavorite();
-    }
-
-    @Test
-    public void getUserStories() {
-        int id = getRandomUser().getId();
-        ArrayList<UserDTO> listUser = User.getAllUser();
-
-        int count = 0;
-        for (UserDTO currentUser : listUser) {
-            if (User.getStories(currentUser.getId()).size() > 0) count++;
-        }
-        assertTrue(count > 0);
-    }
-
-    @Test
-    public void putUserFavorite() {
-        Integer userId = getRandomUser().getId();
-        Integer companyId = getRandomCompany().getId();
-
-        addedFavoriteForUser(userId, companyId);
-        ArrayList<CompanyDTO> listFavorite = User.getUserFavorite(userId);
-
-        for (CompanyDTO current : listFavorite) {
-            if (current.getId().equals(companyId)) return;
-        }
-        fail();
     }
 }

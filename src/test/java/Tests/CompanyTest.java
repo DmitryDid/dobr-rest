@@ -12,8 +12,8 @@ import java.util.*;
 
 import static Pages.Company.*;
 import static Pages.ProductCategory.createProductCategory;
-import static Pages.ProductCategory.getRandomProdCat;
-import static Pages.User.*;
+import static Pages.User.addedFavoriteForUser;
+import static Pages.User.createUser;
 import static org.junit.Assert.*;
 
 public class CompanyTest extends TestBase {
@@ -180,17 +180,17 @@ public class CompanyTest extends TestBase {
         fail(); //TODO: // Серега говорит, что пока не используется
     }
 
-    @Ignore
     @Test
     public void getCompanyTop() {
-        UserDTO userDTO = getRandomUser();
-        ProductCategoryDTO productCategoryDTO = getRandomProdCat();
+        Integer userId = createUser().getUser().getId();
+        Integer productCategoryId = createProductCategory().getId();
 
-        addedFavoriteForUser(userDTO.getId(), productCategoryDTO.getId());
+        addedFavoriteForUser(userId, productCategoryId);
 
         ArrayList<TopDTO> list = Company.getCompanyTop();
 
         assertTrue(list.size() > 0);
+
         for (TopDTO topDTO : list) {
             assertTrue(topDTO.getCount() > 0);
             assertTrue(topDTO.getCount() <= 3);

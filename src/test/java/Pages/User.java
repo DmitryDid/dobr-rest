@@ -9,7 +9,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.response.Response;
-import org.junit.Assert;
 
 import java.io.File;
 import java.util.*;
@@ -136,12 +135,15 @@ public class User extends TestBase {
     }
 
     public static void addedFavoriteForUser(int userId, int companyId) {
-        Response response = given()
+        given()
                 .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + getToken())
                 .when()
-                .put("User/" + userId + "/favorite/" + companyId);
-        Assert.assertEquals(200, response.getStatusCode());
+                .put("User/" + userId + "/favorite/" + companyId)
+                .then()
+                .statusCode(200)
+                .extract()
+                .response();
         System.out.printf("Добавлена связка пользователя %s и компании %s%n", userId, companyId);
     }
 
