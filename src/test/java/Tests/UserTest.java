@@ -2,7 +2,9 @@ package Tests;
 
 import DTO.AuthDTO;
 import DTO.CompanyDTO;
+import DTO.CompanyOfferDTO;
 import DTO.UserDTO;
+import Pages.Offer;
 import Pages.User;
 import org.junit.Test;
 
@@ -79,7 +81,14 @@ public class UserTest extends TestBase {
     // GET /api/v{version}/User/{id}/offer
     @Test
     public void getUserOffer() {
-        fail();
+        int id = User.getRandomUser().getId();
+        CompanyOfferDTO companyOffer = User.getUserOffer(id);
+        System.out.println(id);
+
+        assertTrue(companyOffer.getPreOffer().size() > 0);
+        assertTrue(companyOffer.getInactiveOffer().size() > 0);
+        assertTrue(companyOffer.getNearbyOffer().size() > 0);
+        assertTrue(companyOffer.getActiveOffer().size() > 0);
     }
 
     // GET /api/v{version}/User/{id}/company/{companyId}/offer

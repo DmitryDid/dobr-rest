@@ -1,9 +1,6 @@
 package Pages;
 
-import DTO.AuthDTO;
-import DTO.CompanyDTO;
-import DTO.CompanyListDTO;
-import DTO.UserDTO;
+import DTO.*;
 import Tests.TestBase;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -132,6 +129,18 @@ public class User extends TestBase {
                 .statusCode(200)
                 .extract()
                 .response().as(AuthDTO.class);
+    }
+
+    public static CompanyOfferDTO getUserOffer(int id) {
+        return given()
+                .spec(BASE_SPEC)
+                .header("Authorization", "Bearer " + getToken())
+                .when()
+                .get("User/" + id + "/offer")
+                .then()
+                .statusCode(200)
+                .extract()
+                .response().as(CompanyOfferDTO.class);
     }
 
     public static void addedFavoriteForUser(int userId, int companyId) {

@@ -11,8 +11,9 @@ import org.junit.Before;
 
 import static Pages.Auth.accessToken;
 import static Pages.Auth.getToken;
-import static Pages.Company.*;
-import static Pages.Offer.createActiveOffer;
+import static Pages.Company.createCompanyWithEmail;
+import static Pages.Company.getCountCompany;
+import static Pages.Offer.*;
 import static Pages.ProductCategory.createProductCategory;
 import static Pages.ProductCategory.getCountProductCategory;
 import static io.restassured.config.EncoderConfig.encoderConfig;
@@ -39,7 +40,9 @@ public class TestBase extends Base {
         }
         if (getCountCompany() < 3) {
             createCompanyWithEmail(getUniqueNumber(9) + "@init.ru");
-            createActiveOffer(getRandomCompany().getId());
+            createActiveOffer();
+            createInactiveOffer();
+            createPreOffer();
         }
     }
 

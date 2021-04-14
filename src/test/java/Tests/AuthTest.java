@@ -3,6 +3,7 @@ package Tests;
 import DTO.AuthDTO;
 import DTO.CompanyDTO;
 import Pages.Auth;
+import Pages.Company;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -73,12 +74,11 @@ public class AuthTest extends TestBase {
     @Ignore
     @Test
     public void getCompanyLostPassword() {
-        int companyId = 1;
-        CompanyDTO companyDTO = getCompany(companyId);
+        String email = getUniqueNumber(8) + "_nsk_dem@mail.ru";
+        Company.createCompanyWithEmail(email);
 
-        AuthDTO authDTO = Auth.getCompanyLostPassword(companyDTO.getEmail(), getToken());
-        //TODO: дописать
-        toConsole(authDTO);
+        Auth.getCompanyLostPassword(email, getToken());
+        //TODO: ХЗ
     }
 
     // POST /api/v{version}/Auth/company/restore-password

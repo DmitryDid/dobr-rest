@@ -14,34 +14,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static Helpers.DateHelper.DAY;
-import static Helpers.DateHelper.NOW;
+import static Helpers.DateHelper.*;
 import static Pages.Auth.getAccessToken;
+import static Pages.Company.*;
 import static io.restassured.RestAssured.given;
 
 public class Offer extends TestBase {
 
     public static File offerImage = new File("src/test/java/resources/offer1.jpg");
-
-    /*
-    Возвращает параметры предстоящего оффера
-    */
-    public static Map<String, Object> getDefaultOfferParams() {
-        Map<String, Object> map = new HashMap<>();
-        map.put("text", "offer_text" + getUniqueNumber(5));
-        map.put("sendingTime", DateHelper.getDate(NOW - (DAY * 10)));
-        map.put("timeStart", DateHelper.getDate(NOW - (DAY * 10)));
-        map.put("timeEnd", DateHelper.getDate(NOW + (DAY * 10)));
-        map.put("dateEnd", DateHelper.getDate(NOW + (DAY * 10)));
-        map.put("dateStart", DateHelper.getDate(NOW - (DAY * 10)));
-        map.put("companyId", Company.getRandomCompany().getId());
-        map.put("percentage", 5);
-        map.put("forMan", true);
-        map.put("forWoman", true);
-        map.put("upperAgeLimit", 60);
-        map.put("lowerAgeLimit", 0);
-        return map;
-    }
 
     public static OfferDTO createInactiveOffer(int companyId) {
         Map<String, Object> params = new HashMap<>();
@@ -72,15 +52,102 @@ public class Offer extends TestBase {
         return response.as(OfferDTO.class);
     }
 
+    public static OfferDTO createInactiveOffer() {
+        Map<String, Object> params = new HashMap<>();
+        params.put("text", "offer_text" + getUniqueNumber(5));
+        params.put("sendingTime", DateHelper.getDate(NOW - (DAY * 9)));
+        params.put("timeStart", DateHelper.getDate(NOW - (DAY * 9)));
+        params.put("timeEnd", DateHelper.getDate(NOW - (DAY * 2)));
+        params.put("dateStart", DateHelper.getDate(NOW - (DAY * 9)));
+        params.put("dateEnd", DateHelper.getDate(NOW - (DAY * 2)));
+        params.put("companyId", getRandomCompany().getId());
+        params.put("percentage", 7);
+        params.put("forMan", true);
+        params.put("forWoman", true);
+        params.put("upperAgeLimit", 60);
+        params.put("lowerAgeLimit", 0);
+
+        Response response = given()
+                .spec(MULTI_DATA_SPEC)
+                .header("Authorization", "Bearer " + getAccessToken())
+                .formParams(params)
+                .multiPart("image", offerImage)
+                .when()
+                .post("offer")
+                .then()
+                .statusCode(200)
+                .extract().response();
+        System.out.println("Создан неактивный оффер");
+        return response.as(OfferDTO.class);
+    }
+
+    public static OfferDTO createPreOffer() {
+        Map<String, Object> params = new HashMap<>();
+        params.put("text", "offer_text" + getUniqueNumber(5));
+        params.put("sendingTime", DateHelper.getDate(NOW + DAY));
+        params.put("timeStart", DateHelper.getDate(NOW + (DAY * 5)));
+        params.put("timeEnd", DateHelper.getDate(NOW + (DAY * 10)));
+        params.put("dateStart", DateHelper.getDate(NOW + (DAY * 5)));
+        params.put("dateEnd", DateHelper.getDate(NOW + (DAY * 10)));
+        params.put("companyId", getRandomCompany().getId());
+        params.put("percentage", 7);
+        params.put("forMan", true);
+        params.put("forWoman", true);
+        params.put("upperAgeLimit", 60);
+        params.put("lowerAgeLimit", 0);
+
+        Response response = given()
+                .spec(MULTI_DATA_SPEC)
+                .header("Authorization", "Bearer " + getAccessToken())
+                .formParams(params)
+                .multiPart("image", offerImage)
+                .when()
+                .post("offer")
+                .then()
+                .statusCode(200)
+                .extract().response();
+        System.out.println("Создан пре оффер");
+        return response.as(OfferDTO.class);
+    }
+
     public static OfferDTO createActiveOffer(int companyId) {
         Map<String, Object> params = new HashMap<>();
         params.put("text", "offer_text" + getUniqueNumber(5));
-        params.put("sendingTime", DateHelper.getDate(NOW + DAY * 5));
-        params.put("timeStart", DateHelper.getDate(NOW + DAY * 5));
-        params.put("timeEnd", DateHelper.getDate(NOW + DAY * 5));
+        params.put("sendingTime", DateHelper.getDate(NOW - HOUR));
+        params.put("timeStart", DateHelper.getDate(NOW - 4 * HOUR));
+        params.put("timeEnd", DateHelper.getDate(NOW + 4 * HOUR));
         params.put("dateEnd", DateHelper.getDate(NOW + DAY * 5));
-        params.put("dateStart", DateHelper.getDate(NOW + DAY * 5));
+        params.put("dateStart", DateHelper.getDate(NOW - DAY * 5));
         params.put("companyId", companyId);
+        params.put("percentage", 7);
+        params.put("forMan", true);
+        params.put("forWoman", true);
+        params.put("upperAgeLimit", 60);
+        params.put("lowerAgeLimit", 0);
+
+        Response response = given()
+                .spec(MULTI_DATA_SPEC)
+                .header("Authorization", "Bearer " + getAccessToken())
+                .formParams(params)
+                .multiPart("image", offerImage)
+                .when()
+                .post("offer")
+                .then()
+                .statusCode(200)
+                .extract().response();
+        System.out.println("Создан активный оффер");
+        return response.as(OfferDTO.class);
+    }
+
+    public static OfferDTO createActiveOffer() {
+        Map<String, Object> params = new HashMap<>();
+        params.put("text", "offer_text" + getUniqueNumber(5));
+        params.put("sendingTime", DateHelper.getDate(NOW - HOUR));
+        params.put("timeStart", DateHelper.getDate(NOW - 4 * HOUR));
+        params.put("timeEnd", DateHelper.getDate(NOW + 4 * HOUR));
+        params.put("dateStart", DateHelper.getDate(NOW - DAY * 5));
+        params.put("dateEnd", DateHelper.getDate(NOW + DAY * 5));
+        params.put("companyId", getRandomCompany().getId());
         params.put("percentage", 7);
         params.put("forMan", true);
         params.put("forWoman", true);
@@ -129,6 +196,23 @@ public class Offer extends TestBase {
                 .extract().response();
         System.out.println("Создан оффер с дефолтными параметрами");
         return response.as(OfferDTO.class);
+    }
+
+    public static Map<String, Object> getDefaultOfferParams() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("text", "offer_text" + getUniqueNumber(5));
+        map.put("sendingTime", DateHelper.getDate(NOW - (DAY * 10)));
+        map.put("timeStart", DateHelper.getDate(NOW - (DAY * 10)));
+        map.put("timeEnd", DateHelper.getDate(NOW + (DAY * 10)));
+        map.put("dateEnd", DateHelper.getDate(NOW + (DAY * 10)));
+        map.put("dateStart", DateHelper.getDate(NOW - (DAY * 10)));
+        map.put("companyId", getRandomCompany().getId());
+        map.put("percentage", 5);
+        map.put("forMan", true);
+        map.put("forWoman", true);
+        map.put("upperAgeLimit", 60);
+        map.put("lowerAgeLimit", 0);
+        return map;
     }
 
     public static void putOfferImage(int id, File image) {

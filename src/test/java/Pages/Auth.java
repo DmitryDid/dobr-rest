@@ -76,9 +76,10 @@ public class Auth extends TestBase {
         return response.as(AuthDTO.class);
     }
 
-    public static AuthDTO getCompanyLostPassword(String email, String token) {
+    public static void getCompanyLostPassword(String email, String token) {
         Response response = given()
                 .spec(BASE_SPEC)
+                .log().all()
                 .header("Authorization", "Bearer " + token)
                 .when()
                 .body("{\n" +
@@ -89,8 +90,7 @@ public class Auth extends TestBase {
                 .statusCode(200) // 500
                 .extract()
                 .response();
-        System.out.println(response.asString());
-        return response.as(AuthDTO.class);
+        toConsole(response);
     }
 
     public static String getToken() {
@@ -121,6 +121,7 @@ public class Auth extends TestBase {
                 .then()
                 .statusCode(200)
                 .extract().response();
+        toConsole(response);
         return response.as(AuthDTO.class);
     }
 }

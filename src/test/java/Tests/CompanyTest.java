@@ -12,8 +12,7 @@ import java.util.*;
 
 import static Pages.Company.*;
 import static Pages.ProductCategory.createProductCategory;
-import static Pages.User.addedFavoriteForUser;
-import static Pages.User.createUser;
+import static Pages.User.*;
 import static org.junit.Assert.*;
 
 public class CompanyTest extends TestBase {
@@ -168,7 +167,7 @@ public class CompanyTest extends TestBase {
         assertNotNull(getCompany.getImageId());
     }
 
-    @Ignore
+    @Ignore  //TODO: Серега говорит, что пока не используется
     @Test
     public void getCompanyNotification() {
         ArrayList<CompanyDTO> listCompany = Company.getAllCompany();
@@ -177,24 +176,19 @@ public class CompanyTest extends TestBase {
             int id = companyDTO.getId();
             Company.getCompanyNotification(id);
         }
-        fail(); //TODO: // Серега говорит, что пока не используется
+        fail();
     }
 
     @Test
     public void getCompanyTop() {
-        Integer userId = createUser().getUser().getId();
-        Integer productCategoryId = createProductCategory().getId();
-
-        addedFavoriteForUser(userId, productCategoryId);
+        int userId = getRandomUser().getId();
+        int companyId = getRandomCompany().getId();
+        addedFavoriteForUser(userId, companyId);
 
         ArrayList<TopDTO> list = Company.getCompanyTop();
 
         assertTrue(list.size() > 0);
-
-        for (TopDTO topDTO : list) {
-            assertTrue(topDTO.getCount() > 0);
-            assertTrue(topDTO.getCount() <= 3);
-        }
+        assertTrue(list.size() <= 3);
     }
 
     @Test
