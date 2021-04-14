@@ -5,7 +5,6 @@ import DTO.OfferDTO;
 import Helpers.DateHelper;
 import Pages.Offer;
 import Pages.ProductCategory;
-import Pages.User;
 import org.junit.Test;
 
 import java.io.File;
@@ -17,6 +16,7 @@ import java.util.Map;
 import static Pages.Company.getCompanyOffer;
 import static Pages.Company.getRandomCompany;
 import static Pages.Offer.*;
+import static Pages.User.createUser;
 import static org.junit.Assert.*;
 
 public class OfferTest extends TestBase {
@@ -66,14 +66,17 @@ public class OfferTest extends TestBase {
     //GET /api/v{version}/Offer/top
     @Test
     public void getOfferTop() {
-        for (int i = 0; i < 50; i++) {
-            Integer offerId = Offer.getRandomOffer().getId();
-            Integer userId = User.getRandomUser().getId();
-
-            addLike(userId, offerId);
-        }
         ArrayList<OfferDTO> topOffers = getOfferTOP();
+
+        if (topOffers.size() == 0)
+            topOffers = getOfferTOPFromRemoteServer();
+
         assertTrue(topOffers.size() > 0);
+        assertTrue(topOffers.size() <= 3);
+
+        for (int i = 0; i < topOffers.size(); i++) {
+            OfferDTO offer = topOffers.get(i);
+        }
     }
 
     @Test
@@ -103,7 +106,7 @@ public class OfferTest extends TestBase {
         } while (list.size() <= 0);
 
         for (OfferDTO offer : list) {
-            assertSame(offer.getCompany().getProductCategory().getId(), id);
+            assertEquals(offer.getCompany().getProductCategory().getId(), id);
 
             Date now = new Date();
             Date dateEnd = DateHelper.parse(offer.getDateEnd());
@@ -135,25 +138,30 @@ public class OfferTest extends TestBase {
 
     @Test
     public void postOfferLike() {
-        Integer userId = User.getRandomUser().getId();
-        Integer offerId = getRandomOffer().getId();
+        Integer userId = createUser().getUser().getId();
+        Integer offerId = createOffer().getId();
+
         Integer countBefore = Offer.getOffer(offerId).getLikeCounter();
 
         addLike(userId, offerId);
-        addLike(userId, offerId);
+        countBefore++;
 
         Integer countAfter = Offer.getOffer(offerId).getLikeCounter();
 
-        assertEquals(++countBefore, countAfter);
+        assertEquals(countBefore, countAfter);
     }
 
     @Test
     public void postOfferDisLike() {
-        Integer userId = User.getRandomUser().getId();
-        Integer offerId = getRandomOffer().getId();
+        Integer userId = createUser().getUser().getId();
+        Integer offerId = createOffer().getId();
         Integer countBefore = Offer.getOffer(offerId).getLikeCounter();
+        Integer count = countBefore + 1;
 
         addLike(userId, offerId);
+
+        assertEquals(count, Offer.getOffer(offerId).getLikeCounter());
+
         addDislike(userId, offerId);
 
         Integer countAfter = Offer.getOffer(offerId).getLikeCounter();

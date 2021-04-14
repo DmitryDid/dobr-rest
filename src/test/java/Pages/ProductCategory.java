@@ -69,7 +69,7 @@ public class ProductCategory extends TestBase {
         return response.as(ProductCategoryDTO.class);
     }
 
-    public static Response getAllProductCategory() {
+    public static ArrayList<ProductCategoryDTO> getAllProductCategory() {
         Response response = given()
                 .spec(BASE_SPEC)
                 .header("Authorization", "Bearer " + getAccessToken())
@@ -78,7 +78,15 @@ public class ProductCategory extends TestBase {
                 .then()
                 .statusCode(200)
                 .extract().response();
-        return response;
+        return getListProductCategory(response);
+    }
+
+    public static ProductCategoryDTO getRandomProdCat() {
+        ArrayList<ProductCategoryDTO> list = ProductCategory.getAllProductCategory();
+        int countCompany = list.size();
+        int index = (int) (Math.random() * (countCompany - 1));
+        if (index <= 0) index = 0;
+        return list.get(index);
     }
 
     public static ArrayList<ProductCategoryDTO> getListProductCategory(Response response) {
@@ -91,7 +99,7 @@ public class ProductCategory extends TestBase {
     }
 
     public static int getCountProductCategory() {
-        return getListProductCategory(getAllProductCategory()).size();
+        return getAllProductCategory().size();
     }
 
     public static ProductCategoryDTO getProductCategory(int id) {
@@ -129,12 +137,5 @@ public class ProductCategory extends TestBase {
                 .statusCode(200)
                 .extract().response();
         return response;
-    }
-
-    public static ProductCategoryDTO getRandomProdCat() {
-        ArrayList<ProductCategoryDTO> list = getListProductCategory(getAllProductCategory());
-        int index = (int) (Math.random() * list.size());
-        int id = list.get(index).getId();
-        return getProductCategory(id);
     }
 }

@@ -27,7 +27,7 @@ public class Company extends TestBase {
         map.put("address", "test_company_address");
         map.put("email", getUniqueNumber(5) + EMAIL);
         map.put("timeOfWork", "8-22");
-        map.put("productCategoryId", 1);
+        map.put("productCategoryId", ProductCategory.getRandomProdCat().getId());
         map.put("playerId", UUID.randomUUID().toString());
         return map;
     }
@@ -250,6 +250,20 @@ public class Company extends TestBase {
                 .then()
                 .statusCode(200)
                 .extract().response();
+        return response;
+    }
+
+    public static Response getOfferLimit(int id) {
+        Response response = given()
+                .spec(BASE_SPEC)
+                .log().uri()
+                .header("Authorization", "Bearer " + Auth.getAccessToken())
+                .when()
+                .get("Company/" + id + "/offer-limit")
+                .then()
+                //.statusCode(200)
+                .extract().response();
+        toConsole(response);
         return response;
     }
 

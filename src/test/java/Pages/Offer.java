@@ -29,11 +29,11 @@ public class Offer extends TestBase {
     public static Map<String, Object> getDefaultOfferParams() {
         Map<String, Object> map = new HashMap<>();
         map.put("text", "offer_text" + getUniqueNumber(5));
-        map.put("sendingTime", DateHelper.getDate(NOW));
-        map.put("timeStart", DateHelper.getDate(NOW + DAY));
+        map.put("sendingTime", DateHelper.getDate(NOW - (DAY * 10)));
+        map.put("timeStart", DateHelper.getDate(NOW - (DAY * 10)));
         map.put("timeEnd", DateHelper.getDate(NOW + (DAY * 10)));
         map.put("dateEnd", DateHelper.getDate(NOW + (DAY * 10)));
-        map.put("dateStart", DateHelper.getDate(NOW + DAY));
+        map.put("dateStart", DateHelper.getDate(NOW - (DAY * 10)));
         map.put("companyId", Company.getRandomCompany().getId());
         map.put("percentage", 5);
         map.put("forMan", true);
@@ -206,6 +206,20 @@ public class Offer extends TestBase {
                 .statusCode(200)
                 .extract()
                 .response();
+        return getListOffer(response);
+    }
+
+    public static ArrayList<OfferDTO> getOfferTOPFromRemoteServer() {
+        Response response = given()
+                .spec(SERVER_SPEC)
+                .header("Authorization", "Bearer " + Auth.getRemoteToken())
+                .when()
+                .get("Offer/top")
+                .then()
+                .statusCode(200)
+                .extract()
+                .response();
+        System.out.println("Получение данных с удаленного сервера " + REMOTE_SERVER_URL);
         return getListOffer(response);
     }
 

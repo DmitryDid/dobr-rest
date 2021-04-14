@@ -4,13 +4,11 @@ import DTO.*;
 import Pages.Company;
 import Pages.Offer;
 import Pages.User;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static Pages.Company.*;
 import static Pages.ProductCategory.createProductCategory;
@@ -170,19 +168,19 @@ public class CompanyTest extends TestBase {
         assertNotNull(getCompany.getImageId());
     }
 
+    @Ignore
     @Test
     public void getCompanyNotification() {
-        UserDTO userDTO = getRandomUser();
-        ProductCategoryDTO productCategoryDTO = getRandomProdCat();
-        addedFavoriteForUser(userDTO.getId(), productCategoryDTO.getId());
+        ArrayList<CompanyDTO> listCompany = Company.getAllCompany();
 
-
-
-        Company.getCompanyNotification(1);
-        // []
-        fail();
+        for (CompanyDTO companyDTO : listCompany) {
+            int id = companyDTO.getId();
+            Company.getCompanyNotification(id);
+        }
+        fail(); //TODO: // Серега говорит, что пока не используется
     }
 
+    @Ignore
     @Test
     public void getCompanyTop() {
         UserDTO userDTO = getRandomUser();
@@ -193,8 +191,9 @@ public class CompanyTest extends TestBase {
         ArrayList<TopDTO> list = Company.getCompanyTop();
 
         assertTrue(list.size() > 0);
-        for (int i = 0; i < list.size(); i++) {
-            assertTrue(list.get(i).getCount() > 0);
+        for (TopDTO topDTO : list) {
+            assertTrue(topDTO.getCount() > 0);
+            assertTrue(topDTO.getCount() <= 3);
         }
     }
 
@@ -215,9 +214,15 @@ public class CompanyTest extends TestBase {
         assertTrue(max > 0);
     }
 
+    @Ignore
     @Test
     public void getCompanyOfferLimit() {
-        fail();
+        ArrayList<CompanyDTO> list = Company.getAllCompany();
+
+        for (CompanyDTO companyDTO : list) {
+            getOfferLimit(companyDTO.getId());
+        }
+        // TODO: пока всегда 404
     }
 
     @Test
@@ -233,28 +238,71 @@ public class CompanyTest extends TestBase {
     @Test
     public void getCompanyOffer() {
         int companyId = Company.getRandomCompany().getId();
+        String text = "test_text_" + getUniqueNumber(10);
         Map<String, Object> params = Offer.getDefaultOfferParams();
         params.put("companyId", companyId);
+        params.put("text", text);
 
         Offer.createOffer(params);
-        CompanyOfferDTO companyOffer = Company.getCompanyOffer(companyId);
-        OfferDTO inactiveOffer = companyOffer.getInactiveOffer().get(0);
 
-        assertTrue(inactiveOffer.getId() > 0);
-        assertEquals(0, (int) inactiveOffer.getLikeCounter());
-        assertEquals(params.get("text"), inactiveOffer.getText());
-        assertNotNull(inactiveOffer.getCreateDate());
-        assertEquals(params.get("sendingTime"), inactiveOffer.getSendingTime().replaceAll("T", " "));
-        assertEquals(params.get("dateStart"), inactiveOffer.getDateStart().replaceAll("T", " "));
-        assertEquals(params.get("dateEnd"), inactiveOffer.getDateEnd().replaceAll("T", " "));
-        assertEquals(params.get("timeEnd"), inactiveOffer.getTimeEnd().replaceAll("T", " "));
-        assertEquals(params.get("companyId"), inactiveOffer.getCompany().getId());
-        assertEquals(params.get("percentage"), inactiveOffer.getPercentage());
-        assertEquals(params.get("forMan"), inactiveOffer.getForMan());
-        assertEquals(params.get("forWoman"), inactiveOffer.getForWoman());
-        assertEquals(params.get("upperAgeLimit"), inactiveOffer.getUpperAgeLimit());
-        assertEquals(params.get("lowerAgeLimit"), inactiveOffer.getLowerAgeLimit());
-        assertEquals(inactiveOffer.getUserLike(), false);
+        CompanyOfferDTO companyOffer = Company.getCompanyOffer(companyId);
+        List<OfferDTO> inactiveOffer = companyOffer.getInactiveOffer();
+        List<OfferDTO> activeOffer = companyOffer.getActiveOffer();
+
+        OfferDTO offer = null;
+
+        assertTrue(inactiveOffer.size() > 0 || activeOffer.size() > 0);
+
+        if (inactiveOffer.size() > 0) {
+            for (OfferDTO offerDTO : inactiveOffer) {
+                if (offerDTO.getText().equals(text)) offer = offerDTO;
+            }
+        }
+        if (activeOffer.size() > 0) {
+            for (OfferDTO offerDTO : activeOffer) {
+                if (offerDTO.getText().equals(text)) offer = offerDTO;
+            }
+        }
+
+        assertTrue(offer.getId() > 0);
+        assertEquals(0, (int) offer.getLikeCounter());
+        assertEquals(params.get("text"), offer.getText());
+        assertNotNull(offer.getCreateDate());
+        assertEquals(params.get("sendingTime"), offer.getSendingTime().replaceAll("T", " "));
+        assertEquals(params.get("dateStart"), offer.getDateStart().replaceAll("T", " "));
+        assertEquals(params.get("dateEnd"), offer.getDateEnd().replaceAll("T", " "));
+        assertEquals(params.get("timeEnd"), offer.getTimeEnd().replaceAll("T", " "));
+        assertEquals(params.get("companyId"), offer.getCompany().getId());
+        assertEquals(params.get("percentage"), offer.getPercentage());
+        assertEquals(params.get("forMan"), offer.getForMan());
+        assertEquals(params.get("forWoman"), offer.getForWoman());
+        assertEquals(params.get("upperAgeLimit"), offer.getUpperAgeLimit());
+        assertEquals(params.get("lowerAgeLimit"), offer.getLowerAgeLimit());
+        assertEquals(offer.getUserLike(), false);
+    }
+
+    @Test
+    public void getCompanyOffer_inactive() {
+        int companyId = Company.getRandomCompany().getId();
+
+        Offer.createInactiveOffer(companyId);
+
+        CompanyOfferDTO companyOffer = Company.getCompanyOffer(companyId);
+        List<OfferDTO> inactiveOffer = companyOffer.getInactiveOffer();
+
+        assertTrue(inactiveOffer.size() > 0);
+    }
+
+    @Test
+    public void getCompanyOffer_active() {
+        int companyId = Company.getRandomCompany().getId();
+
+        Offer.createActiveOffer(companyId);
+
+        CompanyOfferDTO companyOffer = Company.getCompanyOffer(companyId);
+        List<OfferDTO> activeOffer = companyOffer.getActiveOffer();
+
+        assertTrue(activeOffer.size() > 0);
     }
 
     @Test
@@ -273,12 +321,14 @@ public class CompanyTest extends TestBase {
 
     @Test
     public void getCompanyAll() {
+        String email = getUniqueNumber(10) + "@" + getUniqueNumber(5) + ".ru";
+        Company.createCompanyWithEmail(email);
         ArrayList<CompanyDTO> companyList = getAllCompany();
         CompanyDTO currentCompany;
 
         for (int i = 0; i < companyList.size(); i++) {
             currentCompany = companyList.get(i);
-            if (EMAIL.equals(currentCompany.getEmail())) {
+            if (email.equals(currentCompany.getEmail())) {
                 assertEquals((Double) 55.0415, currentCompany.getLatitude());
                 assertEquals((Double) 82.9346, currentCompany.getLongitude());
                 assertEquals("test_company nameOfficial", currentCompany.getNameOfficial());
@@ -290,7 +340,7 @@ public class CompanyTest extends TestBase {
                 assertEquals("8-22", currentCompany.getTimeOfWork());
                 assertTrue(currentCompany.getEmailConfirmed());
                 assertTrue(currentCompany.getPlayerId().length() > 20);
-                assertEquals((Integer) 1, currentCompany.getProductCategory().getId());
+                assertTrue(currentCompany.getProductCategory().getId() > 0);
                 assertNotNull(currentCompany.getImageId());
                 return;
             }

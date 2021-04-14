@@ -47,7 +47,7 @@ public class ProductCategoryTest extends TestBase {
 
     @Test
     public void getProductCategoryAll() {
-        ArrayList<ProductCategoryDTO> list = ProductCategory.getListProductCategory(getAllProductCategory());
+        ArrayList<ProductCategoryDTO> list = ProductCategory.getAllProductCategory();
         assertTrue(list.size() > 0);
 
         for (Object o : list) {

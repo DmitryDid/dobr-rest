@@ -141,7 +141,6 @@ public class User extends TestBase {
                 .header("Authorization", "Bearer " + getToken())
                 .when()
                 .put("User/" + userId + "/favorite/" + companyId);
-        toConsole(response);
         Assert.assertEquals(200, response.getStatusCode());
         System.out.printf("Добавлена связка пользователя %s и компании %s%n", userId, companyId);
     }

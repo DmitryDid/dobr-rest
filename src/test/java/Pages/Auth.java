@@ -38,6 +38,17 @@ public class Auth extends TestBase {
         return response.as(AuthDTO.class);
     }
 
+    public static AuthDTO getTokenUserByPlayerIdRemote(String id) {
+        Response response = given()
+                .spec(SERVER_SPEC)
+                .when()
+                .post("Auth/token/user/" + id)
+                .then()
+                .extract()
+                .response();
+        return response.as(AuthDTO.class);
+    }
+
     public static AuthDTO getTokenCompanyByUsernameAndPassword(String username, String password) {
         Response response = given()
                 .spec(BASE_SPEC)
@@ -90,6 +101,10 @@ public class Auth extends TestBase {
             String playerId = User.createUser(PLAYER_ID).getUser().getPlayerId();
             return Auth.getTokenUserByPlayerId(playerId).getAccessToken();
         }
+    }
+
+    public static String getRemoteToken() {
+        return Auth.getTokenUserByPlayerIdRemote(PLAYER_ID).getAccessToken();
     }
 
     public static AuthDTO getCompanyRestorePassword(String email, String password, int code) {
