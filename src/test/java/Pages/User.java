@@ -192,4 +192,44 @@ public class User extends TestBase {
                 .response();
         return Company.getListStories(response);
     }
+
+    public static String getUserImage(int id) {
+        return given()
+                .spec(BASE_SPEC)
+                .header("Authorization", "Bearer " + getToken())
+                .when()
+                .get("User/" + id + "/image")
+                .then()
+                .statusCode(200)
+                .extract()
+                .response()
+                .asString();
+    }
+
+    public static UserDTO putUserImage(int id, File image) {
+        Response response = given()
+                .spec(MULTI_DATA_SPEC)
+                .header("Authorization", "Bearer " + getAccessToken())
+                .multiPart("image", image)
+                .when()
+                .put("User/" + id + "/image")
+                .then()
+                .statusCode(200)
+                .extract().response();
+        return response.as(UserDTO.class);
+    }
+
+    public static String getUserFavoriteOffer(int id) {
+        return given()
+                .spec(BASE_SPEC)
+                .log().all()
+                .header("Authorization", "Bearer " + getToken())
+                .when()
+                .get("User/" + id + "/favarite-offer")
+                .then()
+                .statusCode(200)
+                .extract()
+                .response()
+                .asString();
+    }
 }

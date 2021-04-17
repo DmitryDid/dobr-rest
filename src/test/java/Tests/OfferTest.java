@@ -13,8 +13,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import static Pages.Company.getCompanyOffer;
-import static Pages.Company.getRandomCompany;
+import static Pages.Company.*;
 import static Pages.Offer.*;
 import static Pages.User.createUser;
 import static Pages.User.getRandomUser;
@@ -25,21 +24,21 @@ public class OfferTest extends TestBase {
     @Test
     public void postOffer() {
         Map<String, Object> params = getDefaultOfferParams();
-        OfferDTO offerDTO = Offer.createOffer(params);
+        OfferDTO offer = createOffer(params);
 
-        assertEquals(params.get("text"), offerDTO.getText());
-        assertEquals(params.get("sendingTime"), offerDTO.getSendingTime().replaceAll("T", " "));
-        assertEquals(params.get("timeStart"), offerDTO.getTimeStart().replaceAll("T", " "));
-        assertEquals(params.get("timeEnd"), offerDTO.getTimeEnd().replaceAll("T", " "));
-        assertEquals(params.get("dateEnd"), offerDTO.getDateEnd().replaceAll("T", " "));
-        assertEquals(params.get("dateStart"), offerDTO.getDateStart().replaceAll("T", " "));
-        assertEquals(params.get("companyId"), offerDTO.getCompany().getId());
-        assertEquals(params.get("percentage"), offerDTO.getPercentage());
-        assertEquals(params.get("forMan"), offerDTO.getForMan());
-        assertEquals(params.get("forWoman"), offerDTO.getForWoman());
-        assertEquals(params.get("upperAgeLimit"), offerDTO.getUpperAgeLimit());
-        assertEquals(params.get("lowerAgeLimit"), offerDTO.getLowerAgeLimit());
-        assertTrue(offerDTO.getImageId() > 0);
+        assertEquals(params.get("text"), offer.getText());
+        assertEquals(params.get("sendingTime"), offer.getSendingTime().replaceAll("T", " "));
+        assertEquals(params.get("timeStart"), offer.getTimeStart().replaceAll("T", " "));
+        assertEquals(params.get("timeEnd"), offer.getTimeEnd().replaceAll("T", " "));
+        assertEquals(params.get("dateEnd"), offer.getDateEnd().replaceAll("T", " "));
+        assertEquals(params.get("dateStart"), offer.getDateStart().replaceAll("T", " "));
+        assertEquals(params.get("companyId"), offer.getCompany().getId());
+        assertEquals(params.get("percentage"), offer.getPercentage());
+        assertEquals(params.get("forMan"), offer.getForMan());
+        assertEquals(params.get("forWoman"), offer.getForWoman());
+        assertEquals(params.get("upperAgeLimit"), offer.getUpperAgeLimit());
+        assertEquals(params.get("lowerAgeLimit"), offer.getLowerAgeLimit());
+        assertTrue(offer.getImageId() > 0);
     }
 
     @Test
@@ -82,7 +81,7 @@ public class OfferTest extends TestBase {
 
     @Test
     public void getAllOffer() {
-        Offer.createOffer();
+        createOffer();
 
         ArrayList<OfferDTO> list = Offer.getAllOffer();
 
@@ -132,7 +131,7 @@ public class OfferTest extends TestBase {
         File image = new File("src/test/java/resources/newOffer.jpeg");
 
         putOfferImage(id, image);
-        Integer newImageId = Offer.getOffer(id).getImageId();
+        Integer newImageId = getOffer(id).getImageId();
 
         assertNotEquals(offer.getImageId(), newImageId);
     }
@@ -142,12 +141,12 @@ public class OfferTest extends TestBase {
         Integer userId = createUser().getUser().getId();
         Integer offerId = createOffer().getId();
 
-        Integer countBefore = Offer.getOffer(offerId).getLikeCounter();
+        Integer countBefore = getOffer(offerId).getLikeCounter();
 
         addLike(userId, offerId);
         countBefore++;
 
-        Integer countAfter = Offer.getOffer(offerId).getLikeCounter();
+        Integer countAfter = getOffer(offerId).getLikeCounter();
 
         assertEquals(countBefore, countAfter);
     }
@@ -157,13 +156,13 @@ public class OfferTest extends TestBase {
         Integer userId = getRandomUser().getId();
         Integer offerId = getRandomOffer().getId();
 
-        Integer countBefore = Offer.getOffer(offerId).getLikeCounter();
+        Integer countBefore = getOffer(offerId).getLikeCounter();
 
         addLike(userId, offerId);
         addLike(userId, offerId);
         countBefore++;
 
-        Integer countAfter = Offer.getOffer(offerId).getLikeCounter();
+        Integer countAfter = getOffer(offerId).getLikeCounter();
 
         assertEquals(countBefore, countAfter);
     }
@@ -172,16 +171,16 @@ public class OfferTest extends TestBase {
     public void postOfferDisLike() {
         Integer userId = createUser().getUser().getId();
         Integer offerId = createOffer().getId();
-        Integer countBefore = Offer.getOffer(offerId).getLikeCounter();
+        Integer countBefore = getOffer(offerId).getLikeCounter();
         Integer count = countBefore + 1;
 
         addLike(userId, offerId);
 
-        assertEquals(count, Offer.getOffer(offerId).getLikeCounter());
+        assertEquals(count, getOffer(offerId).getLikeCounter());
 
         addDislike(userId, offerId);
 
-        Integer countAfter = Offer.getOffer(offerId).getLikeCounter();
+        Integer countAfter = getOffer(offerId).getLikeCounter();
 
         assertEquals(countBefore, countAfter);
     }

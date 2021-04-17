@@ -22,6 +22,7 @@ public class TestBase extends Base {
 
     protected static String REMOTE_SERVER_URL = "https://bdobr.ru/api/v1/";
     public static final String LOCAL_SERVER_URL = "http://192.168.1.232/api/v1/";
+    /*public static final String LOCAL_SERVER_URL = "http://192.168.43.135/api/v1/";*/
     /*public static final String BASE_URL = "http://localhost:5003/api/v1/";*/
     public static final String PLAYER_ID = "aee5c185-29b8-4d4c-a4bf-d7641aefc556";
     public static final String EMAIL = "nsk_dem@mail.ru";

@@ -208,15 +208,22 @@ public class CompanyTest extends TestBase {
         assertTrue(max > 0);
     }
 
-    @Ignore
     @Test
     public void getCompanyOfferLimit() {
         ArrayList<CompanyDTO> list = Company.getAllCompany();
 
         for (CompanyDTO companyDTO : list) {
-            getOfferLimit(companyDTO.getId());
+            StatusDTO status = getOfferLimit(companyDTO.getId());
+            if (status.getStatus().equals("SUCCESS")){
+                assertTrue(status.getMessage().isEmpty());
+                continue;
+            }
+            if (status.getStatus().equals("COMPANY_ERROR")){
+                assertFalse(status.getMessage().isEmpty());
+                continue;
+            }
+            fail();
         }
-        // TODO: пока всегда 404
     }
 
     @Test

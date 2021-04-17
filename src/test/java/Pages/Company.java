@@ -253,18 +253,16 @@ public class Company extends TestBase {
         return response;
     }
 
-    public static Response getOfferLimit(int id) {
+    public static StatusDTO getOfferLimit(int id) {
         Response response = given()
                 .spec(BASE_SPEC)
-                .log().uri()
                 .header("Authorization", "Bearer " + Auth.getAccessToken())
                 .when()
                 .get("Company/" + id + "/offer-limit")
                 .then()
                 //.statusCode(200)
                 .extract().response();
-        toConsole(response);
-        return response;
+        return response.as(StatusDTO.class);
     }
 
     public static ArrayList<CompanyDTO> getListCompanyCategory(int id) {

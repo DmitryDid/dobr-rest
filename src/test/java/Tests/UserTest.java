@@ -4,16 +4,14 @@ import DTO.AuthDTO;
 import DTO.CompanyDTO;
 import DTO.CompanyOfferDTO;
 import DTO.UserDTO;
-import Pages.Offer;
+import Pages.Company;
 import Pages.User;
 import org.junit.Test;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
+import static Pages.Company.createCompany;
 import static Pages.Company.getRandomCompany;
 import static Pages.User.*;
 import static org.junit.Assert.*;
@@ -78,7 +76,6 @@ public class UserTest extends TestBase {
         assertTrue(updateParams.get("longitude").toString().startsWith(updated.getUser().getLongitude().toString()));
     }
 
-    // GET /api/v{version}/User/{id}/offer
     @Test
     public void getUserOffer() {
         int id = User.getRandomUser().getId();
@@ -100,7 +97,22 @@ public class UserTest extends TestBase {
     // GET /api/v{version}/User/{id}/favarite-offer
     @Test
     public void getUserFavoriteOffer() {
-        fail();
+        int userId = User.getRandomUser().getId();
+        int companyId = Company.getRandomCompany().getId();
+        List<CompanyDTO> companyList = Company.getAllCompany();
+
+        int favoriteNumber = Integer.MIN_VALUE;
+
+        for (CompanyDTO companyDTO : companyList) {
+            int currentFavoriteNumber = Company.getCompanyNumberOfFavorites(companyDTO.getId());
+            favoriteNumber = Math.max(favoriteNumber, currentFavoriteNumber);
+            if (favoriteNumber > -1) break;
+        }
+
+        User.addedFavoriteForUser(userId, companyId);
+
+        String s = User.getUserFavoriteOffer(userId);
+        System.out.println(s);
     }
 
     @Test
@@ -160,21 +172,28 @@ public class UserTest extends TestBase {
         assertTrue(user.getAccessToken().length() > 100);
     }
 
-    // GET /api/v{version}/User/{id}/image
     @Test
     public void getUserImage() {
-        fail();
+        int id = User.getRandomUser().getId();
+        String response = User.getUserImage(id);
+        assertTrue(response.contains("JPEG") || response.contains("JFIF"));
     }
 
-    // PUT /api/v{version}/User/{id}/image
     @Test
     public void putUserImage() {
-        fail();
+        UserDTO user = User.getRandomUser();
+        int oldImageId = user.getImageId();
+        int id = user.getId();
+        File image = new File("src/test/java/resources/newUserImage.jpeg");
+
+        int newImageId = User.putUserImage(id, image)
+                .getImageId();
+
+        assertTrue(newImageId > oldImageId);
     }
 
     @Test
     public void getUserStories() {
-        int id = getRandomUser().getId();
         ArrayList<UserDTO> listUser = User.getAllUser();
 
         int count = 0;
@@ -217,8 +236,8 @@ public class UserTest extends TestBase {
 
     @Test
     public void deleteUserFavorite() {
-        Integer userId = getRandomUser().getId();
-        Integer companyId = getRandomCompany().getId();
+        Integer userId = createUser().getUser().getId();
+        Integer companyId = createCompany().getCompany().getId();
 
         addedFavoriteForUser(userId, companyId);
         ArrayList<CompanyDTO> listFavorite = User.getUserFavorite(userId);
