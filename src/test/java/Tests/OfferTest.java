@@ -63,7 +63,6 @@ public class OfferTest extends TestBase {
         assertTrue(offer.getImageId() > 0);
     }
 
-    //GET /api/v{version}/Offer/top
     @Test
     public void getOfferTop() {
         ArrayList<OfferDTO> topOffers = getOfferTOP();

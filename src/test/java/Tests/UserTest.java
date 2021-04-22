@@ -78,9 +78,8 @@ public class UserTest extends TestBase {
 
     @Test
     public void getUserOffer() {
-        int id = User.getRandomUser().getId();
+        int id = getRandomUser().getId();
         CompanyOfferDTO companyOffer = User.getUserOffer(id);
-        System.out.println(id);
 
         assertTrue(companyOffer.getPreOffer().size() > 0);
         assertTrue(companyOffer.getInactiveOffer().size() > 0);
@@ -97,7 +96,7 @@ public class UserTest extends TestBase {
     // GET /api/v{version}/User/{id}/favarite-offer
     @Test
     public void getUserFavoriteOffer() {
-        int userId = User.getRandomUser().getId();
+        int userId = getRandomUser().getId();
         int companyId = Company.getRandomCompany().getId();
         List<CompanyDTO> companyList = Company.getAllCompany();
 
@@ -109,8 +108,9 @@ public class UserTest extends TestBase {
             if (favoriteNumber > -1) break;
         }
 
-        User.addedFavoriteForUser(userId, companyId);
-
+        addedFavoriteForUser(userId, companyId);
+        System.out.println(userId);
+        System.out.println(companyId);
         String s = User.getUserFavoriteOffer(userId);
         System.out.println(s);
     }
@@ -174,14 +174,14 @@ public class UserTest extends TestBase {
 
     @Test
     public void getUserImage() {
-        int id = User.getRandomUser().getId();
+        int id = getRandomUser().getId();
         String response = User.getUserImage(id);
         assertTrue(response.contains("JPEG") || response.contains("JFIF"));
     }
 
     @Test
     public void putUserImage() {
-        UserDTO user = User.getRandomUser();
+        UserDTO user = getRandomUser();
         int oldImageId = user.getImageId();
         int id = user.getId();
         File image = new File("src/test/java/resources/newUserImage.jpeg");
@@ -194,11 +194,11 @@ public class UserTest extends TestBase {
 
     @Test
     public void getUserStories() {
-        ArrayList<UserDTO> listUser = User.getAllUser();
+        ArrayList<UserDTO> listUser = getAllUser();
 
         int count = 0;
         for (UserDTO currentUser : listUser) {
-            if (User.getStories(currentUser.getId()).size() > 0) count++;
+            if (getStories(currentUser.getId()).size() > 0) count++;
         }
         assertTrue(count > 0);
     }

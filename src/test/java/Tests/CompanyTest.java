@@ -1,6 +1,7 @@
 package Tests;
 
 import DTO.*;
+import Helpers.DateHelper;
 import Pages.Company;
 import Pages.Offer;
 import Pages.User;
@@ -34,12 +35,14 @@ public class CompanyTest extends TestBase {
         assertTrue(Long.parseLong(companyDTO.getInn()) >= 0);
         assertEquals("test_company_password", companyDTO.getPassword());
         assertEquals("test_company_address", companyDTO.getAddress());
-        assertEquals("8-22", companyDTO.getTimeOfWork());
         assertEquals("Asia/Novosibirsk", companyDTO.getTimeZone());
         assertTrue(companyDTO.getEmailConfirmed());
         assertTrue(companyDTO.getPlayerId().length() > 20);
         assertTrue(companyDTO.getProductCategory().getId() > 0);
         assertTrue(companyDTO.getImageId() > 0);
+
+        assertNotNull(DateHelper.parse(companyDTO.getTimeOpen()));
+        assertNotNull(DateHelper.parse(companyDTO.getTimeClose()));
     }
 
     @Test
@@ -115,7 +118,6 @@ public class CompanyTest extends TestBase {
         assertEquals(map.get("representative"), getCompanyDTO.getRepresentative());
         assertEquals(map.get("password"), getCompanyDTO.getPassword());
         assertEquals(map.get("address"), getCompanyDTO.getAddress());
-        assertEquals(map.get("timeOfWork"), getCompanyDTO.getTimeOfWork());
         assertEquals(map.get("playerId"), getCompanyDTO.getPlayerId());
         assertEquals(map.get("productCategoryId"), getCompanyDTO.getProductCategory().getId());
         assertEquals(map.get("phone"), getCompanyDTO.getPhone());
@@ -124,6 +126,9 @@ public class CompanyTest extends TestBase {
         assertTrue(getCompanyDTO.getEmailConfirmed());
         assertNotEquals(imageId, getCompanyDTO.getImageId());
         assertEquals(authDTO.getCompany().getNameOfficial(), getCompanyDTO.getNameOfficial());
+
+        assertNotNull(DateHelper.parse(getCompanyDTO.getTimeOpen()));
+        assertNotNull(DateHelper.parse(getCompanyDTO.getTimeClose()));
     }
 
     @Test
@@ -156,7 +161,6 @@ public class CompanyTest extends TestBase {
         assertEquals(map.get("representative"), getCompany.getRepresentative());
         assertEquals(map.get("password"), getCompany.getPassword());
         assertEquals(map.get("address"), getCompany.getAddress());
-        assertEquals(map.get("timeOfWork"), getCompany.getTimeOfWork());
         assertEquals(map.get("playerId"), getCompany.getPlayerId());
         assertEquals(map.get("productCategoryId"), getCompany.getProductCategory().getId());
         assertEquals(map.get("phone"), getCompany.getPhone());
@@ -165,6 +169,9 @@ public class CompanyTest extends TestBase {
         assertEquals("Asia/Novosibirsk", getCompany.getTimeZone());
         assertTrue(getCompany.getEmailConfirmed());
         assertNotNull(getCompany.getImageId());
+
+        assertNotNull(DateHelper.parse(getCompany.getTimeOpen()));
+        assertNotNull(DateHelper.parse(getCompany.getTimeClose()));
     }
 
     @Ignore  //TODO: Серега говорит, что пока не используется
@@ -214,11 +221,11 @@ public class CompanyTest extends TestBase {
 
         for (CompanyDTO companyDTO : list) {
             StatusDTO status = getOfferLimit(companyDTO.getId());
-            if (status.getStatus().equals("SUCCESS")){
+            if (status.getStatus().equals("SUCCESS")) {
                 assertTrue(status.getMessage().isEmpty());
                 continue;
             }
-            if (status.getStatus().equals("COMPANY_ERROR")){
+            if (status.getStatus().equals("COMPANY_ERROR")) {
                 assertFalse(status.getMessage().isEmpty());
                 continue;
             }
@@ -338,11 +345,13 @@ public class CompanyTest extends TestBase {
                 assertTrue(Long.parseLong(currentCompany.getInn()) >= 0);
                 assertEquals("test_company_password", currentCompany.getPassword());
                 assertEquals("test_company_address", currentCompany.getAddress());
-                assertEquals("8-22", currentCompany.getTimeOfWork());
                 assertTrue(currentCompany.getEmailConfirmed());
                 assertTrue(currentCompany.getPlayerId().length() > 20);
                 assertTrue(currentCompany.getProductCategory().getId() > 0);
                 assertNotNull(currentCompany.getImageId());
+
+                assertNotNull(DateHelper.parse(currentCompany.getTimeOpen()));
+                assertNotNull(DateHelper.parse(currentCompany.getTimeClose()));
                 return;
             }
         }

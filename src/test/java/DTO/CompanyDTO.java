@@ -56,9 +56,12 @@ public class CompanyDTO {
     @JsonProperty("representative")
     String representative;
 
-    @JsonProperty("timeOfWork")
-    String timeOfWork;
-
     @JsonProperty("timeZone")
     String timeZone;
+
+    @JsonProperty("timeOpen")
+    String timeOpen;
+
+    @JsonProperty("timeClose")
+    String timeClose;
 }

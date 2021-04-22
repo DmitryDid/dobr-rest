@@ -1,6 +1,7 @@
 package Pages;
 
 import DTO.*;
+import Helpers.DateHelper;
 import Tests.TestBase;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -10,6 +11,8 @@ import io.restassured.response.Response;
 import java.io.File;
 import java.util.*;
 
+import static Helpers.DateHelper.HOUR;
+import static Helpers.DateHelper.NOW;
 import static io.restassured.RestAssured.given;
 
 public class Company extends TestBase {
@@ -26,7 +29,9 @@ public class Company extends TestBase {
         map.put("password", "test_company_password");
         map.put("address", "test_company_address");
         map.put("email", getUniqueNumber(5) + EMAIL);
-        map.put("timeOfWork", "8-22");
+        //map.put("timeOfWork", "8-22");
+        map.put("timeOpen", DateHelper.getDate(NOW - 5 * HOUR));
+        map.put("timeClose", DateHelper.getDate(NOW + 5 * HOUR));
         map.put("productCategoryId", ProductCategory.getRandomProdCat().getId());
         map.put("playerId", UUID.randomUUID().toString());
         return map;
@@ -156,6 +161,7 @@ public class Company extends TestBase {
     public static Response deleteCompany(int id, int statusCode) {
         Response response = given()
                 .spec(BASE_SPEC)
+                .log().all()
                 .header("Authorization", "Bearer " + Auth.getAccessToken())
                 .when()
                 .delete("Company/" + id)
