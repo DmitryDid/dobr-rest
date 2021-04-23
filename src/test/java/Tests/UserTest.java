@@ -6,6 +6,7 @@ import DTO.CompanyOfferDTO;
 import DTO.UserDTO;
 import Pages.Company;
 import Pages.User;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -88,6 +89,7 @@ public class UserTest extends TestBase {
     }
 
     // GET /api/v{version}/User/{id}/company/{companyId}/offer
+    @Ignore
     @Test
     public void getUserCompanyOffer() {
         fail();
@@ -105,7 +107,6 @@ public class UserTest extends TestBase {
         for (CompanyDTO companyDTO : companyList) {
             int currentFavoriteNumber = Company.getCompanyNumberOfFavorites(companyDTO.getId());
             favoriteNumber = Math.max(favoriteNumber, currentFavoriteNumber);
-            if (favoriteNumber > -1) break;
         }
 
         addedFavoriteForUser(userId, companyId);
@@ -204,12 +205,14 @@ public class UserTest extends TestBase {
     }
 
     // DELETE /api/v{version}/User/{id}/stories/company/{companyId}
+    @Ignore
     @Test
     public void deleteUserStoriesCompany() {
         fail();
     }
 
     // GET /api/v{version}/User/{userId}/company/{companyId}/distance
+    @Ignore
     @Test
     public void getUserCompanyDistance() {
         fail();

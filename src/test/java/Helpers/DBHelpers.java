@@ -12,10 +12,9 @@ public class DBHelpers {
 
     public static void executeRequest(String request) {
         try (Connection con = DriverManager.getConnection(url, user, password); Statement st = con.createStatement()) {
-            ResultSet rs = st.executeQuery(request);
-            rs.next();
+            st.executeQuery(request);
         } catch (SQLException e) {
-            e.getMessage();
+            e.printStackTrace();
         }
         System.out.println("Выполнен запрос в БД:\n" + request);
         System.out.println();
@@ -26,18 +25,6 @@ public class DBHelpers {
         String request = "UPDATE company SET email_confirmed = true WHERE id = " + id + ";";
         executeRequest(request);
         System.out.println("Email компании с id = " + id + " - подтвержден.");
-    }
-
-    public static ArrayList<String> getConfirmCode() {
-        ArrayList list = new ArrayList();
-        try (Connection con = DriverManager.getConnection(url, user, password); Statement st = con.createStatement()) {
-            ResultSet rs = st.executeQuery("SELECT * FROM email_code;");
-            while (rs.next()) {
-                list.add(rs.getString("code"));
-            }
-        } catch (SQLException ignored) {
-        }
-        return list;
     }
 
     public static String getConfirmCode(String email) {

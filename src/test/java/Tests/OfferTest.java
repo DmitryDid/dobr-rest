@@ -67,8 +67,8 @@ public class OfferTest extends TestBase {
     public void getOfferTop() {
         ArrayList<OfferDTO> topOffers = getOfferTOP();
 
-        if (topOffers.size() == 0)
-            topOffers = getOfferTOPFromRemoteServer();
+       /* if (topOffers.size() == 0)
+            topOffers = getOfferTOPFromRemoteServer();*/
 
         assertTrue(topOffers.size() > 0);
         assertTrue(topOffers.size() <= 3);
