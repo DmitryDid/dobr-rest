@@ -85,7 +85,7 @@ public class ProductCategory extends TestBase {
         ArrayList<ProductCategoryDTO> list = ProductCategory.getAllProductCategory();
         int countCompany = list.size();
         int index = (int) (Math.random() * (countCompany - 1));
-        if (index <= 0) index = 0;
+        if (index < 0) index = 0;
         return list.get(index);
     }
 

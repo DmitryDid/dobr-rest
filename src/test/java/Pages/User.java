@@ -94,7 +94,7 @@ public class User extends TestBase {
         ArrayList<UserDTO> list = User.getAllUser();
         int countUsers = list.size();
         int index = (int) (Math.random() * (countUsers - 1));
-        if (index <= 0) index = 0;
+        if (index < 0) index = 0;
         return list.get(index);
     }
 

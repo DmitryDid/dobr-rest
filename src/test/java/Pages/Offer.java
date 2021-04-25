@@ -218,7 +218,7 @@ public class Offer extends TestBase {
         ArrayList<OfferDTO> list = Offer.getAllOffer();
         int countUsers = list.size();
         int index = (int) (Math.random() * (countUsers - 1));
-        if (index <= 0) index = 0;
+        if (index < 0) index = 0;
         return list.get(index);
     }
 
